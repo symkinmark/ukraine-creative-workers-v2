@@ -80,16 +80,60 @@ CREATIVE_KEYWORDS = [
 # NOTE: кримськотатарський (Crimean Tatar) is NOT in this list — they lived on
 # Ukrainian territory and were targeted by Soviet repressions. Inclusion is
 # intentional and can be reviewed in the analysis phase.
+# AUTO-EXCLUDE: Nationalities with no meaningful Soviet/Ukrainian territory
+# connection. These are clearly outside scope — a Norwegian or Japanese writer
+# has no plausible Ukrainian research angle.
 NON_UKRAINIAN_NATIONALITY_MARKERS = [
-    'грузинськ', 'японськ', 'норвезьк', 'узбецьк', 'башкирськ',
-    'казахськ', 'азербайджанськ', 'чеськ', 'данськ', 'болгарськ',
-    'молдавськ', 'румунськ', 'білорусьськ', 'литовськ', 'французьк',
-    'американськ', 'британськ', 'німецьк', 'австрійськ', 'угорськ',
-    'польськ', 'словацьк', 'сербськ', 'хорватськ', 'фінськ', 'шведськ',
-    'латиськ', 'естонськ', 'вірменськ', 'туркменськ', 'таджицьк',
-    'киргизьк', 'монгольськ', 'китайськ', 'корейськ', 'іранськ',
-    'турецьк', 'арабськ', 'ізраїльськ', 'іспанськ', 'португальськ',
-    'голландськ', 'бельгійськ', 'швейцарськ', 'австралійськ',
+    'японськ', 'норвезьк', 'французьк', 'британськ', 'американськ',
+    'іспанськ', 'португальськ', 'голландськ', 'бельгійськ', 'швейцарськ',
+    'австралійськ', 'шведськ', 'фінськ', 'данськ', 'ірландськ',
+    'монгольськ', 'китайськ', 'корейськ', 'іранськ', 'арабськ',
+    'турецьк', 'перськ', 'афганськ',
+]
+
+# CLAUDE REVIEW: Nationalities that were part of the Soviet Union or had
+# significant communities on Ukrainian territory. Claude will read the bio
+# and determine:
+#   - Did they live in Ukraine (born/grew up/worked there)?
+#   - Did they self-identify as Ukrainian or contribute to Ukrainian culture?
+#   - Were they subject to Soviet persecution on Ukrainian territory?
+# Includes Jewish and Israeli — many "ізраїльськ" entries are Ukrainian-born
+# Jewish émigrés who left during Soviet-era emigration waves.
+NEEDS_CLAUDE_REVIEW_MARKERS = [
+    # Jewish & Israeli — huge overlap with Ukrainian creative history
+    'єврейськ',    # Jewish
+    'ізраїльськ',  # Israeli — often Ukrainian-born émigrés
+
+    # Former Soviet republics — all were Soviet citizens, many lived in Ukraine
+    'російськ',    # Russian
+    'радянськ',    # Soviet
+    'грузинськ',   # Georgian
+    'вірменськ',   # Armenian — communities in Crimea and Odesa
+    'азербайджанськ',
+    'узбецьк',
+    'казахськ',
+    'туркменськ',
+    'таджицьк',
+    'киргизьк',
+    'білорусьськ', # Belarusian — border territory, significant overlap
+    'молдавськ',   # Moldavian — southwestern Ukraine border
+    'литовськ',    # Lithuanian
+    'латиськ',     # Latvian
+    'естонськ',    # Estonian
+    'башкирськ',
+    'татарськ',    # Tatar (non-Crimean)
+
+    # Eastern/Central European — some lived in Soviet-occupied Ukrainian territory
+    'польськ',     # Polish — significant in western Ukraine (Galicia, Volhynia)
+    'чеськ',       # Czech — small communities in Volhynia
+    'румунськ',    # Romanian — border territory, Bukovyna
+    'угорськ',     # Hungarian — Zakarpattia
+    'болгарськ',   # Bulgarian — communities in southern Ukraine
+    'словацьк',
+
+    # Other
+    'грецьк',      # Greek — communities in Odesa and Mariupol
+    'адигейськ',
 ]
 
 
@@ -170,11 +214,21 @@ def is_creative_worker(profession_text):
 
 def is_likely_non_ukrainian(profession_text):
     """
-    Return True if the profession description starts with a non-Ukrainian
+    Return True if the profession description starts with a clearly non-Ukrainian
     nationality marker (e.g. 'грузинський поет', 'японський письменник').
     """
     text_lower = profession_text.lower().strip()
     return any(text_lower.startswith(marker) for marker in NON_UKRAINIAN_NATIONALITY_MARKERS)
+
+
+def needs_claude_review(profession_text):
+    """
+    Return True if the profession description starts with a marker that indicates
+    the person's Ukrainian identity is ambiguous and requires Claude to reason
+    about their biography (e.g. 'єврейський письменник', 'російський актор').
+    """
+    text_lower = profession_text.lower().strip()
+    return any(text_lower.startswith(marker) for marker in NEEDS_CLAUDE_REVIEW_MARKERS)
 
 
 # ─── Scraping ─────────────────────────────────────────────────────────────────
@@ -257,6 +311,7 @@ def parse_entries(html):
             'death_location': death_loc or '',
             'profession_raw': profession_raw,
             'flag_non_ukrainian': 'YES' if is_likely_non_ukrainian(profession_raw) else '',
+            'flag_needs_claude_review': 'YES' if needs_claude_review(profession_raw) else '',
             'article_url': article_url,
             'notes': desc_text[:300],
         })
@@ -284,7 +339,8 @@ def save_to_csv(rows, mode='w'):
     fieldnames = [
         'name', 'birth_year', 'death_year',
         'birth_location', 'death_location',
-        'profession_raw', 'flag_non_ukrainian', 'article_url', 'notes'
+        'profession_raw', 'flag_non_ukrainian', 'flag_needs_claude_review',
+        'article_url', 'notes'
     ]
     with open(OUTPUT_FILE, mode, newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
