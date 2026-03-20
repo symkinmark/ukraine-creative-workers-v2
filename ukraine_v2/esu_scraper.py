@@ -80,60 +80,110 @@ CREATIVE_KEYWORDS = [
 # NOTE: кримськотатарський (Crimean Tatar) is NOT in this list — they lived on
 # Ukrainian territory and were targeted by Soviet repressions. Inclusion is
 # intentional and can be reviewed in the analysis phase.
-# AUTO-EXCLUDE: Nationalities with no meaningful Soviet/Ukrainian territory
-# connection. These are clearly outside scope — a Norwegian or Japanese writer
-# has no plausible Ukrainian research angle.
+# AUTO-EXCLUDE: Nationalities with no plausible Ukrainian connection.
+# A Japanese or Norwegian writer has no research angle here.
 NON_UKRAINIAN_NATIONALITY_MARKERS = [
-    'японськ', 'норвезьк', 'французьк', 'британськ', 'американськ',
+    'японськ', 'норвезьк', 'французьк', 'британськ',
     'іспанськ', 'португальськ', 'голландськ', 'бельгійськ', 'швейцарськ',
-    'австралійськ', 'шведськ', 'фінськ', 'данськ', 'ірландськ',
-    'монгольськ', 'китайськ', 'корейськ', 'іранськ', 'арабськ',
-    'турецьк', 'перськ', 'афганськ',
+    'шведськ', 'данськ', 'ірландськ',
+    'китайськ', 'корейськ', 'іранськ', 'арабськ', 'перськ', 'афганськ',
 ]
 
-# CLAUDE REVIEW: Nationalities that were part of the Soviet Union or had
-# significant communities on Ukrainian territory. Claude will read the bio
-# and determine:
+# CLAUDE REVIEW: Claude reads the biography and decides whether the person
+# qualifies as Ukrainian based on:
 #   - Did they live in Ukraine (born/grew up/worked there)?
 #   - Did they self-identify as Ukrainian or contribute to Ukrainian culture?
 #   - Were they subject to Soviet persecution on Ukrainian territory?
-# Includes Jewish and Israeli — many "ізраїльськ" entries are Ukrainian-born
-# Jewish émigrés who left during Soviet-era emigration waves.
 NEEDS_CLAUDE_REVIEW_MARKERS = [
-    # Jewish & Israeli — huge overlap with Ukrainian creative history
-    'єврейськ',    # Jewish
-    'ізраїльськ',  # Israeli — often Ukrainian-born émigrés
+    # Jewish & Israeli
+    # Huge overlap with Ukrainian creative history — many Jewish Ukrainians
+    # are listed under "єврейський" or emigrated to Israel and appear as "ізраїльський"
+    'єврейськ',
+    'ізраїльськ',
 
-    # Former Soviet republics — all were Soviet citizens, many lived in Ukraine
-    'російськ',    # Russian
-    'радянськ',    # Soviet
-    'грузинськ',   # Georgian
-    'вірменськ',   # Armenian — communities in Crimea and Odesa
+    # Soviet republics
+    'російськ',
+    'радянськ',
+    'грузинськ',
+    'вірменськ',
     'азербайджанськ',
     'узбецьк',
     'казахськ',
     'туркменськ',
     'таджицьк',
     'киргизьк',
-    'білорусьськ', # Belarusian — border territory, significant overlap
-    'молдавськ',   # Moldavian — southwestern Ukraine border
-    'литовськ',    # Lithuanian
-    'латиськ',     # Latvian
-    'естонськ',    # Estonian
+    'білорусьськ',
+    'молдавськ',
+    'литовськ',
+    'латиськ',
+    'естонськ',
+
+    # Soviet-era ethnic minorities within Russia
     'башкирськ',
-    'татарськ',    # Tatar (non-Crimean)
-
-    # Eastern/Central European — some lived in Soviet-occupied Ukrainian territory
-    'польськ',     # Polish — significant in western Ukraine (Galicia, Volhynia)
-    'чеськ',       # Czech — small communities in Volhynia
-    'румунськ',    # Romanian — border territory, Bukovyna
-    'угорськ',     # Hungarian — Zakarpattia
-    'болгарськ',   # Bulgarian — communities in southern Ukraine
-    'словацьк',
-
-    # Other
-    'грецьк',      # Greek — communities in Odesa and Mariupol
+    'татарськ',
+    'чуваськ',
+    'марійськ',
+    'мордовськ',
+    'удмуртськ',
+    'комійськ',
+    'карельськ',
+    'якутськ',
+    'бурятськ',
+    'калмицьк',
+    'чеченськ',
+    'інгуськ',
+    'осетинськ',
+    'абхазьк',
+    'черкеськ',
     'адигейськ',
+    'кабардинськ',
+    'балкарськ',
+    'аварськ',
+    'лезгинськ',
+    'даргинськ',
+    'карачаївськ',
+    'ногайськ',
+
+    # Neighbouring countries with historic communities on Ukrainian territory
+    'польськ',     # Galicia, Volhynia
+    'чеськ',       # Volhynia
+    'румунськ',    # Bukovyna
+    'угорськ',     # Zakarpattia
+    'болгарськ',   # southern Ukraine
+    'словацьк',
+    'сербськ',
+    'хорватськ',
+    'словенськ',
+    'македонськ',
+    'боснійськ',
+    'югославськ',
+    'албанськ',
+
+    # Germans — ethnic German colonies in Ukraine (Mennonites, Black Sea Germans)
+    # were heavily persecuted by Stalin; many lived in Ukraine for generations
+    'німецьк',
+    'австрійськ',  # Austro-Hungarian Empire covered western Ukraine
+
+    # Italian — Genoan colonies in Crimea; communities in Odesa
+    'італійськ',
+
+    # Romani — significant Roma communities in Ukraine, persecuted under Soviets
+    'циганськ',
+    'ромськ',
+
+    # Karaite Jews — indigenous to Crimea
+    'караїмськ',
+
+    # Diaspora countries with large Ukrainian communities
+    # ESU often includes entries like "канадський хореограф українського походження"
+    'канадськ',
+    'американськ',
+    'австралійськ',
+    'аргентинськ',
+    'бразильськ',
+    'фінськ',      # some Ukrainian diaspora via displaced persons camps post-WWII
+    'монгольськ',  # edge case — Soviet-adjacent
+    'турецьк',     # Crimean Tatar diaspora ended up in Turkey
 ]
 
 
