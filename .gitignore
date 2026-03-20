@@ -25,8 +25,7 @@ env/
 # Claude internal
 .claude/
 
-# Output data (large CSVs — commit manually when ready)
-ukraine_v2/esu_creative_workers_raw.csv
+# Temp scraper debug files
 ukraine_v2/sample_page.html
 
 # Jupyter
