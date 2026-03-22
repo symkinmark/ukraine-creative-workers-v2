@@ -1,0 +1,62 @@
+============================================================
+UKRAINIAN CREATIVE WORKERS — LIFE EXPECTANCY ANALYSIS
+V2 Paper — Berdnyk & Symkin
+============================================================
+
+Total confirmed Ukrainian entries: 16,215
+With both birth + death dates:     6,512
+Used in life expectancy analysis:  6,310
+
+── Life Expectancy by Migration Status ──────────────────
+Group                 Count   Avg Birth   Avg Death   Avg Life Exp
+-----------------------------------------------------------------
+Non-migrants           5272      1923.6      1993.5          70.1y
+Migrants               1038      1905.5      1980.1          74.8y
+
+Life expectancy gap (migrants vs non-migrants): +4.6 years
+
+── Most Common Death Years ──────────────────────────────
+
+Non-migrants:
+  2021: 146 deaths  (avg age at death: 79)
+  2006: 134 deaths  (avg age at death: 74)
+  2008: 132 deaths  (avg age at death: 73)
+  2020: 128 deaths  (avg age at death: 79)
+  2005: 125 deaths  (avg age at death: 72)
+
+Migrants:
+  2002: 24 deaths  (avg age at death: 77)
+  1980: 21 deaths  (avg age at death: 73)
+  1994: 20 deaths  (avg age at death: 78)
+  1999: 20 deaths  (avg age at death: 81)
+  2006: 19 deaths  (avg age at death: 78)
+
+── Life Expectancy by Profession ────────────────────────
+Profession            Count   Migrated   Non-mig     Gap
+--------------------------------------------------------
+Writers/Poets          1585      72.9y     69.7y   +3.3y
+Visual Artists         2014      74.0y     70.1y   +3.9y
+Musicians               859      74.7y     69.2y   +5.4y
+Theatre/Film            616      76.0y     70.0y   +6.0y
+Architects              469      77.1y     70.9y   +6.2y
+
+── Non-migrant Deaths by Time Period ────────────────────
+Period                          Deaths   Avg Age
+--------------------------------------------------
+Pre-1917 (Tsarist)                 103     57.3y
+1917–1929 (early Soviet)           141     57.4y
+1930–1939 (Great Terror)           154     53.6y
+1940–1945 (WWII)                   159     51.3y
+1946–1953 (Late Stalin)             83     62.2y
+1954–1991 (post-Stalin)           1038     65.2y
+Post-1991                         3594     74.1y
+
+── Notes for paper ──────────────────────────────────────
+V1 dataset: 415 workers (332 non-migrant / 83 migrant)
+V2 dataset: 6,310 workers with dates (5,272 non-migrant / 1,038 migrant)
+V1 life expectancy gap: 9 years (63 vs 72)
+V2 life expectancy gap: +4.6 years
+
+Pre-1991 death cutoff: REMOVED in V2 (fixes V1 statistical bias)
+Sources: Encyclopedia of Modern Ukraine (esu.com.ua)
+============================================================
