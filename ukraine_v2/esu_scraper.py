@@ -363,7 +363,7 @@ def parse_entries(html):
             'flag_non_ukrainian': 'YES' if is_likely_non_ukrainian(profession_raw) else '',
             'flag_needs_claude_review': 'YES' if needs_claude_review(profession_raw) else '',
             'article_url': article_url,
-            'notes': desc_text[:300],
+            'notes': desc_text,  # full text — no truncation (was [:300], changed V2.1)
         })
 
     return entries

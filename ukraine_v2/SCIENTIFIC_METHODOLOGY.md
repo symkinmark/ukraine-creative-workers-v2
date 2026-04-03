@@ -5,7 +5,9 @@
 **Authors:** Elza Berdnyk, Mark Symkin
 **Study completed:** 2026
 **Data source:** Encyclopedia of Modern Ukraine (esu.com.ua)
-**This document version:** 1.0
+**This document version:** 1.1 — revised 2026-04-03 following Phase 5 human accuracy check
+
+> **⚠ RERUN IN PROGRESS:** Phase 5 human review (63 entries, 9.5% error rate) identified three systematic classification errors requiring a pipeline rerun. Corrections are documented in full in Section 3.3 (Inclusion/Exclusion), Section 3.6 (Migration Classification), and the Phase 5 section of AI_METHODOLOGY_LOG.md. All dataset counts in Section 2.4 are provisional pending rerun.
 
 ---
 
@@ -159,6 +161,22 @@ Individuals whose migration status could not be determined from the biographical
 ### 4.6 Late-Life Emigration
 
 Individuals who emigrated after age 70 were excluded from the migration analysis (though retained in descriptive counts). The rationale is that emigration after age 70 is too late to have substantially affected working-life mortality exposure; the primary period of differential mortality risk from Soviet conditions is the working years (approximately ages 20–65).
+
+### 4.7 Pre-Soviet Deaths — Added in V2.1 (2026-04-03)
+
+**Rule:** Individuals with `death_year < 1921` are excluded from the primary analysis.
+
+**Rationale:** The Ukrainian Soviet Socialist Republic was not consolidated until 1920–1922. Individuals who died before 1921 were never subject to Soviet governance, Soviet cultural repression, or Soviet mortality conditions. Including them in a study of Soviet-era mortality impact is anachronistic and methodologically indefensible. They are retained in the raw dataset with an `excluded_pre_soviet` flag.
+
+**Historical note:** The date 1921 was selected because it marks the approximate end of the Ukrainian-Soviet War and the consolidation of Soviet control over most of Ukrainian territory. Some historians use 1922 (formal formation of the USSR). We use 1921 as the more conservative cutoff.
+
+### 4.8 Galicia Temporal Filter — Added in V2.1 (2026-04-03)
+
+**Rule:** Individuals born in Galicia (modern Lviv, Ternopil, Ivano-Frankivsk oblasts and surrounding historically Galician territory) are included **only if they were alive after 1939**.
+
+**Rationale:** Galicia was part of the Austro-Hungarian Empire until 1918, then part of the Polish Second Republic until September 1939, when the USSR annexed Western Ukraine under the Molotov-Ribbentrop Pact. Galician creative workers who died before 1939 were never under Soviet rule. Including their mortality data in a study of Soviet conditions would be an error of historical fact, not merely a methodological choice. Workers who were alive in 1939 and later experienced Soviet conditions after annexation are legitimately included.
+
+**Implementation:** Birth location field is checked for Galician city/region names. If a Galician birthplace is identified AND `death_year < 1939`, the entry is excluded with flag `excluded_galicia_pre_annexation`.
 
 ### 4.7 Complete Nationality Exclusion Markers
 
@@ -427,38 +445,69 @@ To estimate the error rate in Claude's nationality classifications, a researcher
 
 ## 7. Migration Classification Rules
 
+> **⚠ REVISED V2.1 — 2026-04-03:** Phase 5 human accuracy check found that the original two-group classification system collapsed four meaningfully distinct populations into two, introducing systematic error. The system below replaces the original two-group system with a four-group classification. See AI_METHODOLOGY_LOG.md (Phase 5 — Methodological Corrections) for full rationale.
+
 ### 7.1 Classification Categories
 
-Each confirmed Ukrainian creative worker with complete date data was classified into one of three migration categories:
+Each confirmed Ukrainian creative worker with complete date data was classified into one of four migration categories:
 
-**MIGRANT:** The individual emigrated from Ukraine before or during the Soviet period and settled in a non-Soviet country for a substantial portion of their adult life.
+**MIGRATED:** The individual left the Soviet sphere entirely and settled in a non-Soviet country for a substantial portion of their adult life. The critical criterion is exit from the Soviet sphere — not merely from Ukraine. Only emigration to non-Soviet territory (Western Europe, North America, South America, non-Soviet Asia) qualifies.
 
-**NON-MIGRANT:** The individual spent their entire adult life within Soviet-controlled territory, or was temporarily displaced within Soviet territories (including Gulag imprisonment and internal exile) but did not emigrate westward.
+**NON-MIGRATED:** The individual remained within the Ukrainian SSR for their working life, with no significant period of residence outside Soviet-controlled territory.
 
-**EXCLUDED (indeterminate):** The individual's migration status could not be determined, or they emigrated late in life (after age 70), or their emigration was temporary (they returned to Soviet Ukraine).
+**INTERNAL_TRANSFER:** The individual voluntarily relocated from the Ukrainian SSR to another Soviet republic (Russia, Belarus, Central Asia, etc.) and spent a substantial portion of their adult life there. They remained within the Soviet sphere and experienced Soviet conditions, but in a different republic. This is a voluntary choice distinct from deportation.
+
+**DEPORTED:** The individual was forcibly displaced by Soviet authorities — through formal state deportation orders, Gulag imprisonment followed by exile in another region, assignment as a "special settler" (спецпоселенець) in a designated zone, or any other state-ordered relocation that removed individual choice. **The defining criterion is that the Soviet state made the movement decision, not the individual.** Destination is irrelevant — deportation to Kazakhstan, Siberia, or a Donbas labour camp all qualify. Deported individuals experienced Soviet conditions as direct victims of state violence, not as passive residents.
+
+**EXCLUDED (indeterminate):** Migration status could not be determined, emigration was temporary (individual returned to Soviet Ukraine), or emigration occurred after age 70.
+
+---
+
+**Role in primary analysis:**
+
+| Group | Role |
+|-------|------|
+| `migrated` | Primary comparison group (escaped Soviet sphere) |
+| `non_migrated` | Primary comparison group (remained in Ukrainian SSR) |
+| `internal_transfer` | Reported separately as third comparison group |
+| `deported` | Reported separately as fourth group; grouped with `non_migrated` in primary LE comparison |
+
+---
 
 ### 7.2 Detailed Classification Rules
 
-**Classified as MIGRANT if:**
+**Classified as MIGRATED if:**
 - The ESU biographical text states explicitly that the person emigrated, fled, or left for a named non-Soviet country (e.g., Germany, France, USA, Canada, Czechoslovakia, Poland post-WWII, etc.)
 - The text mentions membership in a diaspora institution (e.g., Ukrainian Free Academy of Sciences / УВАН, Ukrainian Academy of Arts and Sciences in the US, Shevchenko Scientific Society in Sarcelles, Ukrainian Institute in London, Prosvita in the diaspora, etc.)
 - The text mentions publication in diaspora press (e.g., Svoboda, Ukrainske Slovo (Paris), Novy Shliakh, etc.)
-- The text describes permanent settlement abroad with specific country or city mentioned
+- The text describes permanent settlement abroad with specific non-Soviet country or city mentioned
 - The person is described as a representative of the Ukrainian diaspora (діаспора, еміграція)
 - The person emigrated during the first wave (1917–1921) or second wave (1941–1945) and there is no mention of return
 
-**Classified as NON-MIGRANT if:**
+**Classified as NON-MIGRATED if:**
 - The text contains no mention of emigration or life abroad
 - The text explicitly states the person lived and worked in Soviet Ukraine throughout their career
-- The text mentions arrest, imprisonment, Gulag, or exile within Soviet territory — but NOT emigration to the West (internal Soviet displacement does not count as migration for our purposes)
-- The text mentions evacuation during WWII within Soviet territory (e.g., to Central Asia, Siberia, or the Urals) but subsequent return to Soviet Ukraine
-- The person lived and died in Ukrainian SSR, Soviet Russia, Soviet Belarus, or other Soviet republic (all count as non-migrant; the relevant distinction is Soviet vs. non-Soviet, not Ukraine vs. other Soviet republic)
+- The text mentions wartime evacuation within Soviet territory (e.g., to Central Asia, Siberia, Urals) with return to Soviet Ukraine after the war
+
+**Classified as INTERNAL_TRANSFER if:**
+- The person voluntarily relocated to Soviet Russia, Soviet Belarus, or another Soviet republic
+- Their ESU entry describes a career based primarily in another Soviet city (Moscow, Leningrad, Minsk, Tashkent, etc.) without any indication of forced displacement
+- There is no mention of arrest, Gulag, exile orders, or state-mandated relocation
+- The move was career-motivated or voluntary in character
+
+**Classified as DEPORTED if:**
+- The text mentions arrest by Soviet authorities followed by Gulag imprisonment (ув'язнення, табір, ГУЛАГ)
+- The text uses "заслання" (exile), "спецпоселення" (special settlement), or describes assignment to a restricted zone
+- The text references NKVD, MGB, KGB action against the individual resulting in relocation
+- The individual was described as "репресований" (repressed) with geographic displacement as a result
+- The text describes deportation of an ethnic community to which the individual belonged (e.g., Crimean Tatar mass deportations of 1944)
+- **Priority rule:** If there is any evidence of forced displacement, classify as DEPORTED before considering INTERNAL_TRANSFER. Voluntary and forced displacement must not be conflated.
 
 **Classified as EXCLUDED (indeterminate) if:**
-- Emigration is mentioned but the destination is unclear or could be Soviet-aligned
-- The person's postwar fate is unknown or described as "unknown" in the text
-- The person emigrated but returned to Soviet Ukraine (temporary emigration)
-- The person emigrated after age 70 (too late to substantially affect working-life mortality)
+- Emigration is mentioned but the destination is unclear
+- The person's postwar fate is unknown or described as unknown in the text
+- The person emigrated but returned to Soviet Ukraine
+- The person emigrated after age 70
 - The biographical text is too short or vague to determine migration status
 
 ### 7.3 Claude Migration Classification Protocol
@@ -469,7 +518,7 @@ For entries where migration status was ambiguous after applying the rules above,
 **Temperature:** Default (1.0)
 **Max tokens:** 500
 
-**Verbatim migration classification prompt:**
+**Verbatim migration classification prompt (revised V2.1):**
 
 ```
 You are helping classify the migration status of a Ukrainian creative worker for an academic study about Soviet-era life expectancy.
@@ -480,10 +529,19 @@ Here is the full biographical text from the Encyclopedia of Modern Ukraine for t
 [FULL_ESU_TEXT_IN_UKRAINIAN]
 ---
 
-Please classify this person's migration status as one of:
-- MIGRANT: This person emigrated from Soviet-controlled territory and settled permanently (or for the majority of their adult life) in a non-Soviet country. This includes emigration during the 1917-1921 civil war period, the interwar period, or the WWII period, as long as they did not return to Soviet Ukraine.
-- NON-MIGRANT: This person spent their adult life within Soviet-controlled territory. This includes people who were arrested, imprisoned, sent to the Gulag, or internally exiled within the Soviet Union — but who did not emigrate to non-Soviet countries. It also includes wartime evacuees who returned to Soviet Ukraine after the war.
-- INDETERMINATE: The text does not contain enough information to classify migration status with confidence.
+Please classify this person's migration status as exactly one of these four categories:
+
+- MIGRATED: This person left the Soviet sphere entirely and settled in a non-Soviet country (Western Europe, North America, South America, non-Soviet Asia) for a substantial portion of their adult life. Moving to Soviet Russia or another Soviet republic does NOT qualify as migrated.
+
+- NON_MIGRATED: This person remained within the Ukrainian SSR for their working life with no significant period outside Soviet-controlled territory.
+
+- INTERNAL_TRANSFER: This person voluntarily relocated to another Soviet republic (Russia, Belarus, Central Asia, etc.) and based their career there. There is no evidence of forced displacement — the move appears career-motivated or voluntary.
+
+- DEPORTED: This person was forcibly displaced by Soviet authorities — through Gulag imprisonment, state deportation orders, special settler assignment, or any other state-mandated relocation. The defining criterion is that the Soviet state decided the movement, not the individual. Classify as DEPORTED even if the destination was within Ukraine (e.g., a labour camp in Donbas).
+
+- INDETERMINATE: The text does not contain enough information to classify with confidence.
+
+IMPORTANT: If there is any evidence of forced displacement by Soviet authorities, classify as DEPORTED rather than INTERNAL_TRANSFER. Do not conflate voluntary relocation with state-imposed exile.
 
 Reply with ONLY the classification word (MIGRANT, NON-MIGRANT, or INDETERMINATE) followed by a colon and a single sentence of reasoning. Example: "MIGRANT: Fled to Germany in 1943 and later settled in New York, where they published with Ukrainian diaspora press."
 

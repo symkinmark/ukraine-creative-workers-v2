@@ -109,18 +109,98 @@ This log records all decisions made with AI assistance during the V2 research pr
 
 ## Phase 5 — Human Accuracy Check
 
-*[To be completed — details to be added after human review]*
+**Completed:** 2026-04-03 by Mark Symkin
 
-**Planned process:**
-- Mark Symkin manually verifies a 1–2% random sample of entries
-- Checks: correct identification, correct dates, correct profession categorisation
-- Systemic errors trigger re-run of affected batch
+**Method:** Claude generated a random sample of 63 entries (1% of the 6,310 analysable dataset) with full ESU article text fetched live for each entry. Mark reviewed each entry in a browser-based review sheet and recorded verdicts.
+
+**Results:**
+
+| Verdict | Count |
+|---------|-------|
+| ✅ Correct | 57 |
+| ❌ Migration wrong | 2 |
+| ❌ Not Ukrainian / wrong person | 4 |
+| ❌ Dates wrong | 0 |
+| **Error rate** | **9.5%** |
+
+**Flagged entries with notes:**
+- #10: Not Ukrainian
+- #14: Not Ukrainian
+- #39: Died before start of Soviet Union — should be excluded
+- #40: Migrated to Russia (within USSR) — incorrectly classified as migrated
+- #45: Not Ukrainian, died before the Soviet period
+- #50: Migrated to Russia (within USSR) — incorrectly classified as migrated
+
+---
+
+## Phase 5 — Methodological Corrections (Human-approved, 2026-04-03)
+
+The Phase 5 review identified four systematic errors requiring a rerun of the classification pipeline. All corrections below were reviewed and approved by Mark Symkin.
+
+### Correction 1 — Pre-1921 death exclusion
+
+**Rule:** Any individual with `death_year < 1921` is excluded from the primary analysis.
+
+**Reason:** The Ukrainian SSR was not consolidated until 1920–1922. Individuals who died before this date were never subject to Soviet conditions and cannot meaningfully be classified as migrants or non-migrants within a Soviet framework. Their inclusion distorts the mortality analysis.
+
+**Impact:** Removes individuals who predate the Soviet period entirely. Dataset size will decrease.
+
+---
+
+### Correction 2 — Galicia inclusion rule
+
+**Rule:** Individuals born in Galicia (modern Lviv, Ternopil, Ivano-Frankivsk, and surrounding oblasts) are included in the dataset **only if they were alive after 1939** (the year the USSR annexed Western Ukraine from Poland).
+
+**Reason:** Galicia was part of the Austro-Hungarian Empire until 1918, then part of Poland until 1939. Galician creative workers who died before 1939 were never under Soviet rule. Including their deaths in a study of Soviet mortality impact is methodologically incorrect. Workers alive after 1939 experienced Soviet conditions and are legitimately included.
+
+**Implementation:** Claude review will check birth location for Galician indicators. If born in Galicia AND `death_year < 1939`, the entry is excluded.
+
+---
+
+### Correction 3 — Four-way migration classification (primary methodological change)
+
+**Previous system (two groups):**
+- `migrated` — left Ukraine / USSR
+- `non_migrated` — stayed within Soviet territory
+
+**Revised system (four groups):**
+
+| Group | Who decided | Definition | Primary analysis role |
+|-------|------------|-----------|----------------------|
+| `migrated` | Individual | Left the Soviet sphere entirely — settled in Western Europe, North America, South America, or non-Soviet Asia. Spent a substantial portion of adult life outside any Soviet-controlled territory. | Primary comparison group |
+| `non_migrated` | Individual | Remained within the Ukrainian SSR for their working life. | Primary comparison group |
+| `internal_transfer` | Individual | Voluntarily moved from Ukrainian SSR to another Soviet republic (Russia, Belarus, Central Asia, etc.) but remained within the Soviet Union. Did not escape Soviet conditions. | Reported separately as third group |
+| `deported` | Soviet state | Forcibly displaced by Soviet authorities — formal state deportation, Gulag sentence with exile, special settler status, or state-ordered internal exile. **The defining criterion is that the Soviet state made the decision, not the individual.** This applies regardless of destination (Siberia, Kazakhstan, or a Donbas labour camp). | Reported separately as fourth group; grouped with `non_migrated` for primary LE comparison |
+
+**Why this matters scientifically:**
+
+The previous two-group system incorrectly collapsed four distinct populations into two. The critical distinction is not geography but agency:
+
+- `migrated` and `internal_transfer` reflect individual decisions — one to escape the Soviet sphere, one to move within it.
+- `non_migrated` reflects a passive choice (or inability) to leave.
+- `deported` reflects no individual choice at all — Soviet state violence applied directly to the person.
+
+Each group has a distinct expected mortality profile:
+- `migrated` — best life expectancy (escaped Soviet conditions)
+- `non_migrated` — middle (experienced Soviet conditions, not directly targeted)
+- `internal_transfer` — middle (experienced Soviet conditions in a different republic; possibly career-motivated relocation)
+- `deported` — worst (directly targeted by state violence; Gulag, exile, forced labour)
+
+Separating deportees allows the paper to demonstrate that the Soviet state's direct violence against individuals produced measurably worse mortality outcomes than passive residence under Soviet conditions — a finding with significant historical and political implications.
+
+**Implementation note for Claude rerun:** When classifying migration status, Claude must first check for evidence of forced displacement before assessing voluntary movement. Key signals for `deported`: arrest records, Gulag mentions, "special settler" (спецпоселенець) status, references to "exile" (заслання) imposed by Soviet authorities, references to NKVD/KGB actions against the individual. Voluntary relocation to Moscow for career reasons is `internal_transfer`; forced relocation to Kazakhstan under Article 58 is `deported`.
+
+---
+
+### Rerun required
+
+All three corrections require a rerun of the Claude classification pass on `esu_creative_workers_raw.csv`. The scraping does not need to be repeated — only the nationality review and migration classification steps. Output will be a revised `esu_creative_workers_reviewed_v2.csv`.
 
 ---
 
 ## Phase 6 — Paper Writing
 
-*[To be completed — details to be added]*
+*[To be completed after Phase 4 rerun with corrected methodology]*
 
 ---
 
@@ -128,7 +208,7 @@ This log records all decisions made with AI assistance during the V2 research pr
 
 V1 established a baseline AI error rate of ~20% for biography analysis tasks (using ChatGPT for migration status determination). Half were casual mistakes; half required deep human review.
 
-V2 uses Claude Sonnet 4.6. Error rate will be tracked during the Phase 5 accuracy check and reported in the methodology section of the paper.
+V2 Phase 5 accuracy check found a **9.5% error rate** (6 errors in 63 entries reviewed). Error types: nationality misclassification (4 cases), migration misclassification (2 cases). No date errors found. All errors were systematic in nature — addressable by rule corrections rather than individual manual fixes — which is why a full rerun with corrected classification rules is the appropriate response rather than patching individual entries.
 
 ---
 

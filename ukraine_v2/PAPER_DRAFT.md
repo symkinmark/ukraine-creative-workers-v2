@@ -2,6 +2,8 @@
 
 **Authors:** Elza Berdnyk, Mark Symkin
 
+> **⚠ DRAFT IN REVISION — 2026-04-03:** Phase 5 human accuracy check (9.5% error rate, 63 entries reviewed) identified three systematic classification errors. The methodology has been corrected and a classification rerun is pending. Sections marked ⚠ contain outdated figures that will be updated after rerun. Key corrections: (1) pre-1921 deaths excluded, (2) Galician workers filtered to post-1939 only, (3) migration reclassified into four groups: `migrated`, `non_migrated`, `internal_transfer`, `deported`. All results in Section 4 are provisional.
+
 ---
 
 ## Abstract
@@ -91,6 +93,8 @@ Of the 16,215 entries initially collected, 6,310 met all five criteria and form 
 - Individuals whose nationality could not be determined: excluded rather than misclassified.
 - Non-Ukrainian individuals: 1,218 entries in the ESU referred to foreign artists or intellectuals with no substantive Ukrainian connection and were excluded.
 - Individuals whose migration status was ambiguous and could not be resolved: excluded rather than assigned to a group incorrectly.
+- ⚠ **[V2.1 correction]** Individuals with `death_year < 1921`: excluded as pre-Soviet deaths. The Ukrainian SSR was not consolidated until 1920–1922; individuals who died before 1921 were never subject to Soviet conditions and cannot meaningfully be included in a study of Soviet-era mortality.
+- ⚠ **[V2.1 correction]** Galician-born individuals with `death_year < 1939`: excluded because Galicia (Lviv, Ternopil, Ivano-Frankivsk regions) was not part of the Soviet Union until the 1939 annexation of Western Ukraine from Poland. Galician workers who died before 1939 were never under Soviet rule. Those alive after 1939 are included.
 
 ### 3.4 Creative Worker Definition
 
@@ -119,15 +123,19 @@ Of the 1,356 flagged entries reviewed by Claude:
 
 ### 3.6 Migration Classification
 
-Migration status was classified using the following rules, which extend the classification system developed in V1:
+⚠ **[V2.1 revision — 2026-04-03]:** The original two-group classification (migrant / non-migrant) was replaced with a four-group system following Phase 5 human review. The original system incorrectly conflated voluntary internal Soviet transfers and state-imposed deportations with non-migration. The corrected system is described below. All figures in Section 4 will be updated after the classification rerun.
 
-**Migrant (left USSR):** The individual emigrated from Ukraine before or during the Soviet period and settled in a non-Soviet country, OR emigrated from Soviet Ukraine during or after World War II and did not return, OR was expelled or fled during the Ukrainian diaspora formations of 1917–1921 (the first wave) or 1941–1945 (the second wave). The critical criterion is that the individual spent a substantial portion of their adult life outside the Soviet sphere.
+Migration status was classified into four categories:
 
-**Non-migrant (remained in USSR):** The individual spent their entire adult life within Soviet-controlled territory, OR was temporarily arrested or deported within Soviet territories but did not emigrate to the West, OR fled during wartime but returned to Soviet Ukraine.
+**Migrated (left Soviet sphere):** The individual emigrated from Soviet-controlled territory and settled in a non-Soviet country — Western Europe, North America, South America, or non-Soviet Asia — for a substantial portion of their adult life. Movement to Soviet Russia or another Soviet republic does not qualify. The critical criterion is exit from the Soviet sphere entirely.
 
-**Ambiguous / excluded:** Individuals who may have emigrated temporarily, whose postwar fate was unknown, or whose emigration occurred after age 70 (too late to substantially affect working-life mortality exposure) were excluded from the migration analysis.
+**Non-migrated (remained in Ukrainian SSR):** The individual spent their working life within the Ukrainian SSR with no substantial period outside Soviet-controlled territory.
 
-The ESU biographical texts consistently contain sufficient information to make this determination: they record emigration dates, countries of settlement, return dates (where applicable), and references to diaspora institutions (e.g., membership in the Ukrainian Free Academy of Sciences in New York, or publication in the diaspora press). Where the text was ambiguous, Claude was used to review the full Ukrainian-language text and classify migration status according to the above rules. The migration classification prompt is reproduced verbatim in SCIENTIFIC_METHODOLOGY.md.
+**Internal transfer (voluntary, within USSR):** The individual voluntarily relocated from the Ukrainian SSR to another Soviet republic (most commonly Soviet Russia) and based their career there. They remained under Soviet conditions but in a different republic. This is a voluntary act distinct from deportation and distinct from emigration. This group will be analysed separately as a third comparison population.
+
+**Deported (forced displacement by Soviet state):** The individual was forcibly relocated by Soviet authorities — through Gulag imprisonment, formal deportation orders, special settler (спецпоселенець) assignment, or any other state-mandated relocation. The defining criterion is compulsion: the Soviet state made the movement decision, not the individual. This applies regardless of destination. Deportees are reported as a fourth distinct group and, for the primary life expectancy comparison, grouped with non-migrants — they did not escape Soviet conditions; they experienced them as direct targets of state violence.
+
+The ESU biographical texts consistently contain sufficient information to make this determination. Where the text was ambiguous, Claude was used to review the full Ukrainian-language text and classify migration status according to the above rules, with explicit instruction to prioritise DEPORTED classification whenever any evidence of forced displacement exists. The full revised classification prompt is reproduced verbatim in SCIENTIFIC_METHODOLOGY.md (Section 7.3).
 
 ### 3.7 Statistical Methods
 
