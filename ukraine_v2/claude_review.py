@@ -1,24 +1,30 @@
 #!/usr/bin/env python3
 """
 Phase 4: Claude-powered review of Ukrainian Creative Workers dataset.
+V2.1 — revised following Phase 5 human accuracy check (2026-04-03)
 
 Phases:
-  --phase nationality   Review 1,356 flagged entries — Claude reads each bio
-                        and decides if the person qualifies as Ukrainian.
-  --phase migration     For all confirmed-Ukrainian entries, determine whether
-                        they migrated out of the USSR or stayed.
-  --phase analysis      Calculate life expectancy stats and print results.
+  --phase nationality   Review flagged entries — Claude decides if person is Ukrainian.
+  --phase migration     Four-way migration classification: migrated / non_migrated /
+                        internal_transfer / deported. Applies pre-1921 and Galicia
+                        exclusions as pure Python filters before any Claude call.
+  --phase analysis      Calculate life expectancy stats across all four groups.
 
-Usage:
-  python claude_review.py --phase nationality
-  python claude_review.py --phase migration
-  python claude_review.py --phase analysis
+Flags:
+  --rerun               (migration phase only) Re-classify all entries from scratch,
+                        ignoring any existing migration_status. Required for V2.1 rerun.
 
-Output: esu_creative_workers_reviewed.csv
-        esu_analysis_results.txt  (analysis phase only)
+Output:
+  nationality phase → esu_creative_workers_reviewed.csv  (in-place, incremental)
+  migration phase   → esu_creative_workers_v2_1.csv      (new file, full rerun)
+  analysis phase    → esu_analysis_results.txt
+
+Model strategy:
+  Haiku  — first-pass classification (~6,300 entries, ~$1.50 total)
+  Sonnet — deep retry for entries that return 'unknown' after Haiku
 
 Authors: Elza Berdnyk, Mark Symkin
-AI: Claude Haiku-4.5 (Anthropic)
+AI: Claude Haiku-4.5 (first pass) + Claude Sonnet-4.6 (deep retry)
 """
 
 import csv
@@ -35,29 +41,100 @@ import anthropic
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 
-INPUT_FILE  = os.path.join(os.path.dirname(__file__), 'esu_creative_workers_raw.csv')
-OUTPUT_FILE = os.path.join(os.path.dirname(__file__), 'esu_creative_workers_reviewed.csv')
-ANALYSIS_FILE = os.path.join(os.path.dirname(__file__), 'esu_analysis_results.txt')
+INPUT_FILE       = os.path.join(os.path.dirname(__file__), 'esu_creative_workers_raw.csv')
+REVIEWED_FILE    = os.path.join(os.path.dirname(__file__), 'esu_creative_workers_reviewed.csv')
+OUTPUT_FILE      = os.path.join(os.path.dirname(__file__), 'esu_creative_workers_v2_1.csv')
+ANALYSIS_FILE    = os.path.join(os.path.dirname(__file__), 'esu_analysis_results.txt')
 
-DELAY_BETWEEN_REQUESTS = 0.6   # seconds between ESU article fetches
-DELAY_BETWEEN_CLAUDE   = 0.3   # seconds between Claude API calls
+DELAY_FETCH   = 0.6   # seconds between ESU article fetches
+DELAY_CLAUDE  = 0.3   # seconds between Claude API calls
 
-# Output columns — original + new Phase 4 columns
+MODEL_HAIKU   = 'claude-haiku-4-5-20251001'
+MODEL_SONNET  = 'claude-sonnet-4-6'
+
 FIELDNAMES = [
     'name', 'birth_year', 'death_year',
     'birth_location', 'death_location',
     'profession_raw', 'flag_non_ukrainian', 'flag_needs_claude_review',
     'article_url', 'notes',
-    # Phase 4a
-    'is_ukrainian',          # YES / NO / UNCERTAIN  (blank = clean entry, assumed YES)
-    'ukrainian_reasoning',   # Claude's one-sentence explanation
-    # Phase 4b
-    'migration_status',      # migrated / non_migrated / unknown
-    'migration_reasoning',   # Claude's one-sentence explanation
+    'is_ukrainian',           # YES / NO / UNCERTAIN  (blank = clean entry, assumed YES)
+    'ukrainian_reasoning',
+    'migration_status',       # migrated / non_migrated / internal_transfer / deported
+                              # / unknown / alive
+                              # / excluded_pre_soviet / excluded_galicia_pre_annexation
+    'migration_reasoning',
+]
+
+# migration_status values that count as "done" in a normal (non-rerun) pass
+RESOLVED_STATUSES = {
+    'migrated', 'non_migrated', 'internal_transfer', 'deported',
+    'alive', 'excluded_pre_soviet', 'excluded_galicia_pre_annexation',
+}
+
+
+# ─── Galicia detection ────────────────────────────────────────────────────────
+# Galicia = modern Lviv, Ternopil, Ivano-Frankivsk oblasts + historical Galician territory.
+# Was part of Austro-Hungarian Empire until 1918, then Poland until 1939.
+# Workers born here and dead before 1939 never experienced Soviet rule.
+
+GALICIAN_MARKERS = [
+    # Region names
+    'галичин', 'галиці', 'галич',
+    # Lviv oblast cities
+    'львів', 'дрогобич', 'самбір', 'стрий', 'яворів', 'золочів', 'жовква',
+    'рава-руськ', 'городок', 'перемишль', 'белз', 'сокаль', 'броди',
+    # Ternopil oblast
+    'тернопіл', 'чортків', 'збараж', 'бережан', 'борщів', 'бучач',
+    'копичинц', 'кременец', 'підгайц', 'теребовл', 'заліщик', 'зборів',
+    'монастириськ', 'скалат', 'товст', 'козів', 'лановц',
+    # Ivano-Frankivsk oblast
+    'івано-франківськ', 'станіслав', 'коломи', 'снятин', 'городенк',
+    'калуш', 'косів', 'надвірн', 'рогатин', 'тлумач', 'болехів',
+    'долин', 'богородчан', 'галич',
+    # Austro-Hungarian / Polish birth location indicators
+    'австро-угорщин', 'австрійськ',
 ]
 
 
-# ─── Load API key from .env ────────────────────────────────────────────────────
+def is_galician_birth(birth_location):
+    """Return True if birth_location matches a known Galician city or region."""
+    if not birth_location:
+        return False
+    loc = birth_location.lower()
+    return any(marker in loc for marker in GALICIAN_MARKERS)
+
+
+def should_exclude_galicia(row):
+    """
+    Exclude if: born in Galicia AND died before 1939.
+    Galicia was only under Soviet rule from September 1939 onwards.
+    Workers alive in 1939 experienced Soviet conditions; those who died before did not.
+    """
+    death_year = safe_int(row.get('death_year'))
+    if death_year is None:
+        return False
+    if death_year >= 1939:
+        return False
+    return is_galician_birth(row.get('birth_location', ''))
+
+
+def should_exclude_pre_soviet(row):
+    """
+    Exclude if died before 1921 — the Ukrainian SSR was not consolidated
+    until 1920-1922. These individuals were never subject to Soviet conditions.
+    """
+    death_year = safe_int(row.get('death_year'))
+    return death_year is not None and death_year < 1921
+
+
+# ─── Helpers ──────────────────────────────────────────────────────────────────
+
+def safe_int(val):
+    try:
+        return int(val)
+    except (TypeError, ValueError):
+        return None
+
 
 def load_env():
     env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
@@ -70,44 +147,37 @@ def load_env():
                     os.environ.setdefault(key.strip(), val.strip())
 
 
-# ─── Load / save CSV ──────────────────────────────────────────────────────────
+def parse_json_response(text):
+    text = text.strip()
+    text = re.sub(r'^```(?:json)?\s*', '', text)
+    text = re.sub(r'\s*```$', '', text)
+    return json.loads(text.strip())
 
-def load_input():
-    """Load the raw scraper output. Returns list of dicts."""
-    with open(INPUT_FILE, newline='', encoding='utf-8-sig') as f:
+
+# ─── CSV I/O ──────────────────────────────────────────────────────────────────
+
+def load_csv(path):
+    with open(path, newline='', encoding='utf-8-sig') as f:
         return list(csv.DictReader(f))
 
 
-def load_reviewed():
-    """
-    Load existing reviewed output (if it exists).
-    Returns a dict keyed by article_url so we can pick up where we left off.
-    """
-    if not os.path.exists(OUTPUT_FILE):
-        return {}
-    with open(OUTPUT_FILE, newline='', encoding='utf-8-sig') as f:
-        return {row['article_url']: row for row in csv.DictReader(f)}
-
-
-def save_reviewed(rows):
-    """Overwrite the output file with the full reviewed dataset."""
-    with open(OUTPUT_FILE, 'w', newline='', encoding='utf-8-sig') as f:
+def save_csv(rows, path):
+    with open(path, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=FIELDNAMES, extrasaction='ignore')
         writer.writeheader()
         writer.writerows(rows)
 
 
-def append_reviewed(row):
-    """Append a single row to the output file (fast incremental save)."""
-    file_exists = os.path.exists(OUTPUT_FILE)
-    with open(OUTPUT_FILE, 'a', newline='', encoding='utf-8-sig') as f:
+def append_csv(row, path):
+    file_exists = os.path.exists(path)
+    with open(path, 'a', newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=FIELDNAMES, extrasaction='ignore')
         if not file_exists:
             writer.writeheader()
         writer.writerow(row)
 
 
-# ─── Fetch article bio from ESU ───────────────────────────────────────────────
+# ─── ESU article fetcher ──────────────────────────────────────────────────────
 
 def make_session():
     s = requests.Session()
@@ -122,24 +192,21 @@ def make_session():
 
 
 def fetch_article_text(url, session):
-    """
-    Fetch the full text of an ESU article.
-    Returns up to 1500 chars of plain text, or empty string on failure.
-    """
+    """Fetch full ESU article text. Returns up to 1500 chars or empty string."""
     try:
         r = session.get(url, timeout=15)
         if r.status_code != 200:
             return ''
         soup = BeautifulSoup(r.text, 'html.parser')
-        # ESU article content lives in a <div> with class containing 'article' or 'content'
         article_div = (
             soup.find('div', class_=re.compile(r'article[-_]?(text|body|content)', re.I))
             or soup.find('div', class_=re.compile(r'content', re.I))
         )
         if article_div:
             return article_div.get_text(' ', strip=True)[:1500]
-        # Fallback: collect all <p> tags
-        return ' '.join(p.get_text(' ', strip=True) for p in soup.find_all('p')[:12])[:1500]
+        return ' '.join(
+            p.get_text(' ', strip=True) for p in soup.find_all('p')[:12]
+        )[:1500]
     except Exception:
         return ''
 
@@ -168,35 +235,60 @@ Reply ONLY in this exact JSON format, no extra text:
 {"is_ukrainian": "YES" or "NO" or "UNCERTAIN", "reasoning": "one sentence max"}"""
 
 
+# ── Four-way migration prompt (Haiku first pass) ──────────────────────────────
+
 MIGRATION_SYSTEM = """\
-You are a research assistant for an academic paper on life expectancy of Ukrainian creative workers during Soviet occupation.
+You are a research assistant classifying migration status of Ukrainian creative workers for an academic life expectancy study.
 
-Determine whether a Ukrainian creative worker migrated OUT of Soviet-controlled territory, or stayed.
+You must classify each person into exactly one of four categories. Read the biography carefully.
 
-Classification rules:
-- migrated:      Left Soviet-controlled territory and lived abroad for a significant period
-- non_migrated:  Stayed in the USSR/Ukraine their whole life
-- non_migrated:  Was killed by Soviets while in former Polish territories (western Ukraine)
-- non_migrated:  Migrated but returned to the USSR and died there
-- non_migrated:  Released from prison/camp due to poor health and died within 1 year
-- non_migrated:  Was killed by Soviet agents outside USSR territory
-- unknown:       Insufficient information to make a determination
+STEP 1 — CHECK FOR FORCED DISPLACEMENT FIRST (before anything else):
+If there is ANY evidence that Soviet authorities forcibly relocated this person — arrest, Gulag, labour camp, deportation order, special settler status (спецпоселенець), exile (заслання) imposed by NKVD/KGB/MGB — classify as DEPORTED, regardless of destination.
+Key Ukrainian signals: табір, ГУЛАГ, ув'язнення, заслання, спецпоселення, репресований, НКВС, МДБ, КДБ, розстріляний (executed).
+
+STEP 2 — CLASSIFY:
+
+- migrated: Left the Soviet sphere entirely. Settled in a non-Soviet country (Western Europe, North America, South America, non-Soviet Asia) for a substantial part of adult life. Diaspora institution membership (УВАН, НТШ, УВАН у США) or diaspora press publication confirms this. Moving to Soviet Russia does NOT qualify.
+
+- non_migrated: Remained in the Ukrainian SSR throughout working life. No evidence of emigration or forced displacement.
+
+- internal_transfer: Voluntarily moved from Ukrainian SSR to another Soviet republic (Russia, Belarus, Central Asia, etc.) and based career there. No evidence of coercion. Career-motivated or personal choice.
+
+- deported: Soviet state forcibly relocated this person. See Step 1. Destination does not matter — Siberia, Kazakhstan, or a Donbas labour camp all qualify.
+
+- unknown: Genuinely insufficient information even after careful reading.
 
 Reply ONLY in this exact JSON format, no extra text:
-{"migration_status": "migrated" or "non_migrated" or "unknown", "reasoning": "one sentence max"}"""
+{"migration_status": "migrated" or "non_migrated" or "internal_transfer" or "deported" or "unknown", "reasoning": "one sentence max"}"""
 
 
-def parse_json_response(text):
-    """Parse JSON from Claude response, stripping markdown code blocks if present."""
-    text = text.strip()
-    # Remove ```json ... ``` or ``` ... ``` wrappers
-    text = re.sub(r'^```(?:json)?\s*', '', text)
-    text = re.sub(r'\s*```$', '', text)
-    return json.loads(text.strip())
+# ── Four-way deep retry prompt (Sonnet — for unknowns only) ──────────────────
 
+MIGRATION_DEEP_SYSTEM = """\
+You are a research assistant. A previous analysis returned 'unknown' for this Ukrainian creative worker's migration status. Look harder.
+
+STEP 1 — FORCED DISPLACEMENT CHECK (mandatory, do this first):
+Any of these signals = DEPORTED: arrest, Gulag, labour camp, exile order, special settler, NKVD/KGB action resulting in relocation.
+Ukrainian: табір, ГУЛАГ, ув'язнення, заслання, спецпоселення, репресований, розстріляний.
+
+STEP 2 — GEOGRAPHY CLUES:
+- Died in Paris, New York, Munich, London, Buenos Aires, Toronto, Rome, Prague (post-1948), Vienna → likely MIGRATED
+- Died in Ukraine, Russia, or any Soviet republic → NON_MIGRATED (unless Step 1 applies)
+- Born in Galicia/western Ukraine + died abroad → very likely MIGRATED (post-WWII emigration wave)
+- Lived career in Moscow/Leningrad/other Soviet city, no coercion signals → INTERNAL_TRANSFER
+
+STEP 3 — DIASPORA SIGNALS:
+Membership in УВАН, НТШ, УВАН у США, Пролог, diaspora press publication → MIGRATED
+
+Use 'unknown' only as a last resort if truly no clues exist after all of the above.
+
+Reply ONLY in this exact JSON format:
+{"migration_status": "migrated" or "non_migrated" or "internal_transfer" or "deported" or "unknown", "reasoning": "one sentence max"}"""
+
+
+# ─── Claude API calls ─────────────────────────────────────────────────────────
 
 def ask_claude_nationality(client, name, profession, birth_loc, death_loc, bio):
-    """Ask Claude Haiku if this person qualifies as Ukrainian."""
     user_msg = (
         f"Name: {name}\n"
         f"Profession: {profession}\n"
@@ -206,7 +298,7 @@ def ask_claude_nationality(client, name, profession, birth_loc, death_loc, bio):
     )
     try:
         response = client.messages.create(
-            model='claude-haiku-4-5-20251001',
+            model=MODEL_HAIKU,
             max_tokens=120,
             system=NATIONALITY_SYSTEM,
             messages=[{'role': 'user', 'content': user_msg}],
@@ -217,76 +309,55 @@ def ask_claude_nationality(client, name, profession, birth_loc, death_loc, bio):
         return 'UNCERTAIN', f'error: {e}'
 
 
-def ask_claude_migration(client, name, profession, birth_loc, death_loc,
-                         birth_year, death_year, bio):
-    """Ask Claude Haiku for migration status."""
+def ask_claude_migration_haiku(client, name, profession, birth_loc, death_loc,
+                                birth_year, death_year, bio):
     user_msg = (
         f"Name: {name}\n"
         f"Profession: {profession}\n"
         f"Born: {birth_year or '?'} — {birth_loc or 'unknown'}\n"
         f"Died: {death_year or '?'} — {death_loc or 'unknown'}\n"
-        f"Biography excerpt:\n{bio[:900] if bio else 'Not available'}"
+        f"Biography:\n{bio[:900] if bio else 'Not available'}"
     )
     try:
         response = client.messages.create(
-            model='claude-haiku-4-5-20251001',
-            max_tokens=120,
+            model=MODEL_HAIKU,
+            max_tokens=150,
             system=MIGRATION_SYSTEM,
             messages=[{'role': 'user', 'content': user_msg}],
         )
         data = parse_json_response(response.content[0].text)
         return data.get('migration_status', 'unknown'), data.get('reasoning', '')
     except Exception as e:
-        return 'unknown', f'error: {e}'
+        return 'unknown', f'haiku_error: {e}'
 
 
-MIGRATION_DEEP_SYSTEM = """\
-You are a research assistant. A previous analysis could not determine whether this Ukrainian creative worker migrated out of the USSR.
-
-Look harder. Consider:
-- Death location: if they died outside Soviet territory (e.g. Paris, New York, Munich, London, Buenos Aires, Toronto, Rome) → migrated
-- If they died in Ukraine, Russia, or any Soviet republic → non_migrated
-- If born in western Ukraine (Galicia, Bukovyna, Zakarpattia, Volhynia) and died abroad → likely migrated post-WWII
-- If they were repressed, imprisoned, or executed by Soviets → non_migrated
-- If the biography mentions emigration, exile, displaced persons camps, or living abroad → migrated
-- If truly no information exists → unknown is acceptable as last resort
-
-Reply ONLY in this exact JSON format:
-{"migration_status": "migrated" or "non_migrated" or "unknown", "reasoning": "one sentence max"}"""
-
-
-def ask_claude_migration_deep(client, name, profession, birth_loc, death_loc,
-                               birth_year, death_year, bio):
-    """Second-pass migration check with a more aggressive prompt for stubborn unknowns."""
+def ask_claude_migration_sonnet(client, name, profession, birth_loc, death_loc,
+                                 birth_year, death_year, bio):
+    """Sonnet deep retry — used only when Haiku returns 'unknown'."""
     user_msg = (
         f"Name: {name}\n"
         f"Profession: {profession}\n"
         f"Born: {birth_year or '?'} — {birth_loc or 'unknown'}\n"
         f"Died: {death_year or '?'} — {death_loc or 'unknown'}\n"
         f"Full biography:\n{bio[:1400] if bio else 'Not available'}\n\n"
-        f"Previous attempt returned 'unknown'. Please look harder at all available clues."
+        f"Previous Haiku pass returned 'unknown'. Look harder at all clues."
     )
     try:
         response = client.messages.create(
-            model='claude-haiku-4-5-20251001',
-            max_tokens=150,
+            model=MODEL_SONNET,
+            max_tokens=200,
             system=MIGRATION_DEEP_SYSTEM,
             messages=[{'role': 'user', 'content': user_msg}],
         )
         data = parse_json_response(response.content[0].text)
         return data.get('migration_status', 'unknown'), data.get('reasoning', '')
     except Exception as e:
-        return 'unknown', f'error: {e}'
+        return 'unknown', f'sonnet_error: {e}'
 
 
 # ─── Phase 4a: Nationality review ─────────────────────────────────────────────
 
 def run_nationality_phase():
-    """
-    For each entry with flag_needs_claude_review=YES, ask Claude whether
-    the person qualifies as Ukrainian. Uses notes field first; fetches the
-    full article only if the notes are too sparse (< 150 chars).
-    """
     load_env()
     api_key = os.environ.get('ANTHROPIC_API_KEY', '')
     if not api_key:
@@ -295,17 +366,17 @@ def run_nationality_phase():
     client = anthropic.Anthropic(api_key=api_key)
     session = make_session()
 
-    raw_rows = load_input()
-    reviewed = load_reviewed()
+    raw_rows = load_csv(INPUT_FILE)
+    reviewed = {}
+    if os.path.exists(REVIEWED_FILE):
+        reviewed = {row['article_url']: row for row in load_csv(REVIEWED_FILE)}
 
-    # Build working list: start from reviewed data if it exists, else from raw
     working = []
     for row in raw_rows:
         url = row['article_url']
         if url in reviewed:
-            working.append(reviewed[url])  # already has Phase 4 columns
+            working.append(reviewed[url])
         else:
-            # Add blank Phase 4 columns
             working.append({
                 **row,
                 'is_ukrainian': '',
@@ -317,369 +388,419 @@ def run_nationality_phase():
     to_review = [
         r for r in working
         if r.get('flag_needs_claude_review') == 'YES'
-        and not r.get('is_ukrainian')   # skip already done
+        and not r.get('is_ukrainian')
     ]
 
     total = len(to_review)
+    already = sum(1 for r in working
+                  if r.get('flag_needs_claude_review') == 'YES' and r.get('is_ukrainian'))
     print(f"\nPhase 4a — Nationality review")
     print(f"Entries to review: {total}")
-    print(f"Already reviewed:  {sum(1 for r in working if r.get('flag_needs_claude_review') == 'YES' and r.get('is_ukrainian'))}")
+    print(f"Already reviewed:  {already}")
     print()
 
     if total == 0:
-        print("Nothing left to review. Run --phase migration next.")
+        print("Nothing left to review. Run --phase migration --rerun next.")
         return
 
-    # Write header if file doesn't exist yet
-    if not os.path.exists(OUTPUT_FILE):
-        # Seed output file with all rows that don't need review
+    if not os.path.exists(REVIEWED_FILE):
         seed = [r for r in working if r.get('flag_needs_claude_review') != 'YES']
-        save_reviewed(seed)
-        print(f"  Seeded output file with {len(seed)} non-review entries.")
+        save_csv(seed, REVIEWED_FILE)
+        print(f"  Seeded output with {len(seed)} non-flagged entries.")
 
     done = 0
     for row in to_review:
-        name       = row['name']
-        profession = row['profession_raw']
-        birth_loc  = row['birth_location']
-        death_loc  = row['death_location']
-        notes      = row.get('notes', '')
-        url        = row['article_url']
-
-        # Use notes if long enough; otherwise fetch the full article
-        bio = notes
-        if len(notes.strip()) < 150:
-            bio = fetch_article_text(url, session)
-            time.sleep(DELAY_BETWEEN_REQUESTS)
+        url   = row['article_url']
+        notes = row.get('notes', '')
+        bio   = notes if len(notes.strip()) >= 150 else fetch_article_text(url, session)
+        if bio != notes:
+            time.sleep(DELAY_FETCH)
 
         is_ua, reasoning = ask_claude_nationality(
-            client, name, profession, birth_loc, death_loc, bio
+            client, row['name'], row['profession_raw'],
+            row['birth_location'], row['death_location'], bio
         )
-        time.sleep(DELAY_BETWEEN_CLAUDE)
+        time.sleep(DELAY_CLAUDE)
 
         row['is_ukrainian']        = is_ua
         row['ukrainian_reasoning'] = reasoning
-
-        # Update working list in place
-        for i, r in enumerate(working):
-            if r['article_url'] == url:
-                working[i] = row
-                break
-
-        append_reviewed(row)
+        append_csv(row, REVIEWED_FILE)
         done += 1
 
-        flag = {'YES': '✓ Ukrainian', 'NO': '✗ Not Ukrainian', 'UNCERTAIN': '? Uncertain'}.get(is_ua, is_ua)
-        print(f"  [{done}/{total}] {name[:40]:40s} → {flag}")
+        icon = {'YES': '✓ Ukrainian', 'NO': '✗ Not Ukrainian', 'UNCERTAIN': '? Uncertain'}.get(is_ua, is_ua)
+        print(f"  [{done}/{total}] {row['name'][:45]:45s} → {icon}")
         if done % 50 == 0:
-            print(f"  [checkpoint: {done}/{total} done]")
+            print(f"  [checkpoint {done}/{total}]")
 
     print(f"\nDone. {done} entries reviewed.")
-    print(f"Output: {OUTPUT_FILE}")
-    print(f"\nNext step: python claude_review.py --phase migration")
+    print(f"Next: python claude_review.py --phase migration --rerun")
 
 
-# ─── Phase 4b: Migration status ───────────────────────────────────────────────
+# ─── Phase 4b: Migration classification ───────────────────────────────────────
 
-def run_migration_phase():
-    """
-    For all confirmed-Ukrainian entries (clean + reviewed-as-YES),
-    determine migration status using birth/death location + Claude Haiku.
-    """
+def is_confirmed_ukrainian(row):
+    if row.get('flag_non_ukrainian') == 'YES':
+        return False
+    if row.get('flag_needs_claude_review') == 'YES':
+        return row.get('is_ukrainian') == 'YES'
+    return True
+
+
+def run_migration_phase(rerun=False):
     load_env()
     api_key = os.environ.get('ANTHROPIC_API_KEY', '')
     if not api_key:
         sys.exit('Error: ANTHROPIC_API_KEY not found in .env')
 
-    client = anthropic.Anthropic(api_key=api_key)
+    client  = anthropic.Anthropic(api_key=api_key)
     session = make_session()
 
-    if not os.path.exists(OUTPUT_FILE):
-        sys.exit(f'Error: {OUTPUT_FILE} not found. Run --phase nationality first.')
+    source_file = REVIEWED_FILE if os.path.exists(REVIEWED_FILE) else INPUT_FILE
+    rows = load_csv(source_file)
 
-    reviewed = load_reviewed()
-    working  = list(reviewed.values())
+    # Build working dict keyed by URL
+    working = {row['article_url']: row for row in rows}
 
-    # Which entries are confirmed Ukrainian?
-    def is_confirmed_ukrainian(row):
-        if row.get('flag_non_ukrainian') == 'YES':
-            return False
-        if row.get('flag_needs_claude_review') == 'YES':
-            return row.get('is_ukrainian') == 'YES'
-        return True  # clean entry = Ukrainian
+    # If rerun — load OUTPUT_FILE progress so we can resume mid-rerun
+    already_done = {}
+    if os.path.exists(OUTPUT_FILE) and rerun:
+        already_done = {row['article_url']: row for row in load_csv(OUTPUT_FILE)}
+        print(f"  Resuming rerun — {len(already_done)} entries already written to output.")
 
-    to_process = [
-        r for r in working
-        if is_confirmed_ukrainian(r)
-        and r.get('migration_status') not in ('migrated', 'non_migrated', 'alive')
-        # re-process old unknowns with full bio + deep retry
+    # Build list of confirmed Ukrainian entries to process
+    candidates = [
+        row for row in working.values()
+        if is_confirmed_ukrainian(row)
     ]
 
-    total = len(to_process)
-    confirmed = sum(1 for r in working if is_confirmed_ukrainian(r))
-    already_resolved = sum(1 for r in working if is_confirmed_ukrainian(r) and r.get('migration_status') in ('migrated', 'non_migrated'))
-    unknowns = sum(1 for r in working if is_confirmed_ukrainian(r) and r.get('migration_status') == 'unknown')
-    print(f"\nPhase 4b — Migration status (full biography fetch)")
-    print(f"Confirmed Ukrainian entries:  {confirmed}")
-    print(f"Already resolved (m/nm):      {already_resolved}")
-    print(f"Unknowns being re-processed:  {unknowns}")
-    print(f"To process now:               {total}")
+    # Apply date-based exclusions (pure Python — no Claude needed)
+    pre_soviet_excluded = 0
+    galicia_excluded     = 0
+    to_process           = []
+
+    for row in candidates:
+        if should_exclude_pre_soviet(row):
+            row['migration_status']    = 'excluded_pre_soviet'
+            row['migration_reasoning'] = (
+                f"Died before 1921 (death_year={row.get('death_year')}) — "
+                f"pre-Soviet, outside study scope."
+            )
+            working[row['article_url']] = row
+            pre_soviet_excluded += 1
+        elif should_exclude_galicia(row):
+            row['migration_status']    = 'excluded_galicia_pre_annexation'
+            row['migration_reasoning'] = (
+                f"Born in Galicia, died {row.get('death_year')} — before 1939 "
+                f"USSR annexation of western Ukraine. Never under Soviet rule."
+            )
+            working[row['article_url']] = row
+            galicia_excluded += 1
+        else:
+            to_process.append(row)
+
+    # Filter to_process based on rerun mode
+    if rerun:
+        # Skip entries already written in this rerun's output file
+        to_process = [r for r in to_process if r['article_url'] not in already_done]
+    else:
+        # Normal mode — skip already resolved entries
+        to_process = [
+            r for r in to_process
+            if r.get('migration_status') not in RESOLVED_STATUSES
+        ]
+
+    total     = len(to_process)
+    confirmed = len(candidates)
+    print(f"\nPhase 4b — Migration classification (V2.1 four-way)")
+    print(f"Confirmed Ukrainian entries:       {confirmed:,}")
+    print(f"Excluded pre-1921:                 {pre_soviet_excluded:,}")
+    print(f"Excluded Galicia pre-1939:         {galicia_excluded:,}")
+    print(f"To classify now:                   {total:,}")
+    print(f"Rerun mode:                        {'YES — re-classifying all' if rerun else 'NO — skipping resolved'}")
     print()
 
     if total == 0:
-        print("All migration statuses already determined.")
-        print("Run --phase analysis to see results.")
+        print("Nothing to classify. Run --phase analysis to see results.")
         return
 
-    done = 0
-    for row in to_process:
-        name       = row['name']
-        profession = row['profession_raw']
-        birth_loc  = row['birth_location']
-        death_loc  = row['death_location']
-        birth_year = row['birth_year']
-        death_year = row['death_year']
-        notes      = row.get('notes', '')
-        url        = row['article_url']
+    # Write excluded entries to output first
+    if rerun and not already_done:
+        excluded_rows = [
+            r for r in working.values()
+            if r.get('migration_status') in ('excluded_pre_soviet', 'excluded_galicia_pre_annexation')
+        ]
+        # Also write already-resolved from prior rerun
+        if already_done:
+            excluded_rows += list(already_done.values())
+        if excluded_rows:
+            save_csv(excluded_rows, OUTPUT_FILE)
 
-        # If no death year — person is likely still alive, mark and skip Claude
+    done         = 0
+    sonnet_count = 0
+
+    for row in to_process:
+        url        = row['article_url']
+        name       = row['name']
+        birth_year = row.get('birth_year', '')
+        death_year = row.get('death_year', '')
+
+        # No death year → alive, skip Claude
         if not death_year:
             row['migration_status']    = 'alive'
-            row['migration_reasoning'] = 'No death year recorded — presumed alive or death date unknown.'
-            for i, r in enumerate(working):
-                if r['article_url'] == url:
-                    working[i] = row
-                    break
-            append_reviewed(row)
+            row['migration_reasoning'] = 'No death year — presumed alive or date unknown.'
+            append_csv(row, OUTPUT_FILE)
+            working[url] = row
             done += 1
-            print(f"  [{done}/{total}] {name[:40]:40s} → ○ Alive/no date")
+            print(f"  [{done}/{total}] {name[:45]:45s} → ○ Alive")
             continue
 
-        # Always fetch the full article — migration info is rarely in the first 300 chars
+        # Fetch full article
         bio = fetch_article_text(url, session)
         if not bio:
-            bio = notes  # fallback to notes if fetch fails
-        time.sleep(DELAY_BETWEEN_REQUESTS)
+            bio = row.get('notes', '')
+        time.sleep(DELAY_FETCH)
 
-        status, reasoning = ask_claude_migration(
-            client, name, profession, birth_loc, death_loc,
+        # Haiku first pass
+        status, reasoning = ask_claude_migration_haiku(
+            client, name, row['profession_raw'],
+            row['birth_location'], row['death_location'],
             birth_year, death_year, bio
         )
-        time.sleep(DELAY_BETWEEN_CLAUDE)
+        time.sleep(DELAY_CLAUDE)
 
-        # If still unknown — retry with a deeper, more explicit prompt
+        # Sonnet deep retry for unknowns
         if status == 'unknown':
-            status, reasoning = ask_claude_migration_deep(
-                client, name, profession, birth_loc, death_loc,
+            status, reasoning = ask_claude_migration_sonnet(
+                client, name, row['profession_raw'],
+                row['birth_location'], row['death_location'],
                 birth_year, death_year, bio
             )
-            time.sleep(DELAY_BETWEEN_CLAUDE)
+            time.sleep(DELAY_CLAUDE)
+            sonnet_count += 1
 
         row['migration_status']    = status
         row['migration_reasoning'] = reasoning
-
-        for i, r in enumerate(working):
-            if r['article_url'] == url:
-                working[i] = row
-                break
-
-        append_reviewed(row)
+        working[url]               = row
+        append_csv(row, OUTPUT_FILE)
         done += 1
 
-        icon = {'migrated': '→ Migrated', 'non_migrated': '• Stayed', 'unknown': '? Unknown', 'alive': '○ Alive'}.get(status, status)
-        print(f"  [{done}/{total}] {name[:40]:40s} → {icon}")
+        icons = {
+            'migrated':          '→ Migrated',
+            'non_migrated':      '• Stayed',
+            'internal_transfer': '~ Internal transfer',
+            'deported':          '⚑ Deported',
+            'unknown':           '? Unknown',
+        }
+        icon = icons.get(status, status)
+        sonnet_flag = ' [Sonnet]' if 'sonnet' in reasoning.lower() or status == 'unknown' else ''
+        print(f"  [{done}/{total}] {name[:45]:45s} → {icon}{sonnet_flag}")
 
-        if done % 100 == 0:
-            print(f"  [checkpoint: {done}/{total} done — saving full file]")
-            save_reviewed(working)
+        if done % 200 == 0:
+            print(f"\n  [checkpoint {done}/{total} — Sonnet escalations so far: {sonnet_count}]\n")
 
-    save_reviewed(working)
-    print(f"\nDone. {done} entries processed.")
+    print(f"\nDone. {done} entries classified.")
+    print(f"Sonnet escalations: {sonnet_count}")
     print(f"Output: {OUTPUT_FILE}")
-    print(f"\nNext step: python claude_review.py --phase analysis")
+    print(f"\nNext: python claude_review.py --phase analysis")
 
 
 # ─── Phase 4c: Analysis ───────────────────────────────────────────────────────
 
 def run_analysis_phase():
-    """
-    Calculate life expectancy statistics by migration status, profession,
-    time period, and other breakdowns. Print results and save to text file.
-    """
-    if not os.path.exists(OUTPUT_FILE):
-        sys.exit(f'Error: {OUTPUT_FILE} not found. Run nationality + migration phases first.')
+    # Use V2.1 output if it exists, otherwise fall back to reviewed
+    source = OUTPUT_FILE if os.path.exists(OUTPUT_FILE) else REVIEWED_FILE
+    if not os.path.exists(source):
+        sys.exit(f'Error: no output file found. Run nationality + migration phases first.')
 
-    reviewed = load_reviewed()
-    rows = list(reviewed.values())
+    rows = load_csv(source)
 
-    def is_confirmed_ukrainian(row):
-        if row.get('flag_non_ukrainian') == 'YES':
-            return False
-        if row.get('flag_needs_claude_review') == 'YES':
-            return row.get('is_ukrainian') == 'YES'
-        return True
+    def ages(group):
+        result = []
+        for r in group:
+            b = safe_int(r.get('birth_year'))
+            d = safe_int(r.get('death_year'))
+            if b and d and 5 <= d - b <= 110:
+                result.append(d - b)
+        return result
 
-    def safe_int(val):
-        try:
-            return int(val)
-        except (TypeError, ValueError):
-            return None
+    def avg(lst):
+        return sum(lst) / len(lst) if lst else 0
 
-    # Filter to Ukrainian entries with both dates and migration status
-    usable = [
-        r for r in rows
-        if is_confirmed_ukrainian(r)
-        and safe_int(r.get('birth_year'))
-        and safe_int(r.get('death_year'))
-        and r.get('migration_status') in ('migrated', 'non_migrated')
-    ]
+    def median(lst):
+        if not lst:
+            return 0
+        s = sorted(lst)
+        n = len(s)
+        return s[n // 2] if n % 2 else (s[n // 2 - 1] + s[n // 2]) / 2
 
     results = []
     def log(line=''):
         print(line)
         results.append(line)
 
-    log("=" * 60)
-    log("UKRAINIAN CREATIVE WORKERS — LIFE EXPECTANCY ANALYSIS")
-    log("V2 Paper — Berdnyk & Symkin")
-    log("=" * 60)
+    # ── Filter confirmed Ukrainian with dates ──────────────────
+    confirmed_ua = [r for r in rows if is_confirmed_ukrainian(r)]
+    total_ua = len(confirmed_ua)
+
+    migrated    = [r for r in confirmed_ua if r.get('migration_status') == 'migrated']
+    non_mig     = [r for r in confirmed_ua if r.get('migration_status') == 'non_migrated']
+    internal    = [r for r in confirmed_ua if r.get('migration_status') == 'internal_transfer']
+    deported    = [r for r in confirmed_ua if r.get('migration_status') == 'deported']
+    alive       = [r for r in confirmed_ua if r.get('migration_status') == 'alive']
+    unknown     = [r for r in confirmed_ua if r.get('migration_status') == 'unknown']
+    ex_pre      = [r for r in confirmed_ua if r.get('migration_status') == 'excluded_pre_soviet']
+    ex_gal      = [r for r in confirmed_ua if r.get('migration_status') == 'excluded_galicia_pre_annexation']
+
+    # Primary analysis groups: migrated vs (non_migrated + deported)
+    primary_nm = non_mig + deported
+
+    log("=" * 65)
+    log("UKRAINIAN CREATIVE WORKERS — LIFE EXPECTANCY ANALYSIS V2.1")
+    log("Berdnyk & Symkin")
+    log("=" * 65)
+    log()
+    log(f"Total confirmed Ukrainian entries:           {total_ua:,}")
+    log(f"  Excluded (pre-1921 deaths):                {len(ex_pre):,}")
+    log(f"  Excluded (Galicia, died before 1939):      {len(ex_gal):,}")
+    log(f"  Alive / no death date:                     {len(alive):,}")
+    log(f"  Unknown migration (after Sonnet retry):    {len(unknown):,}")
+    log()
+    log(f"Primary analysis dataset:")
+    log(f"  Migrated (left USSR):                      {len(migrated):,}")
+    log(f"  Non-migrated (stayed in Ukrainian SSR):    {len(non_mig):,}")
+    log(f"  Deported (forced by Soviet state):         {len(deported):,}")
+    log(f"  Internal transfer (voluntary, within USSR):{len(internal):,}")
     log()
 
-    # ── Overall counts ─────────────────────────────────────────
-    total_ua = sum(1 for r in rows if is_confirmed_ukrainian(r))
-    with_dates = sum(
-        1 for r in rows
-        if is_confirmed_ukrainian(r)
-        and safe_int(r.get('birth_year'))
-        and safe_int(r.get('death_year'))
-    )
-    log(f"Total confirmed Ukrainian entries: {total_ua:,}")
-    log(f"With both birth + death dates:     {with_dates:,}")
-    log(f"Used in life expectancy analysis:  {len(usable):,}")
+    # ── Primary LE comparison ──────────────────────────────────
+    log("── Primary Life Expectancy Comparison ───────────────────────")
+    log(f"{'Group':<35} {'N':>6}  {'Mean LE':>8}  {'Median':>7}")
+    log("-" * 62)
+
+    for label, group in [
+        ('Migrated (left USSR)',           migrated),
+        ('Non-migrated (stayed in USSR)',  non_mig),
+        ('Deported (forced by state)',     deported),
+        ('Internal transfer (voluntary)',  internal),
+        ('Non-mig + Deported (combined)', primary_nm),
+    ]:
+        a = ages(group)
+        log(f"{label:<35} {len(a):>6}  {avg(a):>7.2f}y  {median(a):>6.0f}y")
+
+    if ages(migrated) and ages(primary_nm):
+        gap_mean   = avg(ages(migrated))   - avg(ages(primary_nm))
+        gap_median = median(ages(migrated)) - median(ages(primary_nm))
+        log()
+        log(f"Primary gap (migrated vs non-mig+deported): mean {gap_mean:+.2f}y / median {gap_median:+.0f}y")
+        gap_nm_only = avg(ages(migrated)) - avg(ages(non_mig))
+        log(f"Gap (migrated vs non-mig only):             mean {gap_nm_only:+.2f}y")
+        gap_dep = avg(ages(deported)) - avg(ages(non_mig)) if ages(deported) else 0
+        log(f"Deported vs non-mig penalty:                mean {gap_dep:+.2f}y")
     log()
 
-    # ── Life expectancy by migration status ────────────────────
-    migrated     = [r for r in usable if r['migration_status'] == 'migrated']
-    non_migrated = [r for r in usable if r['migration_status'] == 'non_migrated']
-
-    def avg_life(group):
-        ages = [safe_int(r['death_year']) - safe_int(r['birth_year']) for r in group]
-        ages = [a for a in ages if 10 <= a <= 110]  # filter outliers
-        return sum(ages) / len(ages) if ages else 0
-
-    def avg_birth(group):
-        years = [safe_int(r['birth_year']) for r in group if safe_int(r['birth_year'])]
-        return sum(years) / len(years) if years else 0
-
-    def avg_death(group):
-        years = [safe_int(r['death_year']) for r in group if safe_int(r['death_year'])]
-        return sum(years) / len(years) if years else 0
-
-    log("── Life Expectancy by Migration Status ──────────────────")
-    log(f"{'Group':<20} {'Count':>6}  {'Avg Birth':>10}  {'Avg Death':>10}  {'Avg Life Exp':>13}")
-    log("-" * 65)
-    for label, group in [("Non-migrants", non_migrated), ("Migrants", migrated)]:
-        log(f"{label:<20} {len(group):>6}  {avg_birth(group):>10.1f}  {avg_death(group):>10.1f}  {avg_life(group):>12.1f}y")
-
-    gap = avg_life(migrated) - avg_life(non_migrated)
-    log()
-    log(f"Life expectancy gap (migrants vs non-migrants): {gap:+.1f} years")
-    log()
-
-    # ── Death year clustering ──────────────────────────────────
+    # ── Most common death years ────────────────────────────────
     from collections import Counter
-
-    log("── Most Common Death Years ──────────────────────────────")
-    for label, group in [("Non-migrants", non_migrated), ("Migrants", migrated)]:
-        death_years = [safe_int(r['death_year']) for r in group if safe_int(r['death_year'])]
+    log("── Most Common Death Years ───────────────────────────────────")
+    for label, group in [
+        ('Non-migrated', non_mig),
+        ('Migrated',     migrated),
+        ('Deported',     deported),
+    ]:
+        death_years = [safe_int(r['death_year']) for r in group if safe_int(r.get('death_year'))]
         top5 = Counter(death_years).most_common(5)
         log(f"\n{label}:")
         for year, count in top5:
-            avg_age = avg_life([r for r in group if safe_int(r['death_year']) == year])
-            log(f"  {year}: {count} deaths  (avg age at death: {avg_age:.0f})")
+            yr_group = [r for r in group if safe_int(r.get('death_year')) == year]
+            log(f"  {year}: {count} deaths  (avg age: {avg(ages(yr_group)):.0f})")
     log()
 
     # ── Profession breakdown ───────────────────────────────────
-    log("── Life Expectancy by Profession ────────────────────────")
-
+    log("── Life Expectancy by Profession ─────────────────────────────")
     profession_keywords = {
-        'Writers/Poets':     ['письменник', 'поет', 'прозаїк', 'драматург', 'літературознавець'],
-        'Visual Artists':    ['художник', 'живописець', 'скульптор', 'графік', 'ілюстратор'],
-        'Musicians':         ['композитор', 'диригент', 'піаніст', 'скрипаль', 'співак'],
-        'Theatre/Film':      ['актор', 'режисер', 'кінорежисер', 'сценарист'],
-        'Architects':        ['архітектор'],
+        'Writers/Poets':  ['письменник', 'поет', 'прозаїк', 'драматург'],
+        'Visual Artists': ['художник', 'живописець', 'скульптор', 'графік', 'ілюстратор'],
+        'Musicians':      ['композитор', 'диригент', 'піаніст', 'скрипаль', 'співак'],
+        'Theatre/Film':   ['актор', 'режисер', 'кінорежисер', 'сценарист'],
+        'Architects':     ['архітектор'],
     }
-
-    log(f"{'Profession':<20} {'Count':>6}  {'Migrated':>9}  {'Non-mig':>8}  {'Gap':>6}")
-    log("-" * 56)
+    log(f"{'Profession':<20} {'N':>5}  {'Migr':>7}  {'Non-mig':>8}  {'Deported':>9}  {'Gap':>6}")
+    log("-" * 62)
     for prof_label, keywords in profession_keywords.items():
-        prof_rows = [
-            r for r in usable
-            if any(kw in r.get('profession_raw', '').lower() for kw in keywords)
-        ]
-        if not prof_rows:
-            continue
-        pm  = [r for r in prof_rows if r['migration_status'] == 'migrated']
-        pnm = [r for r in prof_rows if r['migration_status'] == 'non_migrated']
-        g   = avg_life(pm) - avg_life(pnm) if pm and pnm else 0
-        log(f"{prof_label:<20} {len(prof_rows):>6}  {avg_life(pm):>8.1f}y  {avg_life(pnm):>7.1f}y  {g:>+5.1f}y")
+        prof = [r for r in confirmed_ua
+                if any(kw in r.get('profession_raw', '').lower() for kw in keywords)
+                and r.get('migration_status') in ('migrated', 'non_migrated', 'deported')]
+        pm  = [r for r in prof if r['migration_status'] == 'migrated']
+        pnm = [r for r in prof if r['migration_status'] == 'non_migrated']
+        pd  = [r for r in prof if r['migration_status'] == 'deported']
+        g   = avg(ages(pm)) - avg(ages(pnm)) if ages(pm) and ages(pnm) else 0
+        log(f"{prof_label:<20} {len(prof):>5}  {avg(ages(pm)):>6.1f}y  {avg(ages(pnm)):>7.1f}y  {avg(ages(pd)):>8.1f}y  {g:>+5.1f}y")
     log()
 
-    # ── Time period breakdown ──────────────────────────────────
-    log("── Non-migrant Deaths by Time Period ────────────────────")
+    # ── Period breakdown ───────────────────────────────────────
+    log("── Non-migrant Deaths by Soviet Period ───────────────────────")
     periods = [
-        ('Pre-1917 (Tsarist)',   1800, 1917),
-        ('1917–1929 (early Soviet)', 1917, 1930),
-        ('1930–1939 (Great Terror)', 1930, 1940),
-        ('1940–1945 (WWII)',     1940, 1946),
-        ('1946–1953 (Late Stalin)', 1946, 1954),
-        ('1954–1991 (post-Stalin)', 1954, 1992),
-        ('Post-1991',            1992, 2100),
+        ('1921–1929 (early Soviet)',    1921, 1930),
+        ('1930–1939 (Great Terror)',    1930, 1940),
+        ('1940–1945 (WWII)',            1940, 1946),
+        ('1946–1953 (Late Stalin)',     1946, 1954),
+        ('1954–1991 (post-Stalin)',     1954, 1992),
+        ('Post-1991',                  1992, 2100),
     ]
     log(f"{'Period':<30} {'Deaths':>7}  {'Avg Age':>8}")
     log("-" * 50)
     for label, start, end in periods:
-        group = [
-            r for r in non_migrated
-            if start <= (safe_int(r['death_year']) or 0) < end
-        ]
-        log(f"{label:<30} {len(group):>7}  {avg_life(group):>7.1f}y")
+        grp = [r for r in non_mig
+               if start <= (safe_int(r.get('death_year')) or 0) < end]
+        log(f"{label:<30} {len(grp):>7}  {avg(ages(grp)):>7.1f}y")
     log()
 
-    # ── Summary note for paper ─────────────────────────────────
-    log("── Notes for paper ──────────────────────────────────────")
-    log(f"V1 dataset: 415 workers (332 non-migrant / 83 migrant)")
-    log(f"V2 dataset: {len(usable):,} workers with dates ({len(non_migrated):,} non-migrant / {len(migrated):,} migrant)")
-    log(f"V1 life expectancy gap: 9 years (63 vs 72)")
-    log(f"V2 life expectancy gap: {gap:+.1f} years")
+    # ── Deported period breakdown ──────────────────────────────
+    log("── Deported Deaths by Period ─────────────────────────────────")
+    log(f"{'Period':<30} {'Deaths':>7}  {'Avg Age':>8}")
+    log("-" * 50)
+    for label, start, end in periods:
+        grp = [r for r in deported
+               if start <= (safe_int(r.get('death_year')) or 0) < end]
+        log(f"{label:<30} {len(grp):>7}  {avg(ages(grp)):>7.1f}y")
     log()
-    log("Pre-1991 death cutoff: REMOVED in V2 (fixes V1 statistical bias)")
-    log("Sources: Encyclopedia of Modern Ukraine (esu.com.ua)")
-    log("=" * 60)
 
-    # Save to file
+    # ── Summary ───────────────────────────────────────────────
+    log("── Paper Summary ─────────────────────────────────────────────")
+    log(f"V1: 415 workers / 9-year gap (63y vs 72y) — pre-1991 cutoff bias")
+    log(f"V2.0: 6,310 workers / 4.77-year gap — cutoff bias removed")
+    log(f"V2.1: rerun with four-way classification + date exclusions")
+    log(f"  Migrated:          {len(migrated):,} workers")
+    log(f"  Non-migrated:      {len(non_mig):,} workers")
+    log(f"  Deported:          {len(deported):,} workers")
+    log(f"  Internal transfer: {len(internal):,} workers")
+    log("=" * 65)
+
     with open(ANALYSIS_FILE, 'w', encoding='utf-8') as f:
         f.write('\n'.join(results))
-    print(f"\nResults saved to: {ANALYSIS_FILE}")
+    print(f"\nSaved to: {ANALYSIS_FILE}")
 
 
 # ─── Entry point ──────────────────────────────────────────────────────────────
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Phase 4: Claude-powered review of Ukrainian creative workers dataset.'
+        description='Phase 4: Claude-powered review — V2.1 four-way migration classification.'
     )
     parser.add_argument(
         '--phase',
         choices=['nationality', 'migration', 'analysis'],
         required=True,
-        help='Which phase to run.'
+    )
+    parser.add_argument(
+        '--rerun',
+        action='store_true',
+        help='(migration only) Re-classify all entries from scratch, ignoring existing statuses.'
     )
     args = parser.parse_args()
 
     if args.phase == 'nationality':
         run_nationality_phase()
     elif args.phase == 'migration':
-        run_migration_phase()
+        run_migration_phase(rerun=args.rerun)
     elif args.phase == 'analysis':
         run_analysis_phase()
