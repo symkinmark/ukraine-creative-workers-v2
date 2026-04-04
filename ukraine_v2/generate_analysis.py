@@ -1069,6 +1069,80 @@ save(fig, 'fig15_internal_transfer_null.png')
 
 
 # ===========================================================================
+# FIG 15b — ALL-GROUPS LE COMPARISON (expanded null-result check)
+#
+# Replicates fig15 logic but shows all four groups side-by-side so the reader
+# can directly compare internal_transfer and non_migrated against migrated and
+# deported. Draws explicit written conclusions on the chart.
+# ===========================================================================
+print("  fig15b_all_groups_le_box.png")
+
+mig_les = le_values(migrated)
+it_les2  = le_values(internal_transfer)
+nm_les2  = le_values(non_migrated)
+dep_les  = le_values(deported)
+
+_all_groups_15b = [
+    ('migrated',          mig_les,  GROUP_LABELS['migrated']),
+    ('non_migrated',      nm_les2,  GROUP_LABELS['non_migrated']),
+    ('internal_transfer', it_les2,  GROUP_LABELS['internal_transfer']),
+    ('deported',          dep_les,  GROUP_LABELS['deported']),
+]
+
+fig, ax = plt.subplots(figsize=(10, 7))
+
+bp15b = ax.boxplot(
+    [g[1] for g in _all_groups_15b],
+    patch_artist=True, notch=False,
+    medianprops={'color': 'white', 'linewidth': 2.5},
+    whiskerprops={'color': '#555'},
+    capprops={'color': '#555'},
+    flierprops={'marker': 'o', 'markersize': 3, 'markerfacecolor': '#ccc', 'linestyle': 'none'},
+)
+for box_patch, (ms, _, _lbl) in zip(bp15b['boxes'], _all_groups_15b):
+    box_patch.set_facecolor(COLOUR[ms])
+    box_patch.set_alpha(0.85)
+
+ax.set_xticks(range(1, 5))
+ax.set_xticklabels([g[2] for g in _all_groups_15b], rotation=10, fontsize=9)
+ax.set_ylim(bottom=0)
+
+# Mean labels above each box
+for i, (ms, les, _) in enumerate(_all_groups_15b, start=1):
+    if les:
+        m = statistics.mean(les)
+        ax.text(i, m + 1.2, f"{m:.1f}", ha='center', fontsize=9,
+                color=COLOUR[ms], fontweight='bold')
+
+# Stat tests: IT vs NM (null), MIG vs NM (main finding)
+_, p_it_nm  = mannwhitney(it_les2, nm_les2)
+_, p_mig_nm = mannwhitney(mig_les, nm_les2)
+
+# Conclusions text box
+concl = (
+    f"KEY CONCLUSIONS\n"
+    f"• Migrated vs Non-migrated:  Δ={statistics.mean(mig_les):.1f}−{statistics.mean(nm_les2):.1f}"
+    f" = +{statistics.mean(mig_les)-statistics.mean(nm_les2):.1f} yrs  (p={p_mig_nm:.4f})\n"
+    f"• Internal transfer vs Non-migrated:  Δ={statistics.mean(it_les2):.1f}−{statistics.mean(nm_les2):.1f}"
+    f" = {statistics.mean(it_les2)-statistics.mean(nm_les2):+.1f} yrs  (p={p_it_nm:.3f} — NULL RESULT)\n"
+    f"• Moving within the USSR gives no LE benefit — leaving the Soviet sphere was what mattered."
+)
+ax.text(0.02, 0.97, concl, transform=ax.transAxes,
+        fontsize=8.5, va='top', ha='left',
+        bbox=dict(boxstyle='round,pad=0.5', facecolor='#f9f9f9',
+                  edgecolor='#cccccc', alpha=0.95),
+        fontfamily='monospace')
+
+apply_style(ax,
+    'Figure 15b — Life Expectancy: All Four Groups Compared\n'
+    '(Box = IQR; line = median; whiskers = 1.5×IQR; dots = outliers)',
+    ylabel='Age at Death (years)')
+add_source(fig)
+plt.tight_layout(rect=[0, 0.04, 1, 1])
+save(fig, 'fig15b_all_groups_le_box.png')
+
+
+# ===========================================================================
 # FIG 16 — CONSORT-STYLE EXCLUSION FLOWCHART
 # ===========================================================================
 print("  fig16_consort_flowchart.png")
@@ -1207,6 +1281,56 @@ fig.text(0.5, 0.005,
     ha='center', fontsize=6.5, color='grey', style='italic')
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 save(fig, 'fig19_ssr_population_context.png')
+
+
+# ===========================================================================
+# FIG 19b — SIMPLIFIED ANNUAL DEATH RATE (3-line version)
+#
+# Same normalised % death rate as fig19, but combines non_migrated + deported
+# into a single "Stayed/Deported" line for a cleaner story:
+#   → Migrated | Internal Transfer | Stayed + Deported combined
+# Makes the contrast between leaving and staying starker.
+# ===========================================================================
+print("  fig19b_simplified_death_rate.png")
+
+stayed_deported = non_migrated + deported
+n_stayed_dep = normalise(
+    deaths_by_year(stayed_deported, SPIKE_START, SPIKE_END),
+    len(stayed_deported)
+)
+
+fig19b, ax19b = plt.subplots(figsize=(16, 7))
+
+LINE_DATA19b = [
+    ('non_migrated',      n_stayed_dep, f'Non-migrated + Deported combined  (n={len(stayed_deported)})', '-',  2.5),
+    ('internal_transfer', n_it,         f'Internal transfer (USSR)  (n={len(internal_transfer)})',        '--', 1.8),
+    ('migrated',          n_mig,        f'Migrated (left USSR)  (n={len(migrated)})',                    ':',  2.0),
+]
+for ms, vals, lbl, ls, lw in LINE_DATA19b:
+    ax19b.plot(spike_years, vals, color=COLOUR[ms], linewidth=lw,
+               linestyle=ls, label=lbl, alpha=0.9)
+
+ymax19b = max(max(n_stayed_dep), max(n_it), max(n_mig)) * 1.15
+for x0, x1, col, lbl in EVENT_BANDS19:
+    ax19b.axvspan(x0, x1, alpha=0.10, color=col, zorder=0)
+    ax19b.text((x0 + x1) / 2, ymax19b * 0.92, lbl, ha='center',
+               fontsize=7.5, color=col, fontweight='bold', va='top')
+
+ax19b.set_xlim(SPIKE_START - 0.5, SPIKE_END + 0.5)
+ax19b.set_ylim(0, ymax19b)
+apply_style(ax19b,
+    'Figure 19b — Annual Death Rate: Simplified 3-Line View\n'
+    '(% of each group dying per year — non-migrated + deported combined)',
+    xlabel='Year', ylabel='Deaths per year (% of group total)')
+ax19b.legend(fontsize=9, loc='upper right')
+
+fig19b.text(0.5, 0.005,
+    "Non-migrated and Deported combined into one 'stayed in Soviet sphere' line. "
+    "Normalised: each line = annual deaths ÷ group size × 100. "
+    + SOURCE_NOTE,
+    ha='center', fontsize=6.5, color='grey', style='italic')
+plt.tight_layout(rect=[0, 0.04, 1, 1])
+save(fig19b, 'fig19b_simplified_death_rate.png')
 
 
 # ===========================================================================
