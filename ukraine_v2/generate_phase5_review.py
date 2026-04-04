@@ -30,11 +30,11 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
-INPUT_CSV = os.path.join(os.path.dirname(__file__), "esu_creative_workers_reviewed.csv")
-OUTPUT_HTML = os.path.join(os.path.dirname(__file__), "phase5_review.html")
+INPUT_CSV = os.path.join(os.path.dirname(__file__), "esu_creative_workers_v2_1.csv")
+OUTPUT_HTML = os.path.join(os.path.dirname(__file__), "phase5b_review.html")
 SERVE_DIR = os.path.dirname(__file__)
 PORT = 8765
-SEED = 42  # fixed so the sample is reproducible across reruns
+SEED = 99  # different seed from Phase 5 (42) — fresh independent sample
 
 # All valid migration statuses — includes four-way system from V2.1
 VALID_STATUSES = {"migrated", "non_migrated", "internal_transfer", "deported"}

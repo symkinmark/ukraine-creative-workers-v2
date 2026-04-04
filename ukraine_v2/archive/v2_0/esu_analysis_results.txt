@@ -1,0 +1,91 @@
+=================================================================
+UKRAINIAN CREATIVE WORKERS — LIFE EXPECTANCY ANALYSIS V2.1
+Berdnyk & Symkin
+=================================================================
+
+Total confirmed Ukrainian entries:           16,215
+  Excluded (pre-1921 deaths):                649
+  Excluded (Galicia, died before 1939):      89
+  Alive / no death date:                     8,971
+  Unknown migration (after Sonnet retry):    115
+
+Primary analysis dataset:
+  Migrated (left USSR):                      967
+  Non-migrated (stayed in Ukrainian SSR):    4,841
+  Deported (forced by Soviet state):         87
+  Internal transfer (voluntary, within USSR):496
+
+── Primary Life Expectancy Comparison ───────────────────────
+Group                                    N   Mean LE   Median
+--------------------------------------------------------------
+Migrated (left USSR)                   927    75.86y      78y
+Non-migrated (stayed in USSR)         4610    71.16y      73y
+Deported (forced by state)              75    48.51y      47y
+Internal transfer (voluntary)          479    70.21y      72y
+Non-mig + Deported (combined)         4685    70.80y      72y
+
+Primary gap (migrated vs non-mig+deported): mean +5.06y / median +6y
+Gap (migrated vs non-mig only):             mean +4.70y
+Deported vs non-mig penalty:                mean -22.66y
+
+── Most Common Death Years ───────────────────────────────────
+
+Non-migrated:
+  2021: 141 deaths  (avg age: 79)
+  2006: 121 deaths  (avg age: 74)
+  2020: 119 deaths  (avg age: 79)
+  2008: 118 deaths  (avg age: 73)
+  2018: 118 deaths  (avg age: 78)
+
+Migrated:
+  2002: 22 deaths  (avg age: 77)
+  1980: 21 deaths  (avg age: 72)
+  1990: 18 deaths  (avg age: 80)
+  2000: 18 deaths  (avg age: 85)
+  1999: 18 deaths  (avg age: 81)
+
+Deported:
+  1937: 24 deaths  (avg age: 42)
+  1938: 14 deaths  (avg age: 43)
+  1942: 9 deaths  (avg age: 46)
+  1945: 5 deaths  (avg age: 43)
+  1944: 4 deaths  (avg age: 34)
+
+── Life Expectancy by Profession ─────────────────────────────
+Profession               N     Migr   Non-mig   Deported     Gap
+--------------------------------------------------------------
+Writers/Poets         1350    73.7y     70.5y      44.5y   +3.2y
+Visual Artists        1857    74.7y     70.7y      57.3y   +4.0y
+Musicians              761    75.6y     70.1y      45.0y   +5.5y
+Theatre/Film           547    77.5y     70.5y      40.0y   +6.9y
+Architects             381    80.4y     72.8y      62.0y   +7.6y
+
+── Non-migrant Deaths by Soviet Period ───────────────────────
+Period                          Deaths   Avg Age
+--------------------------------------------------
+1921–1929 (early Soviet)           110     61.2y
+1930–1939 (Great Terror)           130     57.9y
+1940–1945 (WWII)                   132     54.0y
+1946–1953 (Late Stalin)             95     63.6y
+1954–1991 (post-Stalin)            980     65.1y
+Post-1991                         3394     74.0y
+
+── Deported Deaths by Period ─────────────────────────────────
+Period                          Deaths   Avg Age
+--------------------------------------------------
+1921–1929 (early Soviet)             0      0.0y
+1930–1939 (Great Terror)            38     42.3y
+1940–1945 (WWII)                    25     44.8y
+1946–1953 (Late Stalin)              7     54.4y
+1954–1991 (post-Stalin)             12     59.4y
+Post-1991                            5     80.2y
+
+── Paper Summary ─────────────────────────────────────────────
+V1: 415 workers / 9-year gap (63y vs 72y) — pre-1991 cutoff bias
+V2.0: 6,310 workers / 4.77-year gap — cutoff bias removed
+V2.1: rerun with four-way classification + date exclusions
+  Migrated:          967 workers
+  Non-migrated:      4,841 workers
+  Deported:          87 workers
+  Internal transfer: 496 workers
+=================================================================

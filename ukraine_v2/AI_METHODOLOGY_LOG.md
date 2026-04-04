@@ -198,9 +198,49 @@ All three corrections require a rerun of the Claude classification pass on `esu_
 
 ---
 
+## Phase 5b — V2.1 Accuracy Check (pending)
+
+Before running analysis on the V2.1 classified dataset, a second human accuracy check will be performed on a fresh random sample of ~63 entries from `esu_creative_workers_v2_1.csv`. This verifies that the four-way classification (migrated / non_migrated / internal_transfer / deported) is performing correctly, and specifically that:
+- Deportees are not being misclassified as internal transfers or non-migrants
+- Internal transfers are not being conflated with migrants
+- Pre-1921 and Galicia exclusions are applied correctly
+
+Error rate target: below 5% (improvement from V2.0's 9.5%).
+
+---
+
+## Phase 4c — Extended Analysis Plan (pending Phase 5b clearance)
+
+Once V2.1 accuracy is confirmed, the following analysis and charts will be generated:
+
+### Charts — 10 figures + 1 flowchart
+
+| Fig | Type | Scientific purpose |
+|-----|------|--------------------|
+| 1 | Bar + error bars (±1 SD) | Primary LE comparison across four groups |
+| 2 | Box plots (4 groups) | Show distribution shape — means alone mislead on skewed data |
+| 3 | Kaplan-Meier survival curves | Standard mortality research chart — proportion surviving past each age |
+| 4 | Histogram: death year clustering | Great Terror spike visible in raw death year data |
+| 5 | Bar: deaths + avg age by Soviet period | How mortality changed across political history of USSR |
+| 6 | Line: LE by birth cohort (decade) | Which generations were most affected |
+| 7 | Grouped bar: LE by profession + group | Secondary finding — profession-level risk |
+| 8 | Bar: deported deaths by year 1921–1960 | New V2.1 finding — repression concentration in 1937–1942 |
+| 9 | Bar: birth year distribution by group | Selection bias check — are groups comparable at baseline? |
+| 10 | Significance brackets + CI overlay | Connect statistical tests (Mann-Whitney U, Cohen's d) to visuals |
+| Flow | CONSORT-style exclusion flowchart | Standard for filtered datasets — 70,000 → 6,420 entries, step by step |
+
+### Additional analysis (not in V2.0)
+
+- **Confidence intervals on deported group** — n=75 is small; CI must be shown to validate the 22-year penalty finding
+- **Comparison to general Soviet/Ukrainian population LE** — contextual reference line on charts
+- **Gender acknowledgment** — check whether gender distribution differs across groups; report as limitation if data is insufficient
+- **Sensitivity analysis for 9.5% AI error rate** — show conclusions hold if 9.5% of classifications are flipped in the least favourable direction
+
+---
+
 ## Phase 6 — Paper Writing
 
-*[To be completed after Phase 4 rerun with corrected methodology]*
+*[To be completed after Phase 5b accuracy check and full analysis run]*
 
 ---
 
