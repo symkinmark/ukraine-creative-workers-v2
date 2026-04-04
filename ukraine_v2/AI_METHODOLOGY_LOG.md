@@ -416,6 +416,77 @@ These values appear as reference lines in fig01 and fig10, and as the primary co
 
 ---
 
+## Phase 4h — Chart Cleanup & Source Documentation (2026-04-04)
+
+**Changes made:**
+
+**Fig10 — Birth Cohort LE (rewritten):**
+- Added minimum n=10 filter per decade point (previously no floor → erratic lines for sparse decades)
+- Removed the Ukrainian SSR LE overlay: SSR data is period LE (people born in that year), while fig10 plots cohort LE (people born in that decade, dying any year) — mixing both on the same x-axis was methodologically wrong. Period comparison moved to fig21/fig22 only.
+- Numeric labels added to every data point
+- X-axis now starts at first decade with real data (~1858), not 1835
+- Source footnote explicitly explains cohort vs period distinction
+
+**Fig19 — Death Spike Chart (rewritten):**
+- Previous version: stacked raw death counts per year. This was misleading because non_migrated group (n=4,625) completely dominated the chart visually; deported (n=75) and migrated groups were invisible even in their peak years.
+- New version: each group plotted as **% of that group's total size dying per year** (normalised for group size). This enables direct comparison of relative mortality intensity across groups.
+- Key finding now visible: ~30% of the deported group died in 1937–1940 — the clearest single visual in the dataset.
+
+**Fig21 — Soviet Republic Comparison:**
+- X-axis clipped to 1990 (Soviet dissolution). Post-1991 migrated deaths skew the last decade upward (diaspora artists living long lives in the West with good healthcare) — beyond the paper's analytic scope.
+- Numeric label on every decade dot (previously only last point labeled)
+- Y-axis capped at 82
+
+**Fig22 — Educated Urban Comparison:**
+- Same x-axis clip to 1990
+- Numeric label on every decade dot
+- Y-axis capped at 82
+
+---
+
+## External Data Sources Used in Charts — Full Reference List
+
+All external reference data used in charts is hardcoded with inline citations in `generate_analysis.py`. This section documents the complete source list per figure.
+
+### Ukrainian SSR General Population Life Expectancy
+Used in: fig01, fig09, fig10 (footnote only), fig19 (footnote only), fig21, fig22
+
+| Decade midpoint | LE (both sexes) | Source |
+|----------------|----------------|--------|
+| 1925 | 43.4 yrs | Meslé & Vallin 2003 |
+| 1935 | 38.5 yrs | Meslé & Vallin 2003 (Holodomor 1932–33 depresses mean) |
+| 1945 | 36.0 yrs | Meslé & Vallin 2003 (WWII devastation) |
+| 1955 | 62.0 yrs | UN WPP 2022 revision |
+| 1965 | 69.5 yrs | UN WPP 2022 / Human Mortality Database |
+| 1975 | 70.2 yrs | UN WPP 2022 / Human Mortality Database |
+| 1985 | 70.4 yrs | UN WPP 2022 / Human Mortality Database |
+
+**Full citations:**
+- Meslé, F. & Vallin, J. (2003). "Mortality in Eastern Europe and the Former Soviet Union: long-term trends and recent upturns." *Demographic Research*, Special Collection 2, pp. 45–70.
+- United Nations. (2022). *World Population Prospects 2022 Revision*. Department of Economic and Social Affairs, Population Division. Ukrainian SSR / Ukraine, period life expectancy at birth, both sexes.
+- Human Mortality Database. University of California, Berkeley (USA), and Max Planck Institute for Demographic Research (Germany). Available at: www.mortality.org
+
+### Soviet Republic Comparative LE Data
+Used in: fig21
+
+| Republic | Data points | Source |
+|----------|------------|--------|
+| Baltic SSRs (avg of Estonia, Latvia, Lithuania) | 1955–1985 | Katus, K. et al. (2002). *Population Studies in Baltic Countries*. Estonian Interuniversity Population Research Centre. |
+| Ukrainian SSR | 1925–1985 | Meslé & Vallin 2003; UN WPP 2022 |
+| Russian SFSR | 1955–1985 | Andreev, E., Darsky, L., & Kharkova, T. (1998). "Population dynamics: consequences of regular and irregular changes." In *Premature Death in the New Independent States*, National Academies Press. |
+| Central Asian SSRs (avg of Kazakhstan, Uzbekistan, Kyrgyzstan) | 1955–1985 | Andreev et al. 1998 |
+
+### Educational Mortality Gradient
+Used in: fig22
+
+- Shkolnikov, V.M., Andreev, E.M., & Maleva, T.M. (1998). "Educational level and adult mortality in Russia 1979–1994." *European Journal of Public Health*, 8(2): 149–155. PMC1483877.
+  - Estimated LE premium for university-educated vs national average: **+3.0 to +5.0 years** at age 20, based on 1979–80 Soviet census mortality data.
+- Shkolnikov, V. & Meslé, F. (1996). "The Russian epidemiological crisis as mirrored by mortality trends." In *Russia's Demographic Crisis*. RAND Corporation. (Non-manual vs manual worker differential cited in text.)
+
+**Construction of educated urban estimate in fig22:** Ukrainian SSR period LE + 3–5 year premium band (Shkolnikov et al. 1998). This is a constructed estimate clearly labelled as such, not a directly measured value. It represents what we would expect creative workers' LE to be based purely on their socioeconomic class (educated urban), independent of any repression effect.
+
+---
+
 ## Phase 6 — Paper Writing
 
 *[Next phase — to begin now that all analysis and charts are complete]*

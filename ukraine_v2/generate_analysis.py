@@ -762,46 +762,66 @@ save(fig, 'fig09_nonmigrant_deaths_by_period.png')
 
 # ===========================================================================
 # FIG 10 — BIRTH COHORT LE LINE CHART
+#
+# Shows mean age at death for creative workers born in each decade.
+# This is cohort data (not period LE) — each dot = mean age at death of
+# people born in that decade, regardless of when they died.
+# NOTE: Ukrainian SSR LE reference is period data and uses different x-axis
+# logic, so it is NOT overlaid here (see fig21/fig22 for period comparisons).
+# Minimum n=10 per decade to suppress unreliable early/late decade estimates.
 # ===========================================================================
 print("  fig10_birth_cohort_le.png")
 
-decades_ch = list(range(1840, 1981, 10))
+MIN_N_COHORT = 10
+decades_ch   = list(range(1840, 1981, 10))
 cohort_means = {ms: [] for ms in ALL_GROUPS}
 cohort_ns    = {ms: [] for ms in ALL_GROUPS}
 valid_decs   = []
 
 for dec in decades_ch:
-    any_data = False
     for ms in ALL_GROUPS:
         v = [r['_le'] for r in groups[ms] if r['_by'] and dec <= r['_by'] < dec + 10 and r['_le']]
-        cohort_means[ms].append(round(statistics.mean(v), 1) if v else None)
+        cohort_means[ms].append(round(statistics.mean(v), 1) if len(v) >= MIN_N_COHORT else None)
         cohort_ns[ms].append(len(v))
-        if v:
-            any_data = True
     valid_decs.append(dec)
 
 fig, ax = plt.subplots(figsize=(13, 7))
+MARKERS10 = {'migrated': 'o', 'non_migrated': 's', 'internal_transfer': '^', 'deported': 'D'}
+
 for ms in ALL_GROUPS:
     vals = cohort_means[ms]
     xs   = [dec for dec, v in zip(valid_decs, vals) if v is not None]
     ys   = [v for v in vals if v is not None]
-    if xs:
-        ax.plot(xs, ys, 'o-', color=COLOUR[ms], label=GROUP_LABELS[ms],
-                linewidth=2, markersize=5)
+    ns   = [cohort_ns[ms][i] for i, v in enumerate(vals) if v is not None]
+    if not xs:
+        continue
+    ax.plot(xs, ys, marker=MARKERS10[ms], linestyle='-', color=COLOUR[ms],
+            label=GROUP_LABELS[ms], linewidth=2, markersize=7, zorder=5)
+    # Numeric label on every dot — alternate above/below to reduce overlap
+    for j, (x_pt, y_pt, n_pt) in enumerate(zip(xs, ys, ns)):
+        offset_y = 1.5 if j % 2 == 0 else -3.0
+        ax.annotate(f"{y_pt:.0f}", xy=(x_pt, y_pt),
+                    xytext=(0, offset_y * 4), textcoords='offset points',
+                    ha='center', fontsize=7, color=COLOUR[ms], fontweight='bold')
 
-# Overlay Ukrainian SSR general population LE (death-year based, not birth-year,
-# so we plot against approximately birth_year+35 to align with typical working-life midpoint)
-# Simple approach: plot SSR LE values against the decade year they represent
-ax.plot(UKR_SSR_YEARS, UKR_SSR_VALUES, 's--', color='#27AE60', linewidth=2,
-        markersize=6, label='Ukrainian SSR general pop. LE\n(Meslé & Vallin 2003; UN WPP 2022)',
-        zorder=5)
+# Shade the Terror/Holodomor birth cohorts
+ax.axvspan(1890, 1910, alpha=0.06, color='#8B0000', zorder=0)
+ax.text(1899, 31, 'Born\n1890–1910\n(peak repression\nvictim cohort)',
+        ha='center', fontsize=7, color='#8B0000', style='italic')
 
-apply_style(ax, 'Figure 10 — Mean Life Expectancy by Birth Decade (1840s–1980s)\nvs Ukrainian SSR general population',
-            xlabel='Birth Decade / Reference Year', ylabel='Mean Life Expectancy (years)')
+apply_style(ax, 'Figure 10 — Mean Age at Death by Birth Decade\n(cohort data; n≥10 per point)',
+            xlabel='Birth Decade', ylabel='Mean Age at Death (years)')
 ax.legend(fontsize=8.5, ncol=2)
-ax.set_xlim(1835, 1990)
-plt.tight_layout(rect=[0, 0.04, 1, 1])
-add_source(fig)
+# Start x-axis where data actually begins (skip empty early decades)
+first_x = min(dec for dec in valid_decs
+              if any(cohort_means[ms][valid_decs.index(dec)] is not None for ms in ALL_GROUPS))
+ax.set_xlim(first_x - 5, 1985)
+ax.set_ylim(25, 90)
+fig.text(0.5, 0.01,
+    "Source: ESU V2.1 dataset, Berdnyk & Symkin 2026. Each point = mean age at death of creative workers "
+    "born in that decade (cohort estimate, n≥10). Period LE comparison: see fig21/fig22.",
+    ha='center', fontsize=7, color='grey', style='italic')
+plt.tight_layout(rect=[0, 0.05, 1, 1])
 save(fig, 'fig10_birth_cohort_le.png')
 
 
@@ -1041,19 +1061,19 @@ save(fig, 'fig16_consort_flowchart.png')
 
 
 # ===========================================================================
-# FIG 19 — YEAR-BY-YEAR DEATH SPIKE CHART 1921–1992 (all groups stacked)
+# FIG 19 — YEAR-BY-YEAR NORMALISED DEATH RATE CHART 1921–1992
 #
-# Shows deaths per calendar year as vertical bars, making the Great Terror
-# spike, Holodomor, and WWII peaks immediately visible.
-# The Ukrainian SSR general population LE reference (decade-level, published
-# sources) is overlaid as a right-axis line — different metric, clearly labelled.
+# Shows deaths per year as a PERCENTAGE OF EACH GROUP'S TOTAL SIZE.
+# Normalisation allows fair comparison across groups of very different sizes
+# (non_migrated n≈3,500; deported n≈300; migrated n≈1,200 etc.).
+# Raw counts would make small groups invisible — this chart shows relative
+# mortality intensity so every group's spikes are directly comparable.
 # ===========================================================================
 print("  fig19_ssr_population_context.png")
 
 SPIKE_START, SPIKE_END = 1921, 1992
 spike_years = list(range(SPIKE_START, SPIKE_END + 1))
 
-# Deaths per year for each group
 def deaths_by_year(group, start, end):
     ctr = collections.Counter(r['_dy'] for r in group
                               if r['_dy'] and start <= r['_dy'] <= end)
@@ -1064,62 +1084,53 @@ dy_dep = deaths_by_year(deported,          SPIKE_START, SPIKE_END)
 dy_it  = deaths_by_year(internal_transfer, SPIKE_START, SPIKE_END)
 dy_mig = deaths_by_year(migrated,          SPIKE_START, SPIKE_END)
 
-fig, ax1 = plt.subplots(figsize=(16, 8))
+# Normalise: deaths per year / group total × 100  (= % of group dying that year)
+def normalise(counts, group_total):
+    if group_total == 0:
+        return [0.0] * len(counts)
+    return [c / group_total * 100 for c in counts]
 
-# Stacked bars: non_migrated at base, deported on top (shows Soviet violence as
-# an additive layer on top of ordinary deaths)
-ax1.bar(spike_years, dy_nm, color=COLOUR['non_migrated'], alpha=0.75,
-        label='Non-migrated (stayed in Ukraine)', width=0.9)
-ax1.bar(spike_years, dy_dep, bottom=dy_nm, color=COLOUR['deported'], alpha=0.85,
-        label='Deported by Soviet state', width=0.9)
-ax1.bar(spike_years, dy_it,
-        bottom=[a + b for a, b in zip(dy_nm, dy_dep)],
-        color=COLOUR['internal_transfer'], alpha=0.7,
-        label='Internal transfer (moved within USSR)', width=0.9)
+n_nm  = normalise(dy_nm,  len(non_migrated))
+n_dep = normalise(dy_dep, len(deported))
+n_it  = normalise(dy_it,  len(internal_transfer))
+n_mig = normalise(dy_mig, len(migrated))
 
-# Migrated on a separate subtle overlay (they mostly died after 1991)
-ax1.bar(spike_years, dy_mig,
-        bottom=[a + b + c for a, b, c in zip(dy_nm, dy_dep, dy_it)],
-        color=COLOUR['migrated'], alpha=0.5,
-        label='Migrated (left USSR)', width=0.9)
+fig, ax = plt.subplots(figsize=(16, 7))
 
-# Ukrainian SSR reference LE on a right axis (decade points joined by line)
-ax2 = ax1.twinx()
-ax2.plot(UKR_SSR_YEARS, UKR_SSR_VALUES, 's--', color='#27AE60', linewidth=2,
-         markersize=7, label='Ukrainian SSR general pop. LE\n(Meslé & Vallin 2003; UN WPP 2022)',
-         zorder=10)
-ax2.set_ylabel('Ukrainian SSR General Population LE (years)',
-               fontsize=10, color='#27AE60')
-ax2.tick_params(axis='y', colors='#27AE60')
-ax2.set_ylim(20, 90)
+LINE_DATA19 = [
+    ('non_migrated',      n_nm,  'Non-migrated (stayed)',         '-',  2.0),
+    ('deported',          n_dep, 'Deported',                      '-',  2.5),
+    ('internal_transfer', n_it,  'Internal transfer',             '--', 1.8),
+    ('migrated',          n_mig, 'Migrated (left USSR)',          ':',  2.0),
+]
+for ms, vals, lbl, ls, lw in LINE_DATA19:
+    ax.plot(spike_years, vals, color=COLOUR[ms], linewidth=lw,
+            linestyle=ls, label=f'{lbl}  (n={len(groups[ms])})', alpha=0.9)
 
 # Annotate key events as shaded bands
-EVENT_BANDS = [
+EVENT_BANDS19 = [
     (1932, 1934, '#8E44AD', 'Holodomor\n1932–33'),
     (1936, 1939, '#8B0000', 'Great Terror\n1936–38'),
     (1941, 1945, '#7F8C8D', 'WWII\n1941–45'),
     (1946, 1953, '#BDC3C7', 'Late Stalin'),
 ]
-ymax = max(a + b + c + d for a, b, c, d in zip(dy_nm, dy_dep, dy_it, dy_mig)) * 1.05
-for x0, x1, col, lbl in EVENT_BANDS:
-    ax1.axvspan(x0, x1, alpha=0.10, color=col, zorder=0)
-    ax1.text((x0 + x1) / 2, ymax * 0.92, lbl, ha='center',
-             fontsize=7.5, color=col, fontweight='bold', va='top')
+ymax19 = max(max(n_nm), max(n_dep), max(n_it), max(n_mig)) * 1.15
+for x0, x1, col, lbl in EVENT_BANDS19:
+    ax.axvspan(x0, x1, alpha=0.10, color=col, zorder=0)
+    ax.text((x0 + x1) / 2, ymax19 * 0.92, lbl, ha='center',
+            fontsize=7.5, color=col, fontweight='bold', va='top')
 
-ax1.set_xlim(SPIKE_START - 0.5, SPIKE_END + 0.5)
-ax1.set_ylim(0, ymax)
-apply_style(ax1,
-    'Figure 19 — Deaths per Year by Group 1921–1992\n'
-    'with Ukrainian SSR General Population Life Expectancy (right axis)',
-    xlabel='Year', ylabel='Number of Deaths (creative workers dataset)')
-
-# Combine legends from both axes
-h1, l1 = ax1.get_legend_handles_labels()
-h2, l2 = ax2.get_legend_handles_labels()
-ax1.legend(h1 + h2, l1 + l2, fontsize=8.5, loc='upper left', ncol=2)
+ax.set_xlim(SPIKE_START - 0.5, SPIKE_END + 0.5)
+ax.set_ylim(0, ymax19)
+apply_style(ax,
+    'Figure 19 — Annual Death Rate by Group 1921–1992\n'
+    '(% of each group dying per year — normalised for group size)',
+    xlabel='Year', ylabel='Deaths per year (% of group total)')
+ax.legend(fontsize=9, loc='upper right', ncol=2)
 
 fig.text(0.5, 0.005,
-    "SSR reference: Meslé F. & Vallin J. (2003) Demographical Research Sp.Coll.2; UN WPP 2022 revision. "
+    "Each line = deaths in that year as % of that group's total size. "
+    "Normalisation enables direct comparison across groups of different sizes. "
     + SOURCE_NOTE,
     ha='center', fontsize=6.5, color='grey', style='italic')
 plt.tight_layout(rect=[0, 0.04, 1, 1])
@@ -1347,10 +1358,14 @@ for name, data in REPUBLIC_DATA_21.items():
             label=f'{name}  (general population)')
 
 # Our groups — bolder, foreground, only 3 key groups
+# x-axis clipped to 1990 (Soviet dissolution = natural analytic boundary;
+# post-1991 deaths in diaspora skew migrated LE upward and are out of scope)
 GROUP_MARKERS = {'migrated': ('o', 2.5), 'non_migrated': ('s', 2.0), 'deported': ('D', 2.5)}
 for ms, (mk, lw) in GROUP_MARKERS.items():
     xs_d, ys_d, ns_d = [], [], []
     for dec in DEATH_DECADES:
+        if dec >= 1990:   # stop at Soviet dissolution
+            continue
         v = [r['_le'] for r in groups[ms]
              if r['_dy'] and dec <= r['_dy'] < dec + 10 and r['_le'] is not None]
         if len(v) >= MIN_N:
@@ -1363,13 +1378,15 @@ for ms, (mk, lw) in GROUP_MARKERS.items():
              'deported': 'Deported (our data)'}[ms]
     ax.plot(xs_d, ys_d, marker=mk, linestyle='-', linewidth=lw,
             color=COLOUR[ms], markersize=9, zorder=10, label=short)
-    # Label the last point
-    ax.annotate(f"{ys_d[-1]:.0f} yrs", xy=(xs_d[-1], ys_d[-1]),
-                xytext=(4, 2), textcoords='offset points',
-                fontsize=8, color=COLOUR[ms], fontweight='bold')
+    # Label EVERY decade dot
+    for j, (xp, yp, np_) in enumerate(zip(xs_d, ys_d, ns_d)):
+        v_off = 6 if j % 2 == 0 else -10
+        ax.annotate(f"{yp:.0f}", xy=(xp, yp),
+                    xytext=(0, v_off), textcoords='offset points',
+                    ha='center', fontsize=7.5, color=COLOUR[ms], fontweight='bold')
 
-ax.set_xlim(1918, 1996)
-ax.set_ylim(28, 80)
+ax.set_xlim(1918, 1992)
+ax.set_ylim(28, 82)
 apply_style(ax, 'Figure 21 — Mean Age at Death: Our Groups vs Soviet Republic General Populations',
             xlabel='Decade', ylabel='Life Expectancy / Mean Age at Death (years)')
 
@@ -1430,33 +1447,39 @@ ax.plot(edu_xs, edu_base, 's:', color='#27AE60', linewidth=1.4, markersize=5,
         alpha=0.65, zorder=2, label='Ukrainian SSR general population')
 
 # Our groups — 4 series, clean markers, bold lines
+# Clipped to 1990 (Soviet dissolution) — same boundary as fig21
 GRP_MARKERS22 = {'migrated': 'o', 'non_migrated': 's',
                  'internal_transfer': '^', 'deported': 'D'}
 for ms in ALL_GROUPS:
-    xs_d, ys_d = [], []
+    xs_d, ys_d, ns_d = [], [], []
     for dec in DEATH_DECADES:
+        if dec >= 1990:   # stop at Soviet dissolution
+            continue
         v = [r['_le'] for r in groups[ms]
              if r['_dy'] and dec <= r['_dy'] < dec + 10 and r['_le'] is not None]
         if len(v) >= MIN_N:
             xs_d.append(dec + 5)
             ys_d.append(statistics.mean(v))
+            ns_d.append(len(v))
     if not xs_d:
         continue
     short = GROUP_LABELS[ms].split('(')[0].strip()
     ax.plot(xs_d, ys_d, marker=GRP_MARKERS22[ms], linestyle='-', linewidth=2.2,
             color=COLOUR[ms], markersize=8, zorder=10, label=short)
-    # Label end of line only
-    ax.annotate(f"{ys_d[-1]:.0f}", xy=(xs_d[-1], ys_d[-1]),
-                xytext=(5, 0), textcoords='offset points',
-                fontsize=8.5, color=COLOUR[ms], fontweight='bold', va='center')
+    # Label EVERY decade dot
+    for j, (xp, yp) in enumerate(zip(xs_d, ys_d)):
+        v_off = 7 if j % 2 == 0 else -11
+        ax.annotate(f"{yp:.0f}", xy=(xp, yp),
+                    xytext=(0, v_off), textcoords='offset points',
+                    ha='center', fontsize=7.5, color=COLOUR[ms], fontweight='bold')
 
 # Shade Terror period
 ax.axvspan(1930, 1939, alpha=0.06, color='#8B0000', zorder=0)
 ax.text(1934.5, 30, 'Great Terror\n& Holodomor', ha='center', fontsize=8,
         color='#8B0000', style='italic')
 
-ax.set_xlim(1918, 1996)
-ax.set_ylim(26, 86)
+ax.set_xlim(1918, 1992)
+ax.set_ylim(26, 82)
 apply_style(ax, 'Figure 22 — Creative Workers Mean Age at Death vs Educated Urban Ukrainian Population',
             xlabel='Decade of Death', ylabel='Life Expectancy / Mean Age at Death (years)')
 ax.legend(fontsize=9, loc='upper left', framealpha=0.95, edgecolor='#cccccc')
