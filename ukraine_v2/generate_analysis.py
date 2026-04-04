@@ -712,51 +712,98 @@ save(fig, 'fig08_deported_deaths_by_year.png')
 
 
 # ===========================================================================
-# FIG 09 — NON-MIGRANT DEATHS BY SOVIET PERIOD (BAR)
+# FIG 09 — MEAN AGE AT DEATH BY SOVIET PERIOD — ALL FOUR GROUPS
+#
+# Shows avg age at death per Soviet historical period, one grouped bar cluster
+# per period, one bar per migration group.
+# Raw death COUNTS are intentionally NOT shown — periods differ in length and
+# population size, making raw counts misleading (late periods look larger
+# simply because more people were alive then, not because of anything dramatic).
+# Avg age at death is the meaningful comparison: it shows who died younger
+# during repression periods.
+# Bars only shown when n ≥ 5. n printed inside/above each bar.
 # ===========================================================================
 print("  fig09_nonmigrant_deaths_by_period.png")
 
 CHART_PERIODS = [
-    ('1921–1929\n(NEP)',           lambda y: 1921 <= y <= 1929),
-    ('1930–1933\n(Holodomor)',     lambda y: 1930 <= y <= 1933),
-    ('1934–1938\n(Terror)',        lambda y: 1934 <= y <= 1938),
-    ('1939–1945\n(WWII)',          lambda y: 1939 <= y <= 1945),
-    ('1946–1953\n(Late Stalin)',   lambda y: 1946 <= y <= 1953),
-    ('1954–1964\n(Thaw)',          lambda y: 1954 <= y <= 1964),
-    ('1965–1991\n(Stagnation)',    lambda y: 1965 <= y <= 1991),
-    ('Post-1991',                   lambda y: y > 1991),
+    ('NEP\n1921–29',       lambda y: 1921 <= y <= 1929),
+    ('Holodomor\n1930–33', lambda y: 1930 <= y <= 1933),
+    ('Terror\n1934–38',    lambda y: 1934 <= y <= 1938),
+    ('WWII\n1939–45',      lambda y: 1939 <= y <= 1945),
+    ('Late Stalin\n1946–53', lambda y: 1946 <= y <= 1953),
+    ('Thaw\n1954–64',      lambda y: 1954 <= y <= 1964),
+    ('Stagnation\n1965–91', lambda y: 1965 <= y <= 1991),
+    ('Post-Soviet\n1992+', lambda y: y > 1991),
 ]
 
-period_labels_ch = [p[0] for p in CHART_PERIODS]
-period_counts_ch = []
-period_avgage_ch = []
-for _, fn in CHART_PERIODS:
-    sub  = [r for r in non_migrated if r['_dy'] and fn(r['_dy'])]
-    ages = [r['_le'] for r in sub if r['_le'] is not None]
-    period_counts_ch.append(len(sub))
-    period_avgage_ch.append(round(statistics.mean(ages), 1) if ages else 0)
+MIN_N_P9 = 5
+period_labels_p9 = [p[0] for p in CHART_PERIODS]
+n_periods = len(CHART_PERIODS)
 
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 9), sharex=True)
+# Compute avg age at death per period per group
+period_data = {}  # {ms: [(mean or None, n), ...]}
+for ms in ALL_GROUPS:
+    vals_by_period = []
+    for _, fn in CHART_PERIODS:
+        sub  = [r for r in groups[ms] if r['_dy'] and fn(r['_dy'])]
+        ages = [r['_le'] for r in sub if r['_le'] is not None]
+        if len(ages) >= MIN_N_P9:
+            vals_by_period.append((round(statistics.mean(ages), 1), len(ages)))
+        else:
+            vals_by_period.append((None, len(ages)))
+    period_data[ms] = vals_by_period
 
-colours_periods = [('#8B0000' if 'Terror' in lb or 'Holodomor' in lb else COLOUR['non_migrated'])
-                   for lb in period_labels_ch]
+# Grouped bar chart
+n_groups = len(ALL_GROUPS)
+bar_w = 0.18   # narrow bars as requested
+x = np.arange(n_periods)
+offsets = np.linspace(-(n_groups - 1) / 2 * bar_w,
+                       (n_groups - 1) / 2 * bar_w, n_groups)
 
-ax1.bar(period_labels_ch, period_counts_ch, color=colours_periods, edgecolor='white')
-ax1.set_ylabel('Number of Deaths', fontsize=10, color=COLOUR['navy'])
-ax1.set_title('Figure 9 — Non-Migrant Deaths by Soviet Period\n(count and average age at death)',
-              fontsize=13, fontweight='bold', color=COLOUR['navy'], pad=10)
+# Repression period highlighting
+REPRESSION_PERIODS = {'Holodomor\n1930–33', 'Terror\n1934–38', 'Late Stalin\n1946–53'}
 
-ax2.bar(period_labels_ch, period_avgage_ch, color=colours_periods, edgecolor='white')
-ax2.set_ylabel('Average Age at Death', fontsize=10, color=COLOUR['navy'])
+fig, ax = plt.subplots(figsize=(15, 7))
 
-for ax in (ax1, ax2):
-    ax.set_facecolor('#F7F9FB')
-    ax.tick_params(colors=COLOUR['navy'], labelsize=8)
-    for spine in ax.spines.values():
-        spine.set_edgecolor('#CCCCCC')
+for i, (ms, offset) in enumerate(zip(ALL_GROUPS, offsets)):
+    means = [v[0] for v in period_data[ms]]
+    ns    = [v[1] for v in period_data[ms]]
+    for j, (mean_val, n_val) in enumerate(zip(means, ns)):
+        if mean_val is None:
+            continue
+        edge = '#8B0000' if period_labels_p9[j] in REPRESSION_PERIODS else 'white'
+        bar = ax.bar(x[j] + offset, mean_val, bar_w,
+                     color=COLOUR[ms], edgecolor=edge, linewidth=1.2, alpha=0.85)
+        # Value label above bar
+        ax.text(x[j] + offset, mean_val + 0.6, f"{mean_val:.0f}",
+                ha='center', va='bottom', fontsize=7, color=COLOUR[ms], fontweight='bold')
+        # n label inside bar (bottom)
+        ax.text(x[j] + offset, 2, f"n={n_val}",
+                ha='center', va='bottom', fontsize=6, color='white', alpha=0.85)
 
-plt.tight_layout(rect=[0, 0.04, 1, 1])
-add_source(fig)
+# Legend
+patches = [mpatches.Patch(color=COLOUR[ms], label=GROUP_LABELS[ms]) for ms in ALL_GROUPS]
+ax.legend(handles=patches, fontsize=8.5, loc='upper left', ncol=2)
+
+ax.set_xticks(x)
+ax.set_xticklabels(period_labels_p9, fontsize=8.5)
+ax.set_ylim(0, 95)
+ax.set_ylabel('Mean Age at Death (years)', fontsize=10, color=COLOUR['navy'])
+
+# Shade repression periods
+repression_idxs = [j for j, lbl in enumerate(period_labels_p9) if lbl in REPRESSION_PERIODS]
+for j in repression_idxs:
+    ax.axvspan(j - 0.5, j + 0.5, alpha=0.06, color='#8B0000', zorder=0)
+
+apply_style(ax, 'Figure 9 — Mean Age at Death by Soviet Period and Migration Group\n'
+            '(bars shown only where n≥5; red outline = repression period)',
+            xlabel='Soviet Historical Period', ylabel='Mean Age at Death (years)')
+
+fig.text(0.5, 0.01,
+    "Raw death counts not shown — period length and group sizes differ, making counts incomparable. "
+    "Mean age at death is the meaningful measure. " + SOURCE_NOTE,
+    ha='center', fontsize=7, color='grey', style='italic')
+plt.tight_layout(rect=[0, 0.05, 1, 1])
 save(fig, 'fig09_nonmigrant_deaths_by_period.png')
 
 
