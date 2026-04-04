@@ -1367,31 +1367,38 @@ for name, data in REPUBLIC_DATA.items():
     ax.plot(xs, ys, marker=marker, linestyle=ls, linewidth=lw,
             color=REP_COLOURS[name], markersize=7, label=name, alpha=0.85)
 
-# Our creative worker groups as single data points with 95% CI error bars.
-# Positioned at each group's mean birth year — the scientifically correct
-# x-position because LE is a cohort property tied to when people were born,
-# not a period value valid at every year.
-for ms in ['migrated', 'non_migrated', 'deported']:
-    d = descs[ms]
-    if not d['mean']:
-        continue
-    x_pos = d.get('mean_by', 1920)   # mean birth year of the group
-    yerr  = [[d['mean'] - d['ci95_lo']], [d['ci95_hi'] - d['mean']]]
-    ax.errorbar(x_pos, d['mean'], yerr=yerr,
-                fmt='o', color=COLOUR[ms], markersize=11,
-                capsize=7, capthick=2, elinewidth=2,
-                label=f"Our data — {GROUP_LABELS[ms]}\n"
-                      f"  mean LE = {d['mean']} yrs  [95% CI {d['ci95_lo']}–{d['ci95_hi']}]\n"
-                      f"  n={d['n']}, mean birth yr ≈ {int(x_pos)}",
-                zorder=10)
+# Our creative worker groups — mean age at death per DEATH decade.
+# Each dot = mean age at death for people in this group who died in that decade.
+# This is period data, directly comparable to the SSR LE reference lines.
+# Minimum 5 deaths per decade required to plot a point.
+DEATH_DECADES_21 = list(range(1920, 1995, 10))
+MIN_N = 5
 
-ax.set_xlim(1918, 1998)
+for ms in ['migrated', 'non_migrated', 'deported']:
+    xs_dec, ys_dec, ns_dec = [], [], []
+    for dec in DEATH_DECADES_21:
+        v = [r['_le'] for r in groups[ms]
+             if r['_dy'] and dec <= r['_dy'] < dec + 10 and r['_le'] is not None]
+        if len(v) >= MIN_N:
+            xs_dec.append(dec + 5)   # plot at decade midpoint
+            ys_dec.append(statistics.mean(v))
+            ns_dec.append(len(v))
+
+    if not xs_dec:
+        continue
+
+    ax.plot(xs_dec, ys_dec, 'o-', color=COLOUR[ms], markersize=7,
+            linewidth=1.8, alpha=0.9, zorder=10,
+            label=f"Our data — {GROUP_LABELS[ms]}\n(mean age at death per decade, n≥{MIN_N})")
+    sizes = [max(30, min(200, n * 4)) for n in ns_dec]
+    ax.scatter(xs_dec, ys_dec, s=sizes, color=COLOUR[ms], zorder=11, alpha=0.45)
+
+ax.set_xlim(1838, 1998)
 ax.set_ylim(28, 84)
 apply_style(ax,
     'Figure 21 — Soviet Republic General Population LE vs Ukrainian Creative Workers\n'
-    '(lines = general population period LE by decade; dots = cohort mean LE ± 95% CI\n'
-    ' positioned at each group\'s mean birth year)',
-    xlabel='Year / Mean Birth Year', ylabel='Life Expectancy (years)')
+    '(lines = general population period LE; dots = mean age at death per death decade)',
+    xlabel='Decade', ylabel='Life Expectancy / Mean Age at Death (years)')
 ax.legend(fontsize=7.5, loc='upper left', ncol=2,
           framealpha=0.9, edgecolor='#cccccc')
 
@@ -1452,47 +1459,55 @@ ax.fill_between(edu_xs, edu_lo, edu_hi, alpha=0.18, color='#2980B9',
 ax.plot(edu_xs, [(lo + hi) / 2 for lo, hi in zip(edu_lo, edu_hi)],
         'D--', color='#2980B9', linewidth=1.5, markersize=5, alpha=0.7)
 
-# Our creative worker groups as single data points with 95% CI error bars.
-# Positioned at mean birth year of each group — correct because cohort LE
-# belongs to the birth cohort, not to a calendar year.
-for ms in ALL_GROUPS:
-    d = descs[ms]
-    if not d['mean'] or not d['ci95_lo']:
-        continue
-    x_pos = d.get('mean_by', 1920)
-    yerr  = [[d['mean'] - d['ci95_lo']], [d['ci95_hi'] - d['mean']]]
-    ax.errorbar(x_pos, d['mean'], yerr=yerr,
-                fmt='o', color=COLOUR[ms], markersize=11,
-                capsize=7, capthick=2, elinewidth=2, zorder=10,
-                label=f"Our data — {GROUP_LABELS[ms]}\n"
-                      f"  {d['mean']} yrs [95% CI {d['ci95_lo']}–{d['ci95_hi']}]  n={d['n']}")
+# Our creative worker groups — mean age at death per DEATH decade.
+# Directly comparable to the SSR LE reference lines and educated urban band.
+# Min 5 deaths per decade required to show a point.
+DEATH_DECADES_22 = list(range(1920, 1995, 10))
 
-ax.set_xlim(1918, 1995)
+for ms in ALL_GROUPS:
+    xs_dec, ys_dec, ns_dec = [], [], []
+    for dec in DEATH_DECADES_22:
+        v = [r['_le'] for r in groups[ms]
+             if r['_dy'] and dec <= r['_dy'] < dec + 10 and r['_le'] is not None]
+        if len(v) >= MIN_N:
+            xs_dec.append(dec + 5)
+            ys_dec.append(statistics.mean(v))
+            ns_dec.append(len(v))
+
+    if not xs_dec:
+        continue
+
+    marker = {'migrated': 'o', 'non_migrated': 's',
+              'internal_transfer': '^', 'deported': 'D'}.get(ms, 'o')
+    ax.plot(xs_dec, ys_dec, marker=marker, linestyle='-',
+            color=COLOUR[ms], markersize=7, linewidth=1.8, alpha=0.9, zorder=10,
+            label=f"Our data — {GROUP_LABELS[ms]} (per birth decade)")
+    sizes = [max(30, min(200, n * 3)) for n in ns_dec]
+    ax.scatter(xs_dec, ys_dec, s=sizes, color=COLOUR[ms], alpha=0.4, zorder=11)
+
+ax.set_xlim(1838, 1995)
 ax.set_ylim(28, 88)
 apply_style(ax,
-    'Figure 22 — Creative Workers vs Estimated Educated Urban Ukrainian Population\n'
-    '(dots = cohort mean LE ± 95% CI at mean birth year; band = educated urban LE estimate)',
-    xlabel='Year / Mean Birth Year', ylabel='Life Expectancy (years)')
+    'Figure 22 — Creative Workers vs Estimated Educated Urban Population\n'
+    '(dots = mean age at death per death decade; band = educated urban LE estimate)',
+    xlabel='Decade of Death', ylabel='Life Expectancy / Mean Age at Death (years)')
 
 ax.legend(fontsize=8, loc='upper left', framealpha=0.95, edgecolor='#cccccc')
 
-# Annotation: key insight — point to the actual data points
-mig_by = descs['migrated'].get('mean_by', 1900)
-dep_by = descs['deported'].get('mean_by', 1900)
+# Key insight annotations — placed in chart space, not tied to single points
+ax.text(0.97, 0.72,
+    'Migrated group tracks inside\neducated urban LE estimate band\n→ consistent with natural lifespan\n   if not repressed',
+    transform=ax.transAxes, ha='right', va='top', fontsize=8.5,
+    color=COLOUR['migrated'],
+    bbox=dict(boxstyle='round,pad=0.4', facecolor='white', alpha=0.85,
+              edgecolor=COLOUR['migrated'], linewidth=1))
 
-ax.annotate(
-    'Migrated group sits inside\neducated urban LE estimate band —\nconsistent with "natural lifespan\nif not repressed"',
-    xy=(mig_by, descs['migrated']['mean']),
-    xytext=(mig_by - 20, descs['migrated']['mean'] + 8),
-    fontsize=8, color=COLOUR['migrated'],
-    arrowprops=dict(arrowstyle='->', color=COLOUR['migrated'], lw=1.2))
-
-ax.annotate(
-    'Deported group: 27 yrs below migrated.\nCannot be explained by education\nor class — this is state violence.',
-    xy=(dep_by, descs['deported']['mean']),
-    xytext=(dep_by + 12, descs['deported']['mean'] - 10),
-    fontsize=8, color=COLOUR['deported'],
-    arrowprops=dict(arrowstyle='->', color=COLOUR['deported'], lw=1.2))
+ax.text(0.97, 0.25,
+    'Deported group falls far below\nall reference lines — 27 yrs\nbelow migrated peers. Cannot\nbe explained by class alone:\nthis is documented state violence.',
+    transform=ax.transAxes, ha='right', va='bottom', fontsize=8.5,
+    color=COLOUR['deported'],
+    bbox=dict(boxstyle='round,pad=0.4', facecolor='white', alpha=0.85,
+              edgecolor=COLOUR['deported'], linewidth=1))
 
 fig.text(0.5, 0.005,
     "Educational premium estimate based on: Shkolnikov V.M. et al. (1998) "
