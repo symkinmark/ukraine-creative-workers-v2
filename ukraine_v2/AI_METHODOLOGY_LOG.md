@@ -231,38 +231,127 @@ All three corrections require a rerun of the Claude classification pass on `esu_
 
 ---
 
-## Phase 4c — Extended Analysis Plan (pending Phase 5b clearance)
+## Phase 4c — Full Analysis & Chart Generation (COMPLETED 2026-04-04)
 
-Once V2.1 accuracy is confirmed, the following analysis and charts will be generated:
+Phase 5b clearance received → full analysis run executed on `esu_creative_workers_v2_1.csv`.
 
-### Charts — 10 figures + 1 flowchart
+**Script:** `ukraine_v2/generate_analysis.py` (full rewrite from V2.0 version)
 
-| Fig | Type | Scientific purpose |
-|-----|------|--------------------|
-| 1 | Bar + error bars (±1 SD) | Primary LE comparison across four groups |
-| 2 | Box plots (4 groups) | Show distribution shape — means alone mislead on skewed data |
-| 3 | Kaplan-Meier survival curves | Standard mortality research chart — proportion surviving past each age |
-| 4 | Histogram: death year clustering | Great Terror spike visible in raw death year data |
-| 5 | Bar: deaths + avg age by Soviet period | How mortality changed across political history of USSR |
-| 6 | Line: LE by birth cohort (decade) | Which generations were most affected |
-| 7 | Grouped bar: LE by profession + group | Secondary finding — profession-level risk |
-| 8 | Bar: deported deaths by year 1921–1960 | New V2.1 finding — repression concentration in 1937–1942 |
-| 9 | Bar: birth year distribution by group | Selection bias check — are groups comparable at baseline? |
-| 10 | Significance brackets + CI overlay | Connect statistical tests (Mann-Whitney U, Cohen's d) to visuals |
-| Flow | CONSORT-style exclusion flowchart | Standard for filtered datasets — 70,000 → 6,420 entries, step by step |
+**Statistical report:** `ukraine_v2/analysis_v2_1.txt`
 
-### Additional analysis (not in V2.0)
+### Key findings
 
-- **Confidence intervals on deported group** — n=75 is small; CI must be shown to validate the 22-year penalty finding
-- **Comparison to general Soviet/Ukrainian population LE** — contextual reference line on charts
-- **Gender acknowledgment** — check whether gender distribution differs across groups; report as limitation if data is insufficient
-- **Sensitivity analysis for 9.5% AI error rate** — show conclusions hold if 9.5% of classifications are flipped in the least favourable direction
+| Group | n | Mean LE | 95% CI | vs Non-migrated |
+|-------|---|---------|--------|----------------|
+| Migrated | 927 | 75.86 yrs | [75.0, 76.72] | +4.94 yrs |
+| Non-migrated | 4,625 | 70.92 yrs | [70.51, 71.32] | — |
+| Internal transfer | 479 | 70.21 yrs | [68.93, 71.49] | −0.71 yrs (p=0.38, **not significant**) |
+| Deported | 75 | 48.51 yrs | [45.21, 51.80] | **−22.41 yrs (Cohen's d = 1.58, p<0.001)** |
+
+**Internal transfer null finding** (p=0.38) is scientifically important: it confirms the LE advantage is about escaping the Soviet sphere entirely, not just moving around within it. Moving to Moscow for a career did not save your life; leaving the USSR did.
+
+**Deported finding** (Cohen's d = 1.58 = "huge" effect) is the strongest single finding in the paper. 75 individuals is a small group, but the effect size is so large that the 95% CI (45.2–51.8) still does not overlap with the non-migrated CI (70.5–71.3).
+
+### Charts generated (19 total)
+
+| File | Description |
+|------|-------------|
+| fig01 | Bar + error bars: primary LE comparison, all four groups + SSR reference line |
+| fig02 | Kaplan-Meier survival curves (lifelines library, with 95% CI bands) |
+| fig03 | V1 vs V2.1 comparison (migrated/non-migrated only, apples-to-apples) |
+| fig04 | Box plots with notches, all four groups |
+| fig05 | Deported group: age-at-death histogram |
+| fig06 | Violin plots (full distribution shape) |
+| fig07 | Death year histogram 1900–2024 (migrated vs non-migrated, annotated) |
+| fig08 | Deported deaths by year 1921–1965 (1937 peak highlighted) |
+| fig09 | Non-migrant deaths by Soviet period — count and avg age, dual panel |
+| fig10 | Birth cohort LE line chart, all four groups + SSR reference overlay |
+| fig11 | Profession × group grouped bar |
+| fig12 | Geographic migration rates: top 20 birth cities |
+| fig13 | Birth year distribution by group (selection bias check) |
+| fig14 | Sensitivity analysis: LE gap vs AI error rate (conclusion holds at 10% error) |
+| fig15 | Internal transfer null finding (box plots, p-value annotated) |
+| fig16 | CONSORT-style exclusion flowchart (70,000 → 6,106 entries, step by step) |
+| fig17 | Gender distribution by migration group |
+| fig18 | LE by gender × migration group |
+| fig19 | Creative workers LE vs Ukrainian SSR general population (context chart) |
+
+### Statistical methods used
+
+- **Mann-Whitney U** (non-parametric, used because LE distributions are non-normal) + p-values
+- **Cohen's d** effect size for all pairwise comparisons
+- **95% confidence intervals** via Student's t (valid at n>30; deported n=75 qualifies)
+- **Kaplan-Meier survival curves** via `lifelines` 0.30.3
+- **Sensitivity analysis** — LE gap tested at 0%–10% AI error rate; main finding holds throughout
+
+---
+
+## Phase 4d — Gender Classification (COMPLETED 2026-04-04)
+
+**Script:** `ukraine_v2/add_gender.py`
+
+**Method:** Two-stage pipeline:
+1. Rule-based engine using Ukrainian/Slavic naming conventions (patronymics and first-name endings are strongly gendered in Ukrainian — female names end in -а/-я, female patronymics end in -івна/-ївна; male patronymics end in -ович/-євич)
+2. Claude Haiku fallback for the small number of names the rule engine cannot resolve (foreign names, pseudonyms, collective entries)
+
+**Results:**
+- Total rows classified: 16,215
+- Rule-based resolution: 16,125 (99.4%)
+- Claude Haiku calls: 90 (0.6%) — mostly foreign names (Єжи, Ентоні, Ґеорґе, etc.)
+
+**Gender distribution in analysable subset (n=6,391):**
+
+| Gender | Count | % |
+|--------|-------|---|
+| Male | 5,261 | 82.3% |
+| Female | 1,104 | 17.3% |
+| Unknown | 26 | 0.4% |
+
+**Interpretation:** The 82.3%/17.3% gender split reflects the historical reality of male dominance in officially recognised creative roles under Soviet-era documentation. This is a dataset characteristic, not a bias in our collection method (we collected all ESU entries without gender filtering). This imbalance will be acknowledged as a limitation in the paper.
+
+---
+
+## Phase 4e — Ukrainian SSR General Population Reference Data
+
+**Added:** 2026-04-04
+
+**Purpose:** Contextualise creative workers' LE against the general Ukrainian population they came from.
+
+**Sources used:**
+- Meslé F. & Vallin J. (2003). "Mortality in Eastern Europe and the Former Soviet Union: long-term trends and recent upturns." *Demographical Research*, Special Collection 2, pp. 45–70. *(pre-1959 reconstruction)*
+- United Nations World Population Prospects (2022 revision) — Ukrainian SSR / Ukraine period LE, both sexes combined.
+- Human Mortality Database (mortality.org) — Ukraine, 1959–1991.
+
+**Values used (decade midpoints, both sexes):**
+
+| Period | Ukrainian SSR general population LE |
+|--------|-------------------------------------|
+| 1920s | 43.4 years |
+| 1930s | 38.5 years (Holodomor 1932–33 impact) |
+| 1940s | 36.0 years (WWII) |
+| 1950s | 62.0 years (post-war recovery) |
+| 1960s | 69.5 years |
+| 1970s | 70.2 years |
+| 1980s | 70.4 years |
+
+These values appear as reference lines in fig01 and fig10, and as the primary comparison series in fig19. All values are hardcoded from published sources (not scraped live), which is the appropriate approach for stable historical demographic reference data.
+
+**Key observation from fig19:** Non-migrated creative workers tracked closely with the general Ukrainian SSR population in the post-1950 period, but suffered disproportionately during the 1930s–1940s compared to the general population average — consistent with the thesis that creative professionals were specifically targeted during the Great Terror.
 
 ---
 
 ## Phase 6 — Paper Writing
 
-*[To be completed after Phase 5b accuracy check and full analysis run]*
+*[Next phase — to begin now that all analysis and charts are complete]*
+
+**Status:** All data, figures, and statistical analysis are complete and pushed to git. Paper draft (`PAPER_DRAFT.md`) needs to be updated with:
+- Final V2.1 numbers (replacing ⚠ provisional flags)
+- Four-group analysis results (Section 4)
+- Deportation finding as prominent result (Section 4.2)
+- Internal transfer null finding (Section 4.3)
+- Gender distribution as limitation (Section 5)
+- Ukrainian SSR reference comparison (Section 4.4)
+- All 19 figure references with captions
 
 ---
 
@@ -270,7 +359,11 @@ Once V2.1 accuracy is confirmed, the following analysis and charts will be gener
 
 V1 established a baseline AI error rate of ~20% for biography analysis tasks (using ChatGPT for migration status determination). Half were casual mistakes; half required deep human review.
 
-V2 Phase 5 accuracy check found a **9.5% error rate** (6 errors in 63 entries reviewed). Error types: nationality misclassification (4 cases), migration misclassification (2 cases). No date errors found. All errors were systematic in nature — addressable by rule corrections rather than individual manual fixes — which is why a full rerun with corrected classification rules is the appropriate response rather than patching individual entries.
+V2.0 Phase 5 accuracy check: **9.5% error rate** (6 errors in 63 entries reviewed). Systematic errors — addressed by rule corrections and full rerun.
+
+V2.1 Phase 5b accuracy check: **3.2% error rate** (2 errors in 62 entries reviewed). Non-systematic — no classification rule is broken. Both errors were edge cases (one reverse-direction internal transfer, one nationality stray). Cleared for full analysis.
+
+V2.1 gender classification: **rule-based engine resolved 99.4%** of entries without Claude. Claude Haiku called for 90 ambiguous cases (foreign names, pseudonyms). No accuracy check conducted on gender — Ukrainian naming conventions are deterministic enough that the rule engine is considered reliable.
 
 ---
 

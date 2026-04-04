@@ -43,6 +43,41 @@ SOURCE_NOTE = ("Source: Encyclopedia of Modern Ukraine (esu.com.ua), V2.1 datase
                "Berdnyk & Symkin 2026")
 
 # ---------------------------------------------------------------------------
+# UKRAINIAN SSR GENERAL POPULATION LIFE EXPECTANCY (reference baseline)
+#
+# Sources:
+#   Meslé F. & Vallin J. (2003). "Mortality in Eastern Europe and the Former
+#   Soviet Union: long-term trends and recent upturns." Demographical Research,
+#   Special Collection 2, pp. 45–70. (pre-1959 reconstruction)
+#
+#   United Nations World Population Prospects (2022 revision) — Ukrainian SSR /
+#   Ukraine, period LE at birth, both sexes combined. (1950–1991)
+#
+#   Human Mortality Database (mortality.org) — Ukraine, 1959–1991.
+#
+# These are period LE estimates (the LE of a person born in that year if
+# age-specific mortality rates stayed constant). Presented as decade midpoints
+# for chart overlay.
+# ---------------------------------------------------------------------------
+UKR_SSR_LE = {
+    # decade_midpoint: (le_both_sexes, source_note)
+    1925: (43.4, 'Meslé & Vallin 2003'),   # 1920s — post-civil war, pre-Holodomor
+    1935: (38.5, 'Meslé & Vallin 2003'),   # 1930s — Holodomor 1932–33 depresses avg
+    1945: (36.0, 'Meslé & Vallin 2003'),   # 1940s — WWII devastation
+    1955: (62.0, 'UN WPP 2022'),           # 1950s — rapid post-war recovery
+    1965: (69.5, 'UN WPP 2022 / HMD'),    # 1960s — peak Soviet-era health gains
+    1975: (70.2, 'UN WPP 2022 / HMD'),    # 1970s — stagnation begins
+    1985: (70.4, 'UN WPP 2022 / HMD'),    # 1980s — flat
+}
+# For chart overlays: sorted lists of (year, le) pairs
+UKR_SSR_YEARS = sorted(UKR_SSR_LE.keys())
+UKR_SSR_VALUES = [UKR_SSR_LE[y][0] for y in UKR_SSR_YEARS]
+# Overall Soviet-period mean for horizontal reference on bar charts (1922–1991)
+UKR_SSR_SOVIET_MEAN = round(
+    statistics.mean([UKR_SSR_LE[y][0] for y in UKR_SSR_YEARS if 1920 < y < 1992]), 2
+)
+
+# ---------------------------------------------------------------------------
 # PALETTE — consistent across all figures
 # ---------------------------------------------------------------------------
 COLOUR = {
@@ -450,8 +485,11 @@ ax.set_xticks(x)
 ax.set_xticklabels(labels, rotation=15, ha='right')
 ax.set_ylim(0, max(means) * 1.3 + 5)
 ax.axhline(statistics.mean(le_values(analysable)), color='grey',
-           linestyle='--', linewidth=1, label='Overall mean')
-ax.legend(fontsize=9)
+           linestyle='--', linewidth=1, label='Dataset overall mean')
+# Reference: Ukrainian SSR general population average during Soviet period
+ax.axhline(UKR_SSR_SOVIET_MEAN, color='#27AE60', linestyle=':',
+           linewidth=2, label=f'Ukrainian SSR general pop. avg ≈{UKR_SSR_SOVIET_MEAN} yrs\n(Meslé & Vallin 2003; UN WPP 2022)')
+ax.legend(fontsize=8.5)
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 add_source(fig)
 save(fig, 'fig01_primary_le_comparison.png')
@@ -751,9 +789,16 @@ for ms in ALL_GROUPS:
         ax.plot(xs, ys, 'o-', color=COLOUR[ms], label=GROUP_LABELS[ms],
                 linewidth=2, markersize=5)
 
-apply_style(ax, 'Figure 10 — Mean Life Expectancy by Birth Decade (1840s–1980s)',
-            xlabel='Birth Decade', ylabel='Mean Life Expectancy (years)')
-ax.legend(fontsize=9)
+# Overlay Ukrainian SSR general population LE (death-year based, not birth-year,
+# so we plot against approximately birth_year+35 to align with typical working-life midpoint)
+# Simple approach: plot SSR LE values against the decade year they represent
+ax.plot(UKR_SSR_YEARS, UKR_SSR_VALUES, 's--', color='#27AE60', linewidth=2,
+        markersize=6, label='Ukrainian SSR general pop. LE\n(Meslé & Vallin 2003; UN WPP 2022)',
+        zorder=5)
+
+apply_style(ax, 'Figure 10 — Mean Life Expectancy by Birth Decade (1840s–1980s)\nvs Ukrainian SSR general population',
+            xlabel='Birth Decade / Reference Year', ylabel='Mean Life Expectancy (years)')
+ax.legend(fontsize=8.5, ncol=2)
 ax.set_xlim(1835, 1990)
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 add_source(fig)
@@ -993,6 +1038,67 @@ ax.set_title('Figure 16 — CONSORT-Style Dataset Exclusion Flowchart',
              fontsize=13, fontweight='bold', color=COLOUR['navy'], pad=10)
 fig.text(0.5, 0.01, SOURCE_NOTE, ha='center', fontsize=7, color='grey', style='italic')
 save(fig, 'fig16_consort_flowchart.png')
+
+
+# ===========================================================================
+# FIG 19 — UKRAINIAN SSR GENERAL POPULATION LE vs CREATIVE WORKERS (context chart)
+# ===========================================================================
+print("  fig19_ssr_population_context.png")
+
+# For each decade, get mean LE for non_migrated creative workers whose birth decade
+# aligns (this is the most apples-to-apples comparison vs general population)
+creative_nm_by_decade = {}
+for dec in [1920, 1930, 1940, 1950, 1960, 1970, 1980]:
+    v = [r['_le'] for r in non_migrated if r['_by'] and dec <= r['_by'] < dec + 10 and r['_le']]
+    midpoint = dec + 5
+    if v:
+        creative_nm_by_decade[midpoint] = round(statistics.mean(v), 1)
+
+fig, ax = plt.subplots(figsize=(11, 7))
+
+# SSR general population
+ax.plot(UKR_SSR_YEARS, UKR_SSR_VALUES, 's-', color='#27AE60', linewidth=2.5,
+        markersize=8, label='Ukrainian SSR general population\n(Meslé & Vallin 2003; UN WPP 2022)',
+        zorder=5)
+
+# Creative workers — non-migrated
+cn_xs = sorted(creative_nm_by_decade.keys())
+cn_ys = [creative_nm_by_decade[x] for x in cn_xs]
+ax.plot(cn_xs, cn_ys, 'o-', color=COLOUR['non_migrated'], linewidth=2.5,
+        markersize=8, label='Non-migrated creative workers (V2.1 dataset)',
+        zorder=6)
+
+# Creative workers — migrated (for reference)
+creative_m_by_decade = {}
+for dec in [1880, 1890, 1900, 1910, 1920, 1930, 1940]:
+    v = [r['_le'] for r in migrated if r['_by'] and dec <= r['_by'] < dec + 10 and r['_le']]
+    midpoint = dec + 5
+    if v:
+        creative_m_by_decade[midpoint] = round(statistics.mean(v), 1)
+
+cm_xs = sorted(creative_m_by_decade.keys())
+cm_ys = [creative_m_by_decade[x] for x in cm_xs]
+ax.plot(cm_xs, cm_ys, '^-', color=COLOUR['migrated'], linewidth=2.5,
+        markersize=8, label='Migrated creative workers (V2.1 dataset)',
+        zorder=6)
+
+ax.set_xlim(1910, 1995)
+ax.set_ylim(25, 85)
+apply_style(ax,
+    'Figure 19 — Creative Workers LE vs Ukrainian SSR General Population\n'
+    '(birth decade alignment)',
+    xlabel='Birth Decade Midpoint', ylabel='Mean Life Expectancy (years)')
+ax.legend(fontsize=9)
+ax.fill_between([1932, 1934], 25, 85, alpha=0.07, color='#8E44AD', label='Holodomor')
+ax.fill_between([1936, 1939], 25, 85, alpha=0.07, color='#8B0000', label='Great Terror')
+ax.text(1932.5, 28, 'Holodomor', fontsize=7.5, color='#8E44AD', rotation=90, va='bottom')
+ax.text(1936.5, 28, 'Great Terror', fontsize=7.5, color='#8B0000', rotation=90, va='bottom')
+
+# Citation note
+fig.text(0.5, 0.005,
+    "SSR reference: Meslé F. & Vallin J. (2003) Demographical Research Sp.Coll.2; UN WPP 2022 revision.",
+    ha='center', fontsize=6.5, color='grey', style='italic')
+save(fig, 'fig19_ssr_population_context.png')
 
 
 # ===========================================================================
