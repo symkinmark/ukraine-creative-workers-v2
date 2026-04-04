@@ -108,18 +108,37 @@ Where individuals held multiple professions (e.g., a writer who was also a journ
 
 ### 3.5 Nationality Determination Protocol
 
-Determining Ukrainian nationality from an encyclopedia of Ukrainian cultural life proved less straightforward than anticipated. The ESU includes entries for foreign-born artists with significant connections to Ukraine, Ukrainian Jews whose national identification was complex, ethnic Poles from Galicia who self-identified as Ukrainian, and ethnic Russians who spent their careers in Soviet Ukraine. To handle this complexity systematically, we developed a three-tier nationality classification protocol.
+#### 3.5.1 Definition of Ukrainian
 
-**Tier 1: Clean inclusion.** Entries explicitly described as "Ukrainian" (Українець/Українка) with no ambiguity markers were included directly without further review. This accounted for the majority of entries.
+This study applies a **cultural participation definition of Ukrainian identity**, not an ethnic or linguistic one. A person is counted as Ukrainian if they meet any of the following criteria: they were born or raised on territory that is now Ukraine and made a creative contribution that forms part of the Ukrainian cultural record; they contributed substantially to Ukrainian cultural life regardless of ethnic background; they self-identified as Ukrainian or were recognised as part of the Ukrainian creative community by their contemporaries; or they were subject to Soviet persecution specifically in the context of suppressing Ukrainian cultural identity.
 
-**Tier 2: Claude AI review.** Entries containing ambiguous nationality markers — Jewish heritage, Polish origin, German origin, or descriptions as "Soviet" rather than Ukrainian — were flagged for review by Claude (Anthropic), a large language model. A total of 1,356 entries underwent this review. Claude was presented with the full ESU biographical text (in Ukrainian) and asked to determine, based on the text, whether the individual should be classified as Ukrainian for the purposes of this study. The prompt used verbatim and the full review protocol are documented in SCIENTIFIC_METHODOLOGY.md.
+This definition deliberately excludes ethnic or linguistic tests for two reasons. First, the Soviet state systematically suppressed Ukrainian cultural identity precisely as expressed through creative practice — through language choice, subject matter, institutional affiliation, and artistic tradition. The population most at risk was defined by cultural participation, not by blood. Second, applying an ethnic test would arbitrarily exclude substantial portions of the historically documented Ukrainian creative community: Ukrainian Jews whose cultural world was entirely Ukrainian even when they wrote in Yiddish; Galician Poles who participated fully in Ukrainian cultural institutions and self-identified with the Ukrainian national movement; Crimean Tatars indigenous to Ukrainian territory who were collectively deported by the Soviet state.
 
-Of the 1,356 flagged entries reviewed by Claude:
-- 137 were confirmed as Ukrainian (primarily Jewish-Ukrainians born in Ukrainian territory who participated in Ukrainian cultural life, and Polish-Ukrainians from Galicia who self-identified as Ukrainian).
-- 1,218 were confirmed as non-Ukrainian (primarily foreign artists referenced in the ESU for their influence on Ukrainian culture, or Soviet-era figures with no authentic Ukrainian cultural connection) and excluded.
+The definition also excludes figures who merely appear in the ESU as foreign reference points with no Ukrainian presence, and ethnic Russians whose creative careers were oriented toward Russian rather than Ukrainian culture even if they were born or worked in Ukraine.
+
+**Notably included under this definition:**
+- Crimean Tatars: indigenous to Ukrainian territory, targeted by the 1944 Soviet mass deportation; included without individual review.
+- Ukrainian Jews with substantive Ukrainian cultural connection: reviewed individually; those who participated in Ukrainian cultural institutions, wrote about Ukraine, or were targeted as part of the Ukrainian intelligentsia included.
+- Galician Poles who self-identified as Ukrainian and participated in Ukrainian cultural institutions: included after individual review.
+
+The full nationality determination protocol, including verbatim AI prompts and stress-test case decisions, is reproduced in SCIENTIFIC_METHODOLOGY.md (Section 6).
+
+#### 3.5.2 Classification Procedure
+
+Determining Ukrainian identity in practice proved less straightforward than applying the definition above, because Soviet administrative records frequently imposed or obscured national identities, and ESU biographical texts reflect the political constraints of the periods in which they were written. We developed a three-tier classification system.
+
+**Tier 1: Clean inclusion.** Entries explicitly described as Ukrainian (Українець/Українка) with no ambiguity markers were included directly without further review.
+
+**Tier 2: Claude AI review.** Entries containing markers suggesting possible nationality ambiguity — Jewish heritage, Polish origin, German or Austrian origin, descriptions as "Soviet" without an underlying national identity, or birth entirely outside Ukraine — were flagged for individual review by Claude (Anthropic, claude-haiku-4-5). Claude was presented with the full ESU biographical text in Ukrainian and asked to classify the individual against the Section 3.5.1 criteria. A total of 1,356 entries underwent this review.
+
+Of the 1,356 reviewed:
+- 137 were confirmed as Ukrainian and included.
+- 1,218 were confirmed as non-Ukrainian and excluded.
 - 1 entry remained indeterminate and was excluded.
 
-**Tier 3: Auto-exclusion.** Entries containing explicit exclusion markers — nationalities clearly not Ukrainian without any Ukrainian connection stated — were automatically excluded without Claude review.
+**Tier 3: Auto-exclusion.** Entries with explicit non-Ukrainian nationality markers and no Ukrainian connection stated were excluded without Claude review.
+
+The verbatim prompt used for Tier 2 review and the full list of Tier 3 auto-exclusion markers are reproduced in SCIENTIFIC_METHODOLOGY.md (Sections 6.4 and 6.5).
 
 ### 3.6 Migration Classification
 

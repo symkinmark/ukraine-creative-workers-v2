@@ -353,15 +353,59 @@ The following professions were explicitly excluded even when they appeared along
 
 ## 6. Nationality Determination Protocol
 
+### 6.0 Definition: Who Counts as Ukrainian
+
+This study uses a **cultural participation definition of Ukrainian identity**, not an ethnic or linguistic one. This is a deliberate methodological choice with a principled scholarly basis, and it is stated here explicitly so that it can be critiqued, replicated, and compared against alternative definitions.
+
+**A person is counted as Ukrainian in this study if they meet ANY of the following criteria:**
+
+1. **Born or raised on territory that is now Ukraine** (including all historical Ukrainian lands: Left-Bank and Right-Bank Ukraine, Galicia, Bukovyna, Zakarpattia, Volhynia, Sloboda Ukraine, Novorossiya, and Crimea), AND made a creative contribution that forms part of the Ukrainian cultural record.
+
+2. **Contributed substantially to Ukrainian cultural life**, regardless of ethnic or linguistic background — for example, a composer who wrote in the Ukrainian folk tradition, a theatre director who led Ukrainian-language productions, or an architect who shaped Ukrainian urban identity.
+
+3. **Self-identified as Ukrainian** or was recognised as part of the Ukrainian creative community by their contemporaries, regardless of the ethnic category imposed by Soviet administrative records.
+
+4. **Was subject to Soviet persecution specifically in the context of suppressing Ukrainian culture** — for example, was targeted during the Executed Renaissance purges, or lost their position during Soviet Ukrainisation rollbacks.
+
+**A person is NOT counted as Ukrainian if:**
+
+- They lived entirely outside Ukrainian territory with no substantial Ukrainian cultural connection.
+- Their only connection to the ESU is being referenced as a foreign influence on Ukrainian culture (e.g., a famous French novelist whose work was translated into Ukrainian).
+- They worked in Ukraine solely in a Soviet administrative capacity, with no creative output connected to Ukrainian cultural identity.
+- They are an ethnic Russian whose entire career and creative output was oriented toward Russian rather than Ukrainian culture, even if they were born or worked in Ukraine.
+
+**Why this definition:**
+
+The Soviet Union systematically attacked Ukrainian cultural identity precisely because identity is expressed through cultural participation, not biological descent. Writers who chose to write in Ukrainian, composers who chose Ukrainian folk forms, theatre directors who chose Ukrainian-language staging — these were the people whose work was suppressed, whose manuscripts were burned, and who were disproportionately shot during the Great Terror. Defining "Ukrainian" by ethnicity or language alone would exclude significant portions of this persecuted community — including Ukrainian Jews whose entire cultural world was Ukrainian even when they wrote in Yiddish, and including Galician Poles who participated fully in Ukrainian cultural institutions. Defining it by cultural participation captures the population that was actually at risk.
+
+**Notable inclusions justified by this definition:**
+
+- **Crimean Tatars**: Indigenous to Ukrainian territory, targeted by the 1944 mass deportation. Included without review.
+- **Ukrainian Jews**: Many participated fully in Ukrainian cultural life — writing about Ukraine, working in Ukrainian institutions, being targeted as part of the Ukrainian intelligentsia. Reviewed individually; those with substantial Ukrainian cultural connection included.
+- **Galician Poles**: Those who self-identified with Ukrainian rather than Polish national identity and participated in Ukrainian cultural institutions included after review.
+- **Non-Ukrainian-ethnicity figures with substantial Ukrainian careers**: Reviewed individually; included where Ukrainian cultural contribution is substantive and sustained.
+
+**Stress-test questions applied during classification:**
+
+| Scenario | Decision | Reasoning |
+|----------|----------|-----------|
+| Jewish, born Odesa, wrote in Yiddish, whole life in Ukraine | ✅ Include | Ukrainian territory, Ukrainian cultural world |
+| Ethnic Russian, born Kharkiv, wrote in Russian, moved to Moscow at 25 | ❌ Exclude | No meaningful Ukrainian cultural contribution |
+| Pole from Galicia, self-identified Ukrainian, wrote in Ukrainian | ✅ Include | Cultural participation + self-identification |
+| Crimean Tatar, born Crimea, wrote in Crimean Tatar | ✅ Include | Indigenous to Ukrainian territory |
+| Georgian composer, 30 years in Kyiv conducting Ukrainian orchestras | ✅ Include | Substantial Ukrainian cultural contribution |
+| French writer referenced in ESU for influence on Ukrainian literature | ❌ Exclude | Referenced figure only, no Ukrainian presence |
+| Ethnic Ukrainian born in Russia, no Ukraine connection | ❌ Exclude | No Ukrainian cultural or territorial connection |
+
 ### 6.1 Overview
 
-The ESU contains entries for individuals of varied national backgrounds. Because we are studying Ukrainian creative workers specifically, we must determine whether each individual in our dataset should be classified as Ukrainian. This is not always straightforward: Ukrainian identity is a complex combination of ethnic heritage, language of work, self-identification, geographic origin, and cultural participation.
+The ESU contains entries for individuals of varied national backgrounds. Because we are studying Ukrainian creative workers specifically, we must determine whether each individual in our dataset should be classified as Ukrainian under the definition in Section 6.0. This is not always straightforward in practice, even with a clear definition: Soviet records often obscured or imposed national identities, and biographical texts reflect the political constraints of the periods in which they were written.
 
 We developed a three-tier system:
 
-**Tier 1 (Clean inclusion):** Unambiguously Ukrainian — include directly.
-**Tier 2 (Claude review):** Ambiguous nationality markers — send to Claude for review.
-**Tier 3 (Auto-exclusion):** Unambiguously non-Ukrainian — exclude directly.
+**Tier 1 (Clean inclusion):** Unambiguously Ukrainian under Section 6.0 — include directly.
+**Tier 2 (Claude review):** Biographical markers suggest possible ambiguity — send to Claude for review against Section 6.0 criteria.
+**Tier 3 (Auto-exclusion):** Unambiguously non-Ukrainian under Section 6.0 — exclude directly.
 
 ### 6.2 Tier 1: Clean Inclusion Criteria
 
