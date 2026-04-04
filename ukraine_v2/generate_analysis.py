@@ -528,49 +528,74 @@ save(fig, 'fig02_kaplan_meier.png')
 
 
 # ===========================================================================
-# FIG 03 — V1 / V2.0 / V2.1 COMPARISON
+# FIG 03 — V1 / V2.1 COMPARISON (apples-to-apples)
+#
+# V1 used a simple two-group system: migrated vs non-migrated (everyone who
+# stayed in the Soviet sphere was "non-migrated").
+# To make V2.1 directly comparable, we use the same two-group framing here:
+#   - "Left USSR" = migrated (V2.1 group)
+#   - "Stayed in Soviet sphere" = non_migrated + deported + internal_transfer
+#     combined (matching V1's definition of "non-migrated")
+# This is the same grouping used in fig20 — the two charts now show consistent
+# numbers and do not contradict each other.
+# The four-group breakdown (fig01) is the primary V2.1 analysis.
 # ===========================================================================
 print("  fig03_version_comparison.png")
 
-# V1 numbers from the paper
-V1 = {'non_migrated': 63, 'migrated': 72}
-# V2.0: read from archive txt if present, else use best known values
-V2_0 = {'non_migrated': None, 'migrated': None}
-archive_txt = os.path.join(PROJECT_ROOT, 'archive', 'v2_0', 'esu_analysis_results.txt')
-if os.path.exists(archive_txt):
-    with open(archive_txt, encoding='utf-8') as f:
-        for line in f:
-            if 'mean_le' in line.lower() and 'migrated' in line.lower():
-                pass  # parse if available
+# V1 numbers (from paper)
+V1_mig = 72
+V1_nm  = 63
+V1_n   = 415
 
-# V2.1 current
-V2_1 = {ms: round(statistics.mean(le_values(groups[ms])), 2)
-         for ms in ['migrated', 'non_migrated']}
+# V2.1 — using same two-group logic as V1 (and as fig20)
+# "Left USSR" = migrated only
+v21_left_les = le_values(migrated)
+V21_mig      = round(statistics.mean(v21_left_les), 1)
+V21_mig_n    = len(v21_left_les)
 
-labels_v = ['V1 (n=415)', 'V2.1 (n={})'.format(len(migrated) + len(non_migrated))]
-mig_vals = [V1['migrated'],     V2_1['migrated']]
-nm_vals  = [V1['non_migrated'], V2_1['non_migrated']]
+# "Stayed in Soviet sphere" = non_migrated + internal_transfer + deported
+# (matches V1's definition and fig20's conservative grouping)
+v21_stayed_les = (le_values(non_migrated) + le_values(internal_transfer)
+                  + le_values(deported))
+V21_nm         = round(statistics.mean(v21_stayed_les), 1)
+V21_nm_n       = len(v21_stayed_les)
+
+labels_v = [f'V1\n(n={V1_n})', f'V2.1\n(n={V21_mig_n + V21_nm_n})']
+mig_vals = [V1_mig, V21_mig]
+nm_vals  = [V1_nm,  V21_nm]
 
 fig, ax = plt.subplots(figsize=(9, 6))
 x = np.arange(len(labels_v))
 w = 0.3
-ax.bar(x - w/2, mig_vals, w, color=COLOUR['migrated'],     label='Migrated')
-ax.bar(x + w/2, nm_vals,  w, color=COLOUR['non_migrated'], label='Non-migrated')
+ax.bar(x - w/2, mig_vals, w, color=COLOUR['migrated'],     label='Left USSR (migrated)')
+ax.bar(x + w/2, nm_vals,  w, color=COLOUR['non_migrated'], label='Stayed in Soviet sphere')
 
 for xi, (mv, nv) in enumerate(zip(mig_vals, nm_vals)):
-    ax.text(xi - w/2, mv + 0.4, f"{mv:.1f}", ha='center', fontsize=10, fontweight='bold',
-            color=COLOUR['migrated'])
-    ax.text(xi + w/2, nv + 0.4, f"{nv:.1f}", ha='center', fontsize=10, fontweight='bold',
-            color=COLOUR['non_migrated'])
+    ax.text(xi - w/2, mv + 0.5, f"{mv:.1f} yrs", ha='center', fontsize=10,
+            fontweight='bold', color=COLOUR['migrated'])
+    ax.text(xi + w/2, nv + 0.5, f"{nv:.1f} yrs", ha='center', fontsize=10,
+            fontweight='bold', color=COLOUR['non_migrated'])
 
-apply_style(ax, 'Figure 3 — Mean Life Expectancy: V1 vs V2.1 Comparison',
+# Gap arrows
+for xi, (mv, nv) in enumerate(zip(mig_vals, nm_vals)):
+    gap = mv - nv
+    mid = (mv + nv) / 2
+    ax.annotate('', xy=(xi + w/2 - 0.02, mv), xytext=(xi + w/2 - 0.02, nv),
+                arrowprops=dict(arrowstyle='<->', color='#555', lw=1.5))
+    ax.text(xi + w/2 + 0.06, mid, f"+{gap:.1f} yrs", va='center',
+            fontsize=9, color='#333', fontweight='bold')
+
+apply_style(ax, 'Figure 3 — Mean Life Expectancy: V1 vs V2.1 (consistent two-group framing)',
             ylabel='Mean Life Expectancy (years)')
 ax.set_xticks(x)
-ax.set_xticklabels(labels_v)
-ax.set_ylim(0, max(mig_vals + nm_vals) * 1.3)
-ax.legend()
-plt.tight_layout(rect=[0, 0.04, 1, 1])
-add_source(fig)
+ax.set_xticklabels(labels_v, fontsize=11)
+ax.set_ylim(0, max(mig_vals + nm_vals) * 1.25)
+ax.legend(fontsize=9)
+fig.text(0.5, 0.01,
+    "V2.1 'stayed' = non_migrated + internal_transfer + deported combined "
+    "(matches V1 two-group definition and fig20). Four-group breakdown: see fig01. " + SOURCE_NOTE,
+    ha='center', fontsize=7, color='grey', style='italic')
+plt.tight_layout(rect=[0, 0.05, 1, 1])
 save(fig, 'fig03_version_comparison.png')
 
 
