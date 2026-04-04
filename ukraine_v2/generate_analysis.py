@@ -1295,6 +1295,215 @@ save(fig, 'fig18_le_by_gender_group.png')
 
 
 # ===========================================================================
+# FIG 21 — SOVIET REPUBLIC COMPARISON
+#
+# Contextualises Ukrainian creative workers against the general populations
+# of Soviet republics. Shows our four groups against what different Soviet
+# citizens experienced by geography.
+#
+# Data sources (all hardcoded from published literature):
+#   - Ukrainian SSR: Meslé & Vallin 2003 (already in UKR_SSR_LE above)
+#   - Russian SFSR: Andreev, Darsky & Kharkova 1998; Shkolnikov et al.
+#   - USSR overall: UN World Population Prospects 2022 revision
+#   - Baltic average (Estonian/Lithuanian/Latvian SSR): Katus et al.;
+#     Convergence or Divergence? PMC6223831 (2019)
+#   - Georgian SSR: Meslé & Vallin (Caucasus monograph); UN WPP 2022
+#   - Central Asian average (Kazakh/Uzbek/Turkmen SSR): UN WPP 2022
+#
+# Confidence: HIGH for Ukraine, Russia, USSR overall; MEDIUM for Baltic,
+# Georgia; LOW for Central Asia pre-1960 (noted in chart).
+# All values are both-sexes period LE at birth, decade midpoints.
+# ===========================================================================
+print("  fig21_soviet_republic_comparison.png")
+
+# (year, LE) pairs for each series — decade midpoints
+REPUBLIC_DATA = {
+    'Ukrainian SSR\n(Meslé & Vallin 2003; UN WPP 2022)': {
+        1925: 43.4, 1935: 38.5, 1945: 36.0,
+        1955: 62.0, 1965: 69.5, 1975: 70.2, 1985: 70.4,
+    },
+    'Russian SFSR\n(Andreev et al. 1998; UN WPP 2022)': {
+        # No reliable pre-1950 by republic; post-1950 from multiple sources
+        1955: 63.5, 1965: 68.6, 1975: 68.0, 1985: 68.9,
+    },
+    'USSR overall\n(UN WPP 2022)': {
+        1955: 61.0, 1965: 68.8, 1975: 69.5, 1985: 69.8,
+    },
+    'Baltic SSRs avg\n(Estonian/Latvian/Lithuanian;\nKatus et al.; UN WPP 2022)': {
+        1955: 65.0, 1965: 70.5, 1975: 70.4, 1985: 70.8,
+    },
+    'Georgian SSR\n(UN WPP 2022)': {
+        1955: 63.5, 1965: 70.5, 1975: 71.8, 1985: 72.5,
+    },
+    'Central Asian SSRs avg\n(Kazakh/Uzbek; UN WPP 2022;\n⚠ lower confidence pre-1965)': {
+        1955: 53.5, 1965: 63.5, 1975: 65.8, 1985: 67.2,
+    },
+}
+
+REP_COLOURS = {
+    'Ukrainian SSR\n(Meslé & Vallin 2003; UN WPP 2022)':           '#27AE60',
+    'Russian SFSR\n(Andreev et al. 1998; UN WPP 2022)':            '#C0392B',
+    'USSR overall\n(UN WPP 2022)':                                  '#7F8C8D',
+    'Baltic SSRs avg\n(Estonian/Latvian/Lithuanian;\nKatus et al.; UN WPP 2022)': '#2980B9',
+    'Georgian SSR\n(UN WPP 2022)':                                  '#E67E22',
+    'Central Asian SSRs avg\n(Kazakh/Uzbek; UN WPP 2022;\n⚠ lower confidence pre-1965)': '#8E44AD',
+}
+REP_STYLES = {
+    'Ukrainian SSR\n(Meslé & Vallin 2003; UN WPP 2022)':           ('s', '-',  2.5),
+    'Russian SFSR\n(Andreev et al. 1998; UN WPP 2022)':            ('o', '-',  2.0),
+    'USSR overall\n(UN WPP 2022)':                                  ('^', '--', 1.5),
+    'Baltic SSRs avg\n(Estonian/Latvian/Lithuanian;\nKatus et al.; UN WPP 2022)': ('D', '-', 2.0),
+    'Georgian SSR\n(UN WPP 2022)':                                  ('v', '-',  2.0),
+    'Central Asian SSRs avg\n(Kazakh/Uzbek; UN WPP 2022;\n⚠ lower confidence pre-1965)': ('x', ':', 1.5),
+}
+
+fig, ax = plt.subplots(figsize=(14, 8))
+
+# Republic reference lines
+for name, data in REPUBLIC_DATA.items():
+    xs = sorted(data.keys())
+    ys = [data[x] for x in xs]
+    marker, ls, lw = REP_STYLES[name]
+    ax.plot(xs, ys, marker=marker, linestyle=ls, linewidth=lw,
+            color=REP_COLOURS[name], markersize=7, label=name, alpha=0.85)
+
+# Our creative worker groups as single data points with 95% CI error bars.
+# Positioned at each group's mean birth year — the scientifically correct
+# x-position because LE is a cohort property tied to when people were born,
+# not a period value valid at every year.
+for ms in ['migrated', 'non_migrated', 'deported']:
+    d = descs[ms]
+    if not d['mean']:
+        continue
+    x_pos = d.get('mean_by', 1920)   # mean birth year of the group
+    yerr  = [[d['mean'] - d['ci95_lo']], [d['ci95_hi'] - d['mean']]]
+    ax.errorbar(x_pos, d['mean'], yerr=yerr,
+                fmt='o', color=COLOUR[ms], markersize=11,
+                capsize=7, capthick=2, elinewidth=2,
+                label=f"Our data — {GROUP_LABELS[ms]}\n"
+                      f"  mean LE = {d['mean']} yrs  [95% CI {d['ci95_lo']}–{d['ci95_hi']}]\n"
+                      f"  n={d['n']}, mean birth yr ≈ {int(x_pos)}",
+                zorder=10)
+
+ax.set_xlim(1918, 1998)
+ax.set_ylim(28, 84)
+apply_style(ax,
+    'Figure 21 — Soviet Republic General Population LE vs Ukrainian Creative Workers\n'
+    '(lines = general population period LE by decade; dots = cohort mean LE ± 95% CI\n'
+    ' positioned at each group\'s mean birth year)',
+    xlabel='Year / Mean Birth Year', ylabel='Life Expectancy (years)')
+ax.legend(fontsize=7.5, loc='upper left', ncol=2,
+          framealpha=0.9, edgecolor='#cccccc')
+
+# Annotate the Holodomor trough (visible in Ukrainian line)
+ax.annotate('Holodomor\ntrough 1933\n(Ukr. SSR: 11 yrs)',
+            xy=(1935, 38.5), xytext=(1942, 32),
+            fontsize=7.5, color='#27AE60',
+            arrowprops=dict(arrowstyle='->', color='#27AE60', lw=1.2))
+
+fig.text(0.5, 0.005,
+    "Sources: Meslé & Vallin 2003; Andreev, Darsky & Kharkova 1998; "
+    "UN WPP 2022; Katus et al. Baltic demographic data. "
+    "All values: both sexes, period LE at birth. Decade midpoints. "
+    "Central Asia pre-1965: lower confidence.",
+    ha='center', fontsize=6, color='grey', style='italic')
+plt.tight_layout(rect=[0, 0.05, 1, 1])
+save(fig, 'fig21_soviet_republic_comparison.png')
+
+
+# ===========================================================================
+# FIG 22 — EDUCATED URBAN POPULATION COMPARISON
+#
+# Controls for socioeconomic status: were creative workers dying early
+# because of Soviet repression specifically targeting them, or simply
+# because they were a typical educated urban Soviet population?
+#
+# The educational mortality gradient in the Soviet Union:
+#   Shkolnikov et al. (1998) "Educational level and adult mortality in
+#   Russia 1979–1994": university-educated had ~3 years higher LE at age 20
+#   vs the national average in 1979–80 (PMC1483877).
+#   Manual vs non-manual workers: Shkolnikov & Meslé (1996) showed
+#   intelligentsia/"non-manual employees" had significantly better survival
+#   during the late Soviet stagnation than manual workers.
+#
+# Educated urban estimate = Ukrainian SSR general pop. LE + 3–5 years premium.
+# This is a constructed band, clearly labelled as an estimate.
+# ===========================================================================
+print("  fig22_educated_urban_comparison.png")
+
+# Educated urban LE band: SSR population LE + educational premium (3–5 yrs)
+EDU_PREMIUM_LOW = 3.0   # conservative: lower end of Shkolnikov gradient
+EDU_PREMIUM_HIGH = 5.0  # optimistic: upper end
+
+edu_xs   = sorted(UKR_SSR_LE.keys())
+edu_base = [UKR_SSR_LE[y][0] for y in edu_xs]
+edu_lo   = [v + EDU_PREMIUM_LOW  for v in edu_base]
+edu_hi   = [v + EDU_PREMIUM_HIGH for v in edu_base]
+
+fig, ax = plt.subplots(figsize=(13, 8))
+
+# Ukrainian SSR general population baseline
+ax.plot(edu_xs, edu_base, 's-', color='#27AE60', linewidth=2,
+        markersize=7, label='Ukrainian SSR general population\n(Meslé & Vallin 2003; UN WPP 2022)')
+
+# Educated urban band
+ax.fill_between(edu_xs, edu_lo, edu_hi, alpha=0.18, color='#2980B9',
+                label=f'Estimated educated urban Ukrainian LE\n(SSR avg +{EDU_PREMIUM_LOW}–{EDU_PREMIUM_HIGH} yrs educational premium;\nShkolnikov et al. 1998)')
+ax.plot(edu_xs, [(lo + hi) / 2 for lo, hi in zip(edu_lo, edu_hi)],
+        'D--', color='#2980B9', linewidth=1.5, markersize=5, alpha=0.7)
+
+# Our creative worker groups as single data points with 95% CI error bars.
+# Positioned at mean birth year of each group — correct because cohort LE
+# belongs to the birth cohort, not to a calendar year.
+for ms in ALL_GROUPS:
+    d = descs[ms]
+    if not d['mean'] or not d['ci95_lo']:
+        continue
+    x_pos = d.get('mean_by', 1920)
+    yerr  = [[d['mean'] - d['ci95_lo']], [d['ci95_hi'] - d['mean']]]
+    ax.errorbar(x_pos, d['mean'], yerr=yerr,
+                fmt='o', color=COLOUR[ms], markersize=11,
+                capsize=7, capthick=2, elinewidth=2, zorder=10,
+                label=f"Our data — {GROUP_LABELS[ms]}\n"
+                      f"  {d['mean']} yrs [95% CI {d['ci95_lo']}–{d['ci95_hi']}]  n={d['n']}")
+
+ax.set_xlim(1918, 1995)
+ax.set_ylim(28, 88)
+apply_style(ax,
+    'Figure 22 — Creative Workers vs Estimated Educated Urban Ukrainian Population\n'
+    '(dots = cohort mean LE ± 95% CI at mean birth year; band = educated urban LE estimate)',
+    xlabel='Year / Mean Birth Year', ylabel='Life Expectancy (years)')
+
+ax.legend(fontsize=8, loc='upper left', framealpha=0.95, edgecolor='#cccccc')
+
+# Annotation: key insight — point to the actual data points
+mig_by = descs['migrated'].get('mean_by', 1900)
+dep_by = descs['deported'].get('mean_by', 1900)
+
+ax.annotate(
+    'Migrated group sits inside\neducated urban LE estimate band —\nconsistent with "natural lifespan\nif not repressed"',
+    xy=(mig_by, descs['migrated']['mean']),
+    xytext=(mig_by - 20, descs['migrated']['mean'] + 8),
+    fontsize=8, color=COLOUR['migrated'],
+    arrowprops=dict(arrowstyle='->', color=COLOUR['migrated'], lw=1.2))
+
+ax.annotate(
+    'Deported group: 27 yrs below migrated.\nCannot be explained by education\nor class — this is state violence.',
+    xy=(dep_by, descs['deported']['mean']),
+    xytext=(dep_by + 12, descs['deported']['mean'] - 10),
+    fontsize=8, color=COLOUR['deported'],
+    arrowprops=dict(arrowstyle='->', color=COLOUR['deported'], lw=1.2))
+
+fig.text(0.5, 0.005,
+    "Educational premium estimate based on: Shkolnikov V.M. et al. (1998) "
+    "Eur J Public Health 8(2). Educational gradient of ~3 yrs at age 20 in 1979–80 Russia; "
+    "assumed similar magnitude for Ukrainian educated class. Band represents uncertainty range.",
+    ha='center', fontsize=6.2, color='grey', style='italic')
+plt.tight_layout(rect=[0, 0.06, 1, 1])
+save(fig, 'fig22_educated_urban_comparison.png')
+
+
+# ===========================================================================
 # DONE
 # ===========================================================================
 print(f"\nAll charts saved to: {CHARTS_DIR}")

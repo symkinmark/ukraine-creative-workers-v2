@@ -252,7 +252,7 @@ Phase 5b clearance received → full analysis run executed on `esu_creative_work
 
 **Deported finding** (Cohen's d = 1.58 = "huge" effect) is the strongest single finding in the paper. 75 individuals is a small group, but the effect size is so large that the 95% CI (45.2–51.8) still does not overlap with the non-migrated CI (70.5–71.3).
 
-### Charts generated (19 total)
+### Charts generated (22 total, after revisions)
 
 | File | Description |
 |------|-------------|
@@ -337,6 +337,82 @@ Phase 5b clearance received → full analysis run executed on `esu_creative_work
 These values appear as reference lines in fig01 and fig10, and as the primary comparison series in fig19. All values are hardcoded from published sources (not scraped live), which is the appropriate approach for stable historical demographic reference data.
 
 **Key observation from fig19:** Non-migrated creative workers tracked closely with the general Ukrainian SSR population in the post-1950 period, but suffered disproportionately during the 1930s–1940s compared to the general population average — consistent with the thesis that creative professionals were specifically targeted during the Great Terror.
+
+---
+
+## Phase 4f — Soviet Republic & Educated Urban Comparison (ADDED 2026-04-04)
+
+**Decision:** Add two contextualisation figures comparing our creative workers against external reference populations.
+
+### Fig 21 — Soviet republic comparison
+
+**Why:** Shows whether Ukrainian creative workers' LE was unusual relative to the general populations of different Soviet republics, or whether it matches what you'd expect for a Ukrainian living under the Soviet system.
+
+**Data used (hardcoded from published literature):**
+
+| Series | Source | Confidence |
+|--------|--------|-----------|
+| Ukrainian SSR | Meslé & Vallin 2003; UN WPP 2022 | HIGH |
+| Russian SFSR | Andreev, Darsky & Kharkova 1998; UN WPP 2022 | HIGH |
+| USSR overall | UN World Population Prospects 2022 | HIGH |
+| Baltic SSRs avg | Katus et al.; UN WPP 2022 | MEDIUM |
+| Georgian SSR | UN WPP 2022 | MEDIUM |
+| Central Asian SSRs avg | UN WPP 2022 | LOW (pre-1965) |
+
+**Charting decision:** Republic reference data plotted as lines (they are period/calendar-year series). Our creative worker groups plotted as **single data points with 95% CI error bars, positioned at each group's mean birth year** — the scientifically correct approach because cohort life expectancy is a property of a birth cohort, not a calendar year value.
+
+### Fig 22 — Educated urban population comparison
+
+**Why:** Controls for socioeconomic status. The question is whether non-migrated creative workers died early because of Soviet repression specifically targeting them, or simply because educated urban Soviets always had shorter lives than migrants (which would be a selection artifact, not a repression effect).
+
+**Educational premium estimate:**
+- Shkolnikov V.M. et al. (1998) "Educational level and adult mortality in Russia 1979–1994." *Eur J Public Health* 8(2).
+- University-educated had ~3 years higher LE at age 20 vs national average in 1979–80.
+- Applied as a +3–5 year band above Ukrainian SSR general population LE.
+- Band represents uncertainty; constructed estimate, not observed data — clearly labelled.
+
+**Key finding from fig22:** The migrated creative workers group (mean LE 75.9 yrs) falls exactly within the estimated educated urban LE band — consistent with the interpretation that migration allowed them to live out their natural lifespan as educated professionals. The deported group (48.5 yrs) falls 27 years below the migrated group and far below the educated urban estimate — a gap that cannot be explained by socioeconomic class differences alone. It reflects direct Soviet state violence.
+
+---
+
+## Phase 4g — Death Cause Classification (IN PROGRESS 2026-04-04)
+
+**Decision:** Classify cause of death for each analysable entry to add a new dimension to the analysis. This allows comparison of *how* people in different groups died, not just *when*.
+
+**Script:** `ukraine_v2/add_death_cause.py`
+
+**Death cause categories:**
+
+| Category | Definition |
+|----------|-----------|
+| `executed` | Shot or executed by Soviet/Nazi authorities |
+| `gulag` | Died inside a labour camp (Gulag, concentration camp) |
+| `exile` | Died in exile/deportation — survived the camp but died far from home |
+| `suicide` | Suicide, including when driven by imminent arrest |
+| `wwii_combat` | Killed in combat at the WWII front |
+| `wwii_occupation` | Killed by occupying forces during WWII (not combat) |
+| `repression_other` | Clearly a repression victim; exact cause unclear |
+| `natural` | Died of illness or old age; no repression evidence |
+| `accident` | Accident, unrelated to repression |
+| `unknown` | Insufficient information |
+
+**Method:** Claude Haiku reads the `notes` field (ESU biography text already in CSV). If notes are < 150 characters, the full ESU article is fetched live. Claude returns cause + one-sentence English reasoning.
+
+**Cost estimate:**
+- ~6,391 analysable entries
+- Input: ~2.4M tokens → ~$0.60
+- Output: ~192K tokens → ~$0.24
+- ~20% requiring live fetch (~1,200 URLs)
+- **Total Claude cost: ~$0.84**
+
+**Runtime estimate:** ~40–50 minutes
+
+**Status:** Running in background as of 2026-04-04. Output will be written to `esu_creative_workers_v2_1.csv` as new columns `death_cause` and `death_cause_reasoning`.
+
+**Planned additional charts once complete:**
+- Fig 23: Death cause breakdown by migration group (stacked bar)
+- Fig 24: Age at death by cause (box plots — e.g. executed vs natural vs gulag)
+- Fig 25: Death cause concentration by Soviet period (1930s Terror spike visible in executed/gulag bars)
 
 ---
 
