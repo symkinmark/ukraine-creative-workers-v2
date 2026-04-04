@@ -198,14 +198,36 @@ All three corrections require a rerun of the Claude classification pass on `esu_
 
 ---
 
-## Phase 5b — V2.1 Accuracy Check (pending)
+## Phase 5b — V2.1 Accuracy Check
 
-Before running analysis on the V2.1 classified dataset, a second human accuracy check will be performed on a fresh random sample of ~63 entries from `esu_creative_workers_v2_1.csv`. This verifies that the four-way classification (migrated / non_migrated / internal_transfer / deported) is performing correctly, and specifically that:
-- Deportees are not being misclassified as internal transfers or non-migrants
-- Internal transfers are not being conflated with migrants
-- Pre-1921 and Galicia exclusions are applied correctly
+**Completed:** 2026-04-04 by Mark Symkin
 
-Error rate target: below 5% (improvement from V2.0's 9.5%).
+**Method:** Fresh random sample of 63 entries (seed 99, independent from Phase 5 seed 42) drawn from `esu_creative_workers_v2_1.csv`. Full ESU article text fetched live for each entry. Reviewed via browser-based review sheet served locally.
+
+**Results:**
+
+| Verdict | Count |
+|---------|-------|
+| ✅ Correct | 60 |
+| ❌ Other error | 2 |
+| ⬜ Not reviewed | 1 |
+| **Error rate** | **3.2%** |
+
+**Phase 5 → Phase 5b improvement:**
+
+| Metric | Phase 5 (V2.0) | Phase 5b (V2.1) |
+|--------|---------------|----------------|
+| Error rate | 9.5% | **3.2%** |
+| Migration wrong | 2 | **0** |
+| Not Ukrainian | 4 | 1 |
+| Systematic errors | Yes | **No** |
+
+**Flagged entries:**
+
+- **#25 Домаров Костянтин Васильович** — Note: "Migrated to Ukraine from Russia." This is a reverse-direction internal transfer — the person moved FROM Russia TO Ukraine within the Soviet sphere, and is correctly classified as `non_migrated` (remained within Soviet-controlled territory). This is a legitimate edge case our classification rules handle correctly but do not explicitly name. Noted as a methodological edge case, no reclassification needed. Will be acknowledged as a limitation.
+- **#46 Міньковецький Ілля Соломонович** — Note: "Not Ukrainian." One stray nationality misclassification. Non-systematic — V2.0 had 4 nationality errors in 63; V2.1 has 1 in 62. No action required.
+
+**Assessment:** Phase 5b passed. The four-way reclassification eliminated migration errors entirely. The 3.2% error rate is within acceptable range for AI-assisted academic classification. Both remaining errors are non-systematic edge cases rather than indicators of a classification rule problem. **Cleared to proceed to full analysis.**
 
 ---
 
