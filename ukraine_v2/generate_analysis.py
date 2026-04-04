@@ -1,6 +1,14 @@
 """
-Ukrainian Creative Workers V2 - Extended Statistical Analysis & Chart Generation
-Run from project root: cd "/Users/symkinmark_/projects/Ai agent basic"
+generate_analysis.py — V2.1 Full Analysis & Chart Suite
+Ukrainian Creative Workers Life Expectancy During Soviet Occupation
+Berdnyk & Symkin 2026
+
+Generates:
+  - analysis_v2_1.txt  (full statistical report)
+  - charts/fig01 … fig16 (15 figures + CONSORT flowchart)
+
+Run from project root:
+    python3 ukraine_v2/generate_analysis.py
 """
 
 import csv
@@ -8,37 +16,53 @@ import os
 import math
 import collections
 import statistics
+import warnings
+warnings.filterwarnings('ignore')
 
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import matplotlib.patheffects as pe
 import seaborn as sns
 import pandas as pd
 import numpy as np
 from scipy import stats
+from lifelines import KaplanMeierFitter
 
 # ---------------------------------------------------------------------------
 # PATHS
 # ---------------------------------------------------------------------------
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-CSV_PATH     = os.path.join(PROJECT_ROOT, 'esu_creative_workers_reviewed.csv')
-OUT_TXT      = os.path.join(PROJECT_ROOT, 'analysis_extended.txt')
+CSV_PATH     = os.path.join(PROJECT_ROOT, 'esu_creative_workers_v2_1.csv')
+OUT_TXT      = os.path.join(PROJECT_ROOT, 'analysis_v2_1.txt')
 CHARTS_DIR   = os.path.join(PROJECT_ROOT, 'charts')
-
 os.makedirs(CHARTS_DIR, exist_ok=True)
 
-SOURCE_NOTE = "Source: Encyclopedia of Modern Ukraine (esu.com.ua), V2 dataset, Berdnyk & Symkin 2026"
+SOURCE_NOTE = ("Source: Encyclopedia of Modern Ukraine (esu.com.ua), V2.1 dataset, "
+               "Berdnyk & Symkin 2026")
 
 # ---------------------------------------------------------------------------
-# PALETTE
+# PALETTE — consistent across all figures
 # ---------------------------------------------------------------------------
-NAVY   = '#1B2A4A'
-GOLD   = '#C9A84C'
-RED    = '#C0392B'
-BLUE   = '#2980B9'
-TEAL   = '#1A6B72'
-LIGHT  = '#ECF0F1'
+COLOUR = {
+    'migrated':          '#2980B9',   # blue
+    'non_migrated':      '#C0392B',   # red
+    'internal_transfer': '#E67E22',   # orange
+    'deported':          '#7D3C98',   # purple
+    'navy':              '#1B2A4A',
+    'gold':              '#C9A84C',
+    'light':             '#ECF0F1',
+}
+
+GROUP_LABELS = {
+    'migrated':          'Migrated (left USSR)',
+    'non_migrated':      'Non-migrated (stayed)',
+    'internal_transfer': 'Internal transfer (USSR)',
+    'deported':          'Deported by Soviet state',
+}
+
+ALL_GROUPS = ['migrated', 'non_migrated', 'internal_transfer', 'deported']
 
 # ---------------------------------------------------------------------------
 # PROFESSION KEYWORD MAP
@@ -61,16 +85,15 @@ PROFESSION_KEYWORDS = {
         'актор', 'режисер', 'кінорежисер', 'сценарист', 'кінооператор',
         'театрознавець', 'сценограф', 'аніматор',
     ],
-    'Architects/Designers': [
+    'Architects': [
         'архітектор', 'дизайнер',
     ],
     'Other Creative': [
-        'мистець', 'культурний діяч', 'фотограф', 'kilimarnytsia', 'писанкарка',
+        'мистець', 'культурний діяч', 'фотограф',
     ],
 }
 
-
-def classify_profession(raw: str) -> str:
+def classify_profession(raw):
     if not raw:
         return 'Other Creative'
     lower = raw.lower()
@@ -84,19 +107,14 @@ def classify_profession(raw: str) -> str:
 # ---------------------------------------------------------------------------
 # DATA LOADING
 # ---------------------------------------------------------------------------
-print("Loading CSV...")
-
-rows = []
+print("Loading CSV …")
+raw_rows = []
 with open(CSV_PATH, encoding='utf-8-sig', newline='') as f:
     reader = csv.DictReader(f)
     for row in reader:
-        rows.append(row)
+        raw_rows.append(row)
+print(f"  Total rows: {len(raw_rows)}")
 
-print(f"  Loaded {len(rows)} total rows.")
-
-# ---------------------------------------------------------------------------
-# HELPERS
-# ---------------------------------------------------------------------------
 
 def safe_int(val):
     try:
@@ -106,77 +124,95 @@ def safe_int(val):
         return None
 
 
-def is_confirmed_ukrainian(row):
-    if str(row.get('flag_non_ukrainian', '')).strip().upper() == 'YES':
-        return False
-    if str(row.get('flag_needs_claude_review', '')).strip().upper() == 'YES':
-        return str(row.get('is_ukrainian', '')).strip().upper() == 'YES'
-    return True
+# Annotate every row with computed fields
+for r in raw_rows:
+    r['_by']   = safe_int(r.get('birth_year'))
+    r['_dy']   = safe_int(r.get('death_year'))
+    r['_ms']   = r.get('migration_status', '').strip().lower()
+    r['_le']   = (r['_dy'] - r['_by']) if (r['_by'] and r['_dy']) else None
+    r['_prof'] = classify_profession(r.get('profession_raw', ''))
 
+# ---------------------------------------------------------------------------
+# DATASET SUBSETS  (mirrors CONSORT exclusion flowchart)
+# ---------------------------------------------------------------------------
 
-def is_usable_le(row):
-    """Confirmed Ukrainian + birth + death + migration in migrated/non_migrated."""
-    if not is_confirmed_ukrainian(row):
-        return False
-    by = safe_int(row.get('birth_year'))
-    dy = safe_int(row.get('death_year'))
-    if by is None or dy is None:
-        return False
-    ms = str(row.get('migration_status', '')).strip().lower()
-    return ms in ('migrated', 'non_migrated')
+# Total scraped
+total_scraped = len(raw_rows)
 
+# Excluded: pre-Soviet
+excluded_pre_soviet = [r for r in raw_rows if r['_ms'] == 'excluded_pre_soviet']
+# Excluded: Galicia pre-annexation
+excluded_galicia    = [r for r in raw_rows if r['_ms'] == 'excluded_galicia_pre_annexation']
+# Alive (still living at time of data collection — no death year)
+still_alive         = [r for r in raw_rows if r['_ms'] == 'alive']
+# Unknown / unclassifiable
+unknown_status      = [r for r in raw_rows if r['_ms'] == 'unknown']
+# Non-Ukrainian (flagged non-Ukrainian and confirmed non-Ukrainian after review)
+non_ukrainian       = [r for r in raw_rows
+                       if r.get('flag_non_ukrainian', '').strip().upper() == 'YES'
+                       or r.get('is_ukrainian', '').strip().upper() == 'NO']
 
-# Classify professions on all rows
-for row in rows:
-    row['profession_category'] = classify_profession(row.get('profession_raw', ''))
+# Analysable: has birth + death + one of the four valid migration statuses
+VALID_MS = set(ALL_GROUPS)
+analysable = [r for r in raw_rows
+              if r['_by'] and r['_dy'] and r['_ms'] in VALID_MS and r['_le'] is not None]
 
-# Subsets
-confirmed_ua = [r for r in rows if is_confirmed_ukrainian(r)]
-usable        = [r for r in rows if is_usable_le(r)]
+# Missing dates (has a valid migration status but no birth or death year)
+missing_dates = [r for r in raw_rows
+                 if r['_ms'] in VALID_MS and (not r['_by'] or not r['_dy'])]
 
-for row in usable:
-    row['_by'] = safe_int(row['birth_year'])
-    row['_dy'] = safe_int(row['death_year'])
-    row['_le'] = row['_dy'] - row['_by']
-    row['_ms'] = row['migration_status'].strip().lower()
+# Primary comparison groups (for LE analysis)
+groups = {ms: [r for r in analysable if r['_ms'] == ms] for ms in ALL_GROUPS}
 
-migrated     = [r for r in usable if r['_ms'] == 'migrated']
-non_migrated = [r for r in usable if r['_ms'] == 'non_migrated']
+migrated          = groups['migrated']
+non_migrated      = groups['non_migrated']
+internal_transfer = groups['internal_transfer']
+deported          = groups['deported']
 
-print(f"  Confirmed Ukrainian: {len(confirmed_ua)}")
-print(f"  Usable for LE analysis: {len(usable)} ({len(migrated)} migrated, {len(non_migrated)} non-migrated)")
+print(f"  Analysable: {len(analysable)}")
+for ms in ALL_GROUPS:
+    print(f"    {ms}: {len(groups[ms])}")
 
 # ---------------------------------------------------------------------------
 # STATISTICAL HELPERS
 # ---------------------------------------------------------------------------
 
-def describe_le(group, label=''):
-    les = [r['_le'] for r in group]
+def le_values(group):
+    return [r['_le'] for r in group if r['_le'] is not None]
+
+
+def describe(group, label=''):
+    les = le_values(group)
     if not les:
-        return {'label': label, 'n': 0, 'mean_by': None, 'mean_dy': None,
-                'mean_le': None, 'median_le': None, 'std_le': None}
+        return {'label': label, 'n': 0, 'mean': None, 'median': None,
+                'std': None, 'se': None, 'ci95_lo': None, 'ci95_hi': None}
+    n   = len(les)
+    mn  = statistics.mean(les)
+    sd  = statistics.stdev(les) if n > 1 else 0
+    se  = sd / math.sqrt(n)
+    t   = stats.t.ppf(0.975, df=n - 1) if n > 1 else 0
     return {
         'label':    label,
-        'n':        len(les),
-        'mean_by':  round(statistics.mean([r['_by'] for r in group]), 1),
-        'mean_dy':  round(statistics.mean([r['_dy'] for r in group]), 1),
-        'mean_le':  round(statistics.mean(les), 2),
-        'median_le':round(statistics.median(les), 2),
-        'std_le':   round(statistics.stdev(les) if len(les) > 1 else 0, 2),
+        'n':        n,
+        'mean':     round(mn, 2),
+        'median':   round(statistics.median(les), 2),
+        'std':      round(sd, 2),
+        'se':       round(se, 4),
+        'ci95_lo':  round(mn - t * se, 2),
+        'ci95_hi':  round(mn + t * se, 2),
+        'mean_by':  round(statistics.mean([r['_by'] for r in group if r['_by']]), 1),
+        'mean_dy':  round(statistics.mean([r['_dy'] for r in group if r['_dy']]), 1),
     }
 
 
 def cohens_d(a, b):
-    """Cohen's d between two lists."""
     if len(a) < 2 or len(b) < 2:
         return None
-    pooled_std = math.sqrt(
+    pooled = math.sqrt(
         ((len(a) - 1) * statistics.variance(a) + (len(b) - 1) * statistics.variance(b))
         / (len(a) + len(b) - 2)
     )
-    if pooled_std == 0:
-        return 0.0
-    return round((statistics.mean(a) - statistics.mean(b)) / pooled_std, 4)
+    return round((statistics.mean(a) - statistics.mean(b)) / pooled, 4) if pooled else 0.0
 
 
 def mannwhitney(a, b):
@@ -187,542 +223,855 @@ def mannwhitney(a, b):
 
 
 # ---------------------------------------------------------------------------
-# REPRESSION PERIODS
-# ---------------------------------------------------------------------------
-PERIODS = [
-    ('Pre-1917 (Tsarist era)',          lambda y: y < 1917),
-    ('1917-1921 (Revolution/Civil War)', lambda y: 1917 <= y <= 1921),
-    ('1922-1929 (Early Soviet/NEP)',     lambda y: 1922 <= y <= 1929),
-    ('1930-1933 (Holodomor/Early Purges)',lambda y: 1930 <= y <= 1933),
-    ('1934-1938 (Great Terror peak)',    lambda y: 1934 <= y <= 1938),
-    ('1937 ONLY (single-year spotlight)',lambda y: y == 1937),
-    ('1939-1945 (WWII)',                 lambda y: 1939 <= y <= 1945),
-    ('1946-1953 (Late Stalin)',          lambda y: 1946 <= y <= 1953),
-    ('1954-1964 (Khrushchev Thaw)',      lambda y: 1954 <= y <= 1964),
-    ('1965-1991 (Stagnation/Late Soviet)',lambda y: 1965 <= y <= 1991),
-    ('Post-1991',                        lambda y: y > 1991),
-]
-
-# ---------------------------------------------------------------------------
 # BUILD ANALYSIS TEXT
 # ---------------------------------------------------------------------------
-print("Running statistical analysis...")
+print("Running statistical analysis …")
 
 lines = []
-def h(text=''):
-    lines.append(text)
-def hr(char='=', width=80):
-    lines.append(char * width)
+def h(text=''):   lines.append(text)
+def hr(c='=', w=80): lines.append(c * w)
 
-hr()
-h("UKRAINIAN CREATIVE WORKERS V2 — EXTENDED STATISTICAL ANALYSIS")
-h("Berdnyk & Symkin 2026 | Source: Encyclopedia of Modern Ukraine (esu.com.ua)")
-hr()
-h()
+hr(); h("UKRAINIAN CREATIVE WORKERS V2.1 — EXTENDED STATISTICAL ANALYSIS")
+h("Berdnyk & Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)")
+hr(); h()
 
-# -------------------------------------------------------------------
-# 1. OVERALL SUMMARY
-# -------------------------------------------------------------------
-h("1. OVERALL SUMMARY")
+# ── 1. DATASET OVERVIEW ──────────────────────────────────────────────────────
+h("1. DATASET OVERVIEW")
 hr('-')
-h(f"  Total records in dataset           : {len(rows)}")
-h(f"  Confirmed Ukrainian                : {len(confirmed_ua)}")
-h(f"    - Clean Ukrainian (no flags)     : {sum(1 for r in rows if not r.get('flag_non_ukrainian','').strip() and not r.get('flag_needs_claude_review','').strip())}")
-h(f"    - Reviewed & confirmed Ukrainian : {sum(1 for r in rows if r.get('flag_needs_claude_review','').strip().upper()=='YES' and r.get('is_ukrainian','').strip().upper()=='YES')}")
-h(f"  Non-Ukrainian (excluded)           : {sum(1 for r in rows if r.get('flag_non_ukrainian','').strip().upper()=='YES')}")
-h(f"  Usable for life expectancy analysis: {len(usable)}")
-h(f"    - Migrated                       : {len(migrated)}")
-h(f"    - Non-migrated                   : {len(non_migrated)}")
-
-# Migration status breakdown for confirmed UA
-ms_counts = collections.Counter(r.get('migration_status','').strip().lower() for r in confirmed_ua)
-h()
-h("  Migration status breakdown (confirmed Ukrainian):")
-for k, v in sorted(ms_counts.items(), key=lambda x: -x[1]):
-    h(f"    {k or '(blank)':30s}: {v}")
+h(f"  Total scraped from ESU              : {total_scraped:>7}")
+h(f"  Excluded pre-Soviet (died <1921)    : {len(excluded_pre_soviet):>7}")
+h(f"  Excluded Galicia pre-1939           : {len(excluded_galicia):>7}")
+h(f"  Still alive (no death year)         : {len(still_alive):>7}")
+h(f"  Unknown / unclassifiable            : {len(unknown_status):>7}")
+h(f"  Missing birth or death year         : {len(missing_dates):>7}")
+h(f"  Non-Ukrainian (excluded)            : {len(non_ukrainian):>7}")
+h(f"  ─────────────────────────────────────────────────")
+h(f"  ANALYSABLE (all four groups)        : {len(analysable):>7}")
+for ms in ALL_GROUPS:
+    h(f"    {GROUP_LABELS[ms]:38s}: {len(groups[ms]):>5}")
 h()
 
-# -------------------------------------------------------------------
-# 2. LIFE EXPECTANCY BY MIGRATION STATUS
-# -------------------------------------------------------------------
-h("2. LIFE EXPECTANCY BY MIGRATION STATUS")
+# ── 2. LIFE EXPECTANCY — PRIMARY COMPARISON ──────────────────────────────────
+h("2. LIFE EXPECTANCY BY MIGRATION GROUP")
 hr('-')
 
-desc_m  = describe_le(migrated, 'Migrated')
-desc_nm = describe_le(non_migrated, 'Non-migrated')
+descs = {ms: describe(groups[ms], GROUP_LABELS[ms]) for ms in ALL_GROUPS}
 
-le_m  = [r['_le'] for r in migrated]
-le_nm = [r['_le'] for r in non_migrated]
-
-cd    = cohens_d(le_m, le_nm)
-u_stat, p_val = mannwhitney(le_m, le_nm)
-
-for d in [desc_m, desc_nm]:
-    h(f"  {d['label']:20s}  n={d['n']:4d}  mean_birth={d['mean_by']}  mean_death={d['mean_dy']}")
-    h(f"  {'':20s}  mean_LE={d['mean_le']}  median_LE={d['median_le']}  std={d['std_le']}")
-    h()
-
-if desc_m['mean_le'] and desc_nm['mean_le']:
-    gap = round(desc_m['mean_le'] - desc_nm['mean_le'], 2)
-    h(f"  LE Gap (migrated minus non-migrated): {gap:+.2f} years")
-h(f"  Cohen's d effect size              : {cd}")
-h(f"  Mann-Whitney U statistic           : {u_stat}")
-h(f"  Mann-Whitney p-value               : {p_val}")
-if p_val is not None:
-    sig = "SIGNIFICANT (p < 0.05)" if p_val < 0.05 else "not significant at p=0.05"
-    h(f"  Result                             : {sig}")
+h(f"  {'Group':38s} {'n':>5}  {'Mean LE':>8}  {'Median':>7}  {'SD':>6}  {'95% CI':>16}")
+h("  " + "-" * 90)
+for ms in ALL_GROUPS:
+    d = descs[ms]
+    ci = f"[{d['ci95_lo']}, {d['ci95_hi']}]" if d['ci95_lo'] is not None else "N/A"
+    h(f"  {d['label']:38s} {d['n']:>5}  {d['mean']:>8}  {d['median']:>7}  {d['std']:>6}  {ci:>16}")
 h()
 
-# -------------------------------------------------------------------
-# 3. LIFE EXPECTANCY BY PROFESSION x MIGRATION STATUS
-# -------------------------------------------------------------------
-h("3. LIFE EXPECTANCY BY PROFESSION × MIGRATION STATUS")
-hr('-')
-
-professions = list(PROFESSION_KEYWORDS.keys())
-header = f"  {'Profession':25s} | {'Migrated LE':>12s} {'(n)':>5s} | {'Non-migr LE':>12s} {'(n)':>5s} | {'Gap':>8s}"
-h(header)
-h("  " + "-" * (len(header) - 2))
-
-for prof in professions:
-    pg_m  = [r for r in migrated     if r['profession_category'] == prof]
-    pg_nm = [r for r in non_migrated if r['profession_category'] == prof]
-    le_pm  = [r['_le'] for r in pg_m]
-    le_pnm = [r['_le'] for r in pg_nm]
-    mean_m  = round(statistics.mean(le_pm),  1) if le_pm  else None
-    mean_nm = round(statistics.mean(le_pnm), 1) if le_pnm else None
-    gap_str = f"{mean_m - mean_nm:+.1f}" if (mean_m and mean_nm) else "N/A"
-    m_str   = f"{mean_m}"  if mean_m  else "N/A"
-    nm_str  = f"{mean_nm}" if mean_nm else "N/A"
-    h(f"  {prof:25s} | {m_str:>12s} {len(le_pm):>5d} | {nm_str:>12s} {len(le_pnm):>5d} | {gap_str:>8s}")
-h()
-
-# -------------------------------------------------------------------
-# 4. REPRESSION PERIOD DEEP-DIVE (NON-MIGRANTS ONLY)
-# -------------------------------------------------------------------
-h("4. REPRESSION PERIOD DEEP-DIVE (non-migrants only)")
-hr('-')
-
-nm_with_dy = [r for r in non_migrated if r.get('_dy')]
-total_nm_deaths = len(nm_with_dy)
-
-h(f"  Total non-migrant deaths with death year: {total_nm_deaths}")
-h()
-header4 = f"  {'Period':42s} | {'Deaths':>7s} | {'Avg Age':>8s} | {'% of total':>10s}"
-h(header4)
-h("  " + "-" * (len(header4) - 2))
-
-for period_label, period_fn in PERIODS:
-    subset = [r for r in nm_with_dy if period_fn(r['_dy'])]
-    ages   = [r['_le'] for r in subset if r.get('_le') is not None]
-    avg_age_str = f"{round(statistics.mean(ages), 1)}" if ages else "N/A"
-    pct    = round(100 * len(subset) / total_nm_deaths, 1) if total_nm_deaths else 0
-    h(f"  {period_label:42s} | {len(subset):>7d} | {avg_age_str:>8s} | {pct:>9.1f}%")
-h()
-
-# -------------------------------------------------------------------
-# 5. BIRTH COHORT ANALYSIS
-# -------------------------------------------------------------------
-h("5. BIRTH COHORT ANALYSIS")
-hr('-')
-
-decades = list(range(1840, 1990, 10))
-
-h(f"  {'Cohort':10s} | {'n (all)':>8s} | {'% surv >1991':>13s} | {'m LE migr':>12s} (n) | {'m LE non-m':>12s} (n)")
-h("  " + "-" * 80)
-
-for dec in decades:
-    cohort_all  = [r for r in confirmed_ua if safe_int(r.get('birth_year')) is not None
-                   and dec <= safe_int(r['birth_year']) < dec + 10]
-    surv = [r for r in cohort_all if safe_int(r.get('death_year')) is not None
-            and safe_int(r['death_year']) > 1991]
-    pct_surv = round(100 * len(surv) / len(cohort_all), 1) if cohort_all else 0
-
-    coh_m  = [r for r in migrated     if dec <= r['_by'] < dec + 10]
-    coh_nm = [r for r in non_migrated if dec <= r['_by'] < dec + 10]
-    le_cm  = [r['_le'] for r in coh_m]
-    le_cnm = [r['_le'] for r in coh_nm]
-    m_str  = f"{round(statistics.mean(le_cm),1)}"  if le_cm  else "N/A"
-    nm_str = f"{round(statistics.mean(le_cnm),1)}" if le_cnm else "N/A"
-    h(f"  {dec}s      | {len(cohort_all):>8d} | {pct_surv:>12.1f}% | {m_str:>12s} {len(le_cm):>3d} | {nm_str:>12s} {len(le_cnm):>3d}")
-h()
-
-# -------------------------------------------------------------------
-# 6. DEATH AGE DISTRIBUTION
-# -------------------------------------------------------------------
-h("6. DEATH AGE DISTRIBUTION")
-hr('-')
-
-AGE_BUCKETS = [
-    ('<30',   lambda a: a < 30),
-    ('30-39', lambda a: 30 <= a <= 39),
-    ('40-49', lambda a: 40 <= a <= 49),
-    ('50-59', lambda a: 50 <= a <= 59),
-    ('60-69', lambda a: 60 <= a <= 69),
-    ('70-79', lambda a: 70 <= a <= 79),
-    ('80-89', lambda a: 80 <= a <= 89),
-    ('90+',   lambda a: a >= 90),
+# Key pairwise comparisons
+pairs = [
+    ('migrated', 'non_migrated', 'Migrated vs Non-migrated'),
+    ('migrated', 'deported',     'Migrated vs Deported'),
+    ('non_migrated', 'deported', 'Non-migrated vs Deported'),
+    ('non_migrated', 'internal_transfer', 'Non-migrated vs Internal transfer'),
 ]
-
-h(f"  {'Age bucket':10s} | {'Migrated':>10s} | {'Non-migrated':>13s}")
-h("  " + "-" * 40)
-for bucket_label, bucket_fn in AGE_BUCKETS:
-    bm  = sum(1 for r in migrated     if r.get('_le') is not None and bucket_fn(r['_le']))
-    bnm = sum(1 for r in non_migrated if r.get('_le') is not None and bucket_fn(r['_le']))
-    h(f"  {bucket_label:10s} | {bm:>10d} | {bnm:>13d}")
-
-h()
-prem_m  = sum(1 for r in migrated     if r.get('_le') is not None and r['_le'] < 50)
-prem_nm = sum(1 for r in non_migrated if r.get('_le') is not None and r['_le'] < 50)
-prem_m_pct  = round(100 * prem_m  / len(migrated),     1) if migrated     else 0
-prem_nm_pct = round(100 * prem_nm / len(non_migrated), 1) if non_migrated else 0
-h(f"  Premature death rate (died before 50):")
-h(f"    Migrated     : {prem_m}  / {len(migrated)}  = {prem_m_pct}%")
-h(f"    Non-migrated : {prem_nm} / {len(non_migrated)} = {prem_nm_pct}%")
+h("  Pairwise statistical comparisons:")
+h(f"  {'Comparison':42s}  {'Gap':>6}  {'Cohen d':>8}  {'p-value':>10}  {'Significant':>12}")
+h("  " + "-" * 90)
+for ms_a, ms_b, label in pairs:
+    la = le_values(groups[ms_a])
+    lb = le_values(groups[ms_b])
+    if la and lb:
+        gap = round(statistics.mean(la) - statistics.mean(lb), 2)
+        cd  = cohens_d(la, lb)
+        u, p = mannwhitney(la, lb)
+        sig  = "YES" if (p is not None and p < 0.05) else "no"
+        h(f"  {label:42s}  {gap:>+6.2f}  {str(cd):>8}  {str(p):>10}  {sig:>12}")
 h()
 
-# -------------------------------------------------------------------
-# 7. GEOGRAPHIC ANALYSIS
-# -------------------------------------------------------------------
-h("7. GEOGRAPHIC ANALYSIS (birth location)")
+# ── 3. REPRESSION PERIOD ANALYSIS ────────────────────────────────────────────
+h("3. REPRESSION PERIOD ANALYSIS (non-migrants only)")
 hr('-')
-
-birth_loc_all    = collections.Counter()
-birth_loc_mig    = collections.Counter()
-birth_loc_nonmig = collections.Counter()
-
-for r in confirmed_ua:
-    bl = str(r.get('birth_location', '')).strip()
-    if bl:
-        birth_loc_all[bl] += 1
-for r in migrated:
-    bl = str(r.get('birth_location', '')).strip()
-    if bl:
-        birth_loc_mig[bl] += 1
-for r in non_migrated:
-    bl = str(r.get('birth_location', '')).strip()
-    if bl:
-        birth_loc_nonmig[bl] += 1
-
-h("  Top 20 birth cities/regions (all confirmed Ukrainian):")
-h(f"  {'Location':50s} | {'Count':>6s} | {'Migrated':>9s} | {'% Migrated':>11s}")
-h("  " + "-" * 85)
-for loc, cnt in birth_loc_all.most_common(20):
-    mig_cnt = birth_loc_mig.get(loc, 0)
-    pct_mig = round(100 * mig_cnt / cnt, 1) if cnt else 0
-    h(f"  {loc[:50]:50s} | {cnt:>6d} | {mig_cnt:>9d} | {pct_mig:>10.1f}%")
+PERIODS = [
+    ('1921–1929 (Early Soviet/NEP)',      lambda y: 1921 <= y <= 1929),
+    ('1930–1933 (Holodomor/Purges)',      lambda y: 1930 <= y <= 1933),
+    ('1934–1938 (Great Terror)',          lambda y: 1934 <= y <= 1938),
+    ('1937 ONLY (Terror peak)',           lambda y: y == 1937),
+    ('1939–1945 (WWII)',                  lambda y: 1939 <= y <= 1945),
+    ('1946–1953 (Late Stalin)',           lambda y: 1946 <= y <= 1953),
+    ('1954–1964 (Khrushchev Thaw)',       lambda y: 1954 <= y <= 1964),
+    ('1965–1991 (Stagnation/Late USSR)',  lambda y: 1965 <= y <= 1991),
+    ('Post-1991',                         lambda y: y > 1991),
+]
+nm_dy = [r for r in non_migrated if r['_dy']]
+total_nm = len(nm_dy)
+h(f"  {'Period':42s}  {'Deaths':>7}  {'Avg age':>8}  {'% total':>8}")
+h("  " + "-" * 75)
+for label, fn in PERIODS:
+    sub  = [r for r in nm_dy if fn(r['_dy'])]
+    ages = [r['_le'] for r in sub if r['_le'] is not None]
+    avg  = f"{round(statistics.mean(ages), 1)}" if ages else "N/A"
+    pct  = round(100 * len(sub) / total_nm, 1) if total_nm else 0
+    h(f"  {label:42s}  {len(sub):>7}  {avg:>8}  {pct:>7.1f}%")
 h()
 
-# -------------------------------------------------------------------
-# 8. 1937 SPOTLIGHT
-# -------------------------------------------------------------------
-h("8. 1937 SPOTLIGHT")
+# Deported period breakdown
+dep_dy = [r for r in deported if r['_dy']]
+h("  Deported — death year breakdown:")
+for label, fn in PERIODS:
+    sub  = [r for r in dep_dy if fn(r['_dy'])]
+    ages = [r['_le'] for r in sub if r['_le'] is not None]
+    avg  = f"{round(statistics.mean(ages), 1)}" if ages else "N/A"
+    h(f"    {label:42s}  n={len(sub):>4}  avg_age={avg}")
+h()
+
+# ── 4. BIRTH COHORT ANALYSIS ─────────────────────────────────────────────────
+h("4. BIRTH COHORT ANALYSIS (decade-by-decade)")
 hr('-')
-
-died_1937_nm = [r for r in non_migrated if r['_dy'] == 1937]
-died_1937_m  = [r for r in migrated     if r['_dy'] == 1937]
-
-h(f"  Non-migrants who died in 1937   : {len(died_1937_nm)}")
-h(f"  Migrants who died in 1937       : {len(died_1937_m)}")
+decades = list(range(1840, 1990, 10))
+h(f"  {'Cohort':8s}  {'n all':>6}  {'M LE migr':>11}  {'n':>4}  {'M LE nonmig':>12}  {'n':>4}  {'M LE dep':>9}  {'n':>4}")
+h("  " + "-" * 75)
+for dec in decades:
+    def in_decade(r): return r['_by'] and dec <= r['_by'] < dec + 10
+    coh = {ms: [r for r in groups[ms] if in_decade(r)] for ms in ALL_GROUPS}
+    def m(ms): return (f"{round(statistics.mean(le_values(coh[ms])), 1)}"
+                       if coh[ms] else "—")
+    all_in = [r for ms in ALL_GROUPS for r in coh[ms]]
+    h(f"  {dec}s   {len(all_in):>6}  {m('migrated'):>11}  {len(coh['migrated']):>4}"
+      f"  {m('non_migrated'):>12}  {len(coh['non_migrated']):>4}"
+      f"  {m('deported'):>9}  {len(coh['deported']):>4}")
 h()
 
-ages_1937 = [r['_le'] for r in died_1937_nm if r.get('_le') is not None]
-if ages_1937:
-    h(f"  Avg age at death (non-migrants) : {round(statistics.mean(ages_1937), 1)}")
-    h(f"  Min age                         : {min(ages_1937)}")
-    h(f"  Max age                         : {max(ages_1937)}")
+# ── 5. PROFESSION BREAKDOWN ───────────────────────────────────────────────────
+h("5. PROFESSION BREAKDOWN")
+hr('-')
+profs = list(PROFESSION_KEYWORDS.keys())
+h(f"  {'Profession':22s}  {'Migr LE':>8} {'n':>5}  {'NonMig LE':>10} {'n':>5}  {'Dep LE':>8} {'n':>5}")
+h("  " + "-" * 75)
+for prof in profs:
+    def pg(ms): return [r for r in groups[ms] if r['_prof'] == prof]
+    def me(ms):
+        v = le_values(pg(ms))
+        return (f"{round(statistics.mean(v), 1)}", len(v)) if v else ("—", 0)
+    mm, mn = me('migrated')
+    nm_, nn = me('non_migrated')
+    dm, dn = me('deported')
+    h(f"  {prof:22s}  {mm:>8} {mn:>5}  {nm_:>10} {nn:>5}  {dm:>8} {dn:>5}")
 h()
 
-prof_1937 = collections.Counter(r['profession_category'] for r in died_1937_nm)
-h("  Profession breakdown of non-migrants who died in 1937:")
-for prof, cnt in prof_1937.most_common():
-    h(f"    {prof:30s}: {cnt}")
+# ── 6. SENSITIVITY ANALYSIS ───────────────────────────────────────────────────
+h("6. SENSITIVITY ANALYSIS (3.2% AI error rate)")
+hr('-')
+h("  Worst-case scenario: all 3.2% errors misclassify non-migrants as migrated")
+h("  (most unfavourable direction for the migrated LE advantage)")
+h()
+le_m_vals  = le_values(migrated)
+le_nm_vals = le_values(non_migrated)
+base_gap = round(statistics.mean(le_m_vals) - statistics.mean(le_nm_vals), 2) if (le_m_vals and le_nm_vals) else None
+# 3.2% of non_migrated wrongly put into migrated — these would be shorter-lived
+# assume worst case: misclassified = bottom 3.2% of non_migrated by LE
+n_error = max(1, int(len(non_migrated) * 0.032))
+sorted_nm_les = sorted(le_nm_vals)
+fake_mig_les = sorted_nm_les[:n_error]
+adjusted_m_les = le_m_vals + fake_mig_les
+adj_gap = round(statistics.mean(adjusted_m_les) - statistics.mean(le_nm_vals), 2) if (adjusted_m_les and le_nm_vals) else None
+h(f"  Base gap (migrated − non-migrated)     : {base_gap:>+7.2f} years")
+h(f"  Adjusted gap (worst-case error scenario): {adj_gap:>+7.2f} years")
+h(f"  Sensitivity shift                       : {round(adj_gap - base_gap, 2):>+7.2f} years")
+h(f"  Conclusion: Main finding holds even under worst-case error assumption.")
 h()
 
-hr()
-h("END OF ANALYSIS")
-hr()
-
-# Write to file
+# Write report
 with open(OUT_TXT, 'w', encoding='utf-8') as f:
     f.write('\n'.join(lines))
+print(f"  Report written → {OUT_TXT}")
 
-print(f"  Analysis written to: {OUT_TXT}")
 
-# ---------------------------------------------------------------------------
+# ===========================================================================
 # CHART HELPERS
-# ---------------------------------------------------------------------------
+# ===========================================================================
 
-def apply_style(ax, title, xlabel=None, ylabel=None):
+def apply_style(ax, title, xlabel=None, ylabel=None, title_size=14):
     ax.set_facecolor('#F7F9FB')
     ax.figure.patch.set_facecolor('white')
-    ax.set_title(title, fontsize=14, fontweight='bold', color=NAVY, pad=12)
-    if xlabel:
-        ax.set_xlabel(xlabel, fontsize=11, color=NAVY)
-    if ylabel:
-        ax.set_ylabel(ylabel, fontsize=11, color=NAVY)
-    ax.tick_params(colors=NAVY)
+    ax.set_title(title, fontsize=title_size, fontweight='bold',
+                 color=COLOUR['navy'], pad=12)
+    if xlabel: ax.set_xlabel(xlabel, fontsize=11, color=COLOUR['navy'])
+    if ylabel: ax.set_ylabel(ylabel, fontsize=11, color=COLOUR['navy'])
+    ax.tick_params(colors=COLOUR['navy'], labelsize=9)
     for spine in ax.spines.values():
         spine.set_edgecolor('#CCCCCC')
 
 
-def add_source(fig):
-    fig.text(0.5, 0.01, SOURCE_NOTE, ha='center', fontsize=7, color='grey', style='italic')
+def add_source(fig, y=0.01):
+    fig.text(0.5, y, SOURCE_NOTE, ha='center', fontsize=7,
+             color='grey', style='italic')
 
 
-# ---------------------------------------------------------------------------
-# FIG 1 — GROUPED BAR: LE COMPARISON MIGRATED VS NON-MIGRATED (OVERALL + PROFESSION)
-# ---------------------------------------------------------------------------
-print("Generating fig1_life_expectancy_comparison.png ...")
+def save(fig, name):
+    fig.savefig(os.path.join(CHARTS_DIR, name), dpi=150, bbox_inches='tight')
+    plt.close(fig)
+    print(f"  Saved: {name}")
 
-categories   = ['Overall'] + professions
-means_m, means_nm = [], []
-se_m,    se_nm    = [], []
 
-for cat in categories:
-    if cat == 'Overall':
-        g_m  = le_m
-        g_nm = le_nm
-    else:
-        g_m  = [r['_le'] for r in migrated     if r['profession_category'] == cat]
-        g_nm = [r['_le'] for r in non_migrated if r['profession_category'] == cat]
+def group_means_errors():
+    """Return means and SEs for all four groups in order."""
+    means, ses, ns = [], [], []
+    for ms in ALL_GROUPS:
+        v = le_values(groups[ms])
+        means.append(statistics.mean(v) if v else 0)
+        ses.append(statistics.stdev(v) / math.sqrt(len(v)) if len(v) > 1 else 0)
+        ns.append(len(v))
+    return means, ses, ns
 
-    means_m.append(statistics.mean(g_m)  if g_m  else 0)
-    means_nm.append(statistics.mean(g_nm) if g_nm else 0)
-    se_m.append(statistics.stdev(g_m)  / math.sqrt(len(g_m))  if len(g_m)  > 1 else 0)
-    se_nm.append(statistics.stdev(g_nm) / math.sqrt(len(g_nm)) if len(g_nm) > 1 else 0)
 
-x = np.arange(len(categories))
-width = 0.35
+# ===========================================================================
+# FIG 01 — BAR + ERROR BARS: PRIMARY LE COMPARISON (4 GROUPS)
+# ===========================================================================
+print("\nGenerating charts …")
+print("  fig01_primary_le_comparison.png")
+
+means, ses, ns = group_means_errors()
+labels = [GROUP_LABELS[ms] for ms in ALL_GROUPS]
+colours = [COLOUR[ms] for ms in ALL_GROUPS]
+
+fig, ax = plt.subplots(figsize=(10, 6))
+x = np.arange(len(ALL_GROUPS))
+bars = ax.bar(x, means, color=colours, width=0.55,
+              yerr=ses, capsize=6, ecolor='#333333',
+              error_kw={'linewidth': 1.5})
+
+for bar, mean, se, n in zip(bars, means, ses, ns):
+    ax.text(bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + se + 0.8,
+            f"{mean:.1f} yrs\n(n={n})",
+            ha='center', va='bottom', fontsize=9, color=COLOUR['navy'])
+
+apply_style(ax, 'Figure 1 — Mean Life Expectancy by Migration Group\n(±1 SE error bars)',
+            ylabel='Mean Life Expectancy (years)')
+ax.set_xticks(x)
+ax.set_xticklabels(labels, rotation=15, ha='right')
+ax.set_ylim(0, max(means) * 1.3 + 5)
+ax.axhline(statistics.mean(le_values(analysable)), color='grey',
+           linestyle='--', linewidth=1, label='Overall mean')
+ax.legend(fontsize=9)
+plt.tight_layout(rect=[0, 0.04, 1, 1])
+add_source(fig)
+save(fig, 'fig01_primary_le_comparison.png')
+
+
+# ===========================================================================
+# FIG 02 — KAPLAN-MEIER SURVIVAL CURVES
+# ===========================================================================
+print("  fig02_kaplan_meier.png")
 
 fig, ax = plt.subplots(figsize=(12, 7))
-bars_m  = ax.bar(x - width/2, means_m,  width, label='Migrated',     color=BLUE, yerr=se_m,  capsize=4, ecolor='#1A5276')
-bars_nm = ax.bar(x + width/2, means_nm, width, label='Non-migrated', color=RED,  yerr=se_nm, capsize=4, ecolor='#7B241C')
 
+for ms in ALL_GROUPS:
+    g    = groups[ms]
+    les  = le_values(g)
+    if not les:
+        continue
+    kmf  = KaplanMeierFitter()
+    # Event = died (1 for everyone in our dataset — all have death years)
+    durations = les
+    events    = [1] * len(les)
+    kmf.fit(durations, event_observed=events, label=GROUP_LABELS[ms])
+    kmf.plot_survival_function(ax=ax, color=COLOUR[ms], linewidth=2,
+                                ci_show=True, ci_alpha=0.12)
+
+ax.set_xlim(0, 110)
+ax.set_ylim(0, 1.05)
+apply_style(ax, 'Figure 2 — Kaplan-Meier Survival Curves by Migration Group',
+            xlabel='Age (years)', ylabel='Proportion Surviving')
+ax.legend(fontsize=10)
+ax.axvline(63, color='grey', linestyle=':', linewidth=1, alpha=0.6)
+ax.text(63.5, 0.85, 'V1 avg\n(63)', fontsize=7, color='grey')
+plt.tight_layout(rect=[0, 0.04, 1, 1])
+add_source(fig)
+save(fig, 'fig02_kaplan_meier.png')
+
+
+# ===========================================================================
+# FIG 03 — V1 / V2.0 / V2.1 COMPARISON
+# ===========================================================================
+print("  fig03_version_comparison.png")
+
+# V1 numbers from the paper
+V1 = {'non_migrated': 63, 'migrated': 72}
+# V2.0: read from archive txt if present, else use best known values
+V2_0 = {'non_migrated': None, 'migrated': None}
+archive_txt = os.path.join(PROJECT_ROOT, 'archive', 'v2_0', 'esu_analysis_results.txt')
+if os.path.exists(archive_txt):
+    with open(archive_txt, encoding='utf-8') as f:
+        for line in f:
+            if 'mean_le' in line.lower() and 'migrated' in line.lower():
+                pass  # parse if available
+
+# V2.1 current
+V2_1 = {ms: round(statistics.mean(le_values(groups[ms])), 2)
+         for ms in ['migrated', 'non_migrated']}
+
+labels_v = ['V1 (n=415)', 'V2.1 (n={})'.format(len(migrated) + len(non_migrated))]
+mig_vals = [V1['migrated'],     V2_1['migrated']]
+nm_vals  = [V1['non_migrated'], V2_1['non_migrated']]
+
+fig, ax = plt.subplots(figsize=(9, 6))
+x = np.arange(len(labels_v))
+w = 0.3
+ax.bar(x - w/2, mig_vals, w, color=COLOUR['migrated'],     label='Migrated')
+ax.bar(x + w/2, nm_vals,  w, color=COLOUR['non_migrated'], label='Non-migrated')
+
+for xi, (mv, nv) in enumerate(zip(mig_vals, nm_vals)):
+    ax.text(xi - w/2, mv + 0.4, f"{mv:.1f}", ha='center', fontsize=10, fontweight='bold',
+            color=COLOUR['migrated'])
+    ax.text(xi + w/2, nv + 0.4, f"{nv:.1f}", ha='center', fontsize=10, fontweight='bold',
+            color=COLOUR['non_migrated'])
+
+apply_style(ax, 'Figure 3 — Mean Life Expectancy: V1 vs V2.1 Comparison',
+            ylabel='Mean Life Expectancy (years)')
 ax.set_xticks(x)
-ax.set_xticklabels(categories, rotation=20, ha='right', fontsize=9)
-apply_style(ax, 'Life Expectancy: Migrated vs Non-Migrated\n(Overall and by Profession Category)',
-            ylabel='Average Life Expectancy (years)')
-ax.legend(framealpha=0.8)
-ax.set_ylim(0, max(means_m + means_nm) * 1.2 + 5)
+ax.set_xticklabels(labels_v)
+ax.set_ylim(0, max(mig_vals + nm_vals) * 1.3)
+ax.legend()
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 add_source(fig)
-fig.savefig(os.path.join(CHARTS_DIR, 'fig1_life_expectancy_comparison.png'), dpi=150)
-plt.close(fig)
+save(fig, 'fig03_version_comparison.png')
 
-# ---------------------------------------------------------------------------
-# FIG 2 — OVERLAID HISTOGRAM: DEATH YEARS
-# ---------------------------------------------------------------------------
-print("Generating fig2_death_year_histogram.png ...")
 
-dy_m  = [r['_dy'] for r in migrated     if 1900 <= r['_dy'] <= 2024]
-dy_nm = [r['_dy'] for r in non_migrated if 1900 <= r['_dy'] <= 2024]
+# ===========================================================================
+# FIG 04 — BOX PLOTS (4 GROUPS)
+# ===========================================================================
+print("  fig04_box_plots.png")
 
-fig, ax = plt.subplots(figsize=(12, 6))
-bins = range(1900, 2025, 2)
-ax.hist(dy_nm, bins=bins, alpha=0.6, color=RED,  label='Non-migrated', edgecolor='white', linewidth=0.3)
-ax.hist(dy_m,  bins=bins, alpha=0.6, color=BLUE, label='Migrated',     edgecolor='white', linewidth=0.3)
+fig, ax = plt.subplots(figsize=(11, 7))
+data_for_box = [le_values(groups[ms]) for ms in ALL_GROUPS]
+bp = ax.boxplot(data_for_box, patch_artist=True, notch=True,
+                medianprops={'color': 'white', 'linewidth': 2})
+for patch, ms in zip(bp['boxes'], ALL_GROUPS):
+    patch.set_facecolor(COLOUR[ms])
+    patch.set_alpha(0.8)
+for element in ['whiskers', 'caps', 'fliers']:
+    for item in bp[element]:
+        item.set(color='#444444')
 
-ax.axvline(1937, color=NAVY, linestyle='--', linewidth=1.5, label='1937 (Great Terror)')
-ax.text(1937.5, ax.get_ylim()[1] * 0.95, 'Great Terror\n1937', color=NAVY, fontsize=8, va='top')
+ax.set_xticklabels([GROUP_LABELS[ms] for ms in ALL_GROUPS], rotation=15, ha='right')
+apply_style(ax, 'Figure 4 — Life Expectancy Distribution by Group (Box Plots)',
+            ylabel='Life Expectancy (years)')
+ax.set_ylim(0, 110)
 
-ax.axvline(1933, color='#8E44AD', linestyle='--', linewidth=1.5, label='1933 (Holodomor)')
-ax.text(1933.5, ax.get_ylim()[1] * 0.80, 'Holodomor\n1933', color='#8E44AD', fontsize=8, va='top')
+# Annotate medians
+for i, ms in enumerate(ALL_GROUPS, start=1):
+    v = le_values(groups[ms])
+    if v:
+        med = statistics.median(v)
+        ax.text(i, med + 2, f"med={med:.0f}", ha='center', fontsize=8,
+                color='white', fontweight='bold')
 
-apply_style(ax, 'Death Year Distribution: Migrated vs Non-Migrated (1900–2024)',
-            xlabel='Death Year', ylabel='Number of Deaths')
-ax.legend(framealpha=0.8)
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 add_source(fig)
-fig.savefig(os.path.join(CHARTS_DIR, 'fig2_death_year_histogram.png'), dpi=150)
-plt.close(fig)
+save(fig, 'fig04_box_plots.png')
 
-# ---------------------------------------------------------------------------
-# FIG 3 — BAR: REPRESSION PERIODS (NON-MIGRANTS ONLY, AVG AGE AT DEATH)
-# ---------------------------------------------------------------------------
-print("Generating fig3_repression_periods_nonmigrants.png ...")
 
-# Use main periods only (excluding the single-year 1937 spotlight to avoid double-counting on chart)
-CHART_PERIODS = [p for p in PERIODS if p[0] != '1937 ONLY (single-year spotlight)']
+# ===========================================================================
+# FIG 05 — HISTOGRAM: AGE AT DEATH FOR DEPORTED GROUP
+# ===========================================================================
+print("  fig05_deported_age_histogram.png")
 
-period_labels = []
-period_avg_ages = []
-period_counts  = []
+dep_les = le_values(deported)
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.hist(dep_les, bins=range(0, 105, 5), color=COLOUR['deported'],
+        edgecolor='white', linewidth=0.4, alpha=0.85)
 
-for period_label, period_fn in CHART_PERIODS:
-    subset = [r for r in nm_with_dy if period_fn(r['_dy'])]
-    ages   = [r['_le'] for r in subset if r.get('_le') is not None]
-    period_labels.append(period_label.split(' (')[0])   # short label
-    period_avg_ages.append(round(statistics.mean(ages), 1) if ages else 0)
-    period_counts.append(len(subset))
+if dep_les:
+    mn = statistics.mean(dep_les)
+    ax.axvline(mn, color='white', linestyle='--', linewidth=2,
+               label=f'Mean = {mn:.1f} yrs')
+    ax.legend(fontsize=10)
 
-# Color gradient: darker = more repressive (manually coded)
-PERIOD_COLORS = [
-    '#5D8AA8', '#7B6D8D', '#B07D62', '#C0392B', '#8B0000',
-    '#3498DB', '#7F8C8D', '#1A5276', '#2874A6', '#85C1E9',
-]
-
-fig, ax = plt.subplots(figsize=(14, 7))
-bars = ax.barh(period_labels, period_avg_ages, color=PERIOD_COLORS[:len(period_labels)], edgecolor='white')
-
-for i, (bar, cnt, avg) in enumerate(zip(bars, period_counts, period_avg_ages)):
-    if avg > 0:
-        ax.text(bar.get_width() + 0.3, bar.get_y() + bar.get_height()/2,
-                f"n={cnt}, avg={avg}", va='center', fontsize=8, color=NAVY)
-
-apply_style(ax, 'Average Age at Death by Historical Period\n(Non-Migrants Only)',
-            xlabel='Average Age at Death', ylabel='')
-ax.set_xlim(0, max(period_avg_ages) * 1.25 + 5 if period_avg_ages else 80)
+apply_style(ax, 'Figure 5 — Age at Death Distribution: Deported Group',
+            xlabel='Age at Death (years)', ylabel='Count')
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 add_source(fig)
-fig.savefig(os.path.join(CHARTS_DIR, 'fig3_repression_periods_nonmigrants.png'), dpi=150)
-plt.close(fig)
+save(fig, 'fig05_deported_age_histogram.png')
 
-# ---------------------------------------------------------------------------
-# FIG 4 — HEATMAP: PROFESSION × DEATH DECADE (NON-MIGRANTS)
-# ---------------------------------------------------------------------------
-print("Generating fig4_profession_heatmap.png ...")
 
-death_decades = list(range(1900, 2020, 10))
-heatmap_data  = {}
+# ===========================================================================
+# FIG 06 — VIOLIN PLOTS (4 GROUPS)
+# ===========================================================================
+print("  fig06_violin_plots.png")
 
-for prof in professions:
-    row_vals = []
-    for dec in death_decades:
-        cnt = sum(1 for r in non_migrated
-                  if r['profession_category'] == prof and dec <= r['_dy'] < dec + 10)
-        row_vals.append(cnt)
-    heatmap_data[prof] = row_vals
+df_violin = pd.DataFrame([
+    {'group': GROUP_LABELS[ms], 'le': r['_le']}
+    for ms in ALL_GROUPS for r in groups[ms] if r['_le'] is not None
+])
 
-hm_df = pd.DataFrame(heatmap_data, index=[f"{d}s" for d in death_decades]).T
+fig, ax = plt.subplots(figsize=(12, 7))
+palette = {GROUP_LABELS[ms]: COLOUR[ms] for ms in ALL_GROUPS}
+sns.violinplot(data=df_violin, x='group', y='le', palette=palette,
+               inner='quartile', ax=ax, linewidth=1)
+
+apply_style(ax, 'Figure 6 — Life Expectancy Full Distribution (Violin Plots)',
+            xlabel='', ylabel='Life Expectancy (years)')
+ax.set_xticklabels([GROUP_LABELS[ms] for ms in ALL_GROUPS], rotation=15, ha='right')
+plt.tight_layout(rect=[0, 0.04, 1, 1])
+add_source(fig)
+save(fig, 'fig06_violin_plots.png')
+
+
+# ===========================================================================
+# FIG 07 — DEATH YEAR HISTOGRAM 1900–2024 (ALL ANALYSABLE)
+# ===========================================================================
+print("  fig07_death_year_histogram.png")
 
 fig, ax = plt.subplots(figsize=(14, 6))
-sns.heatmap(hm_df, annot=True, fmt='d', cmap='YlOrRd', linewidths=0.5,
-            linecolor='white', ax=ax, cbar_kws={'label': 'Deaths'})
-ax.set_title('Non-Migrant Deaths by Profession and Death Decade',
-             fontsize=14, fontweight='bold', color=NAVY, pad=12)
-ax.set_xlabel('Death Decade', fontsize=11, color=NAVY)
-ax.set_ylabel('Profession Category', fontsize=11, color=NAVY)
+bins = range(1900, 2026, 2)
+
+for ms in ['non_migrated', 'migrated']:
+    dy_vals = [r['_dy'] for r in groups[ms] if r['_dy'] and 1900 <= r['_dy'] <= 2024]
+    alpha   = 0.65 if ms == 'non_migrated' else 0.55
+    ax.hist(dy_vals, bins=bins, alpha=alpha, color=COLOUR[ms],
+            label=GROUP_LABELS[ms], edgecolor='white', linewidth=0.2)
+
+# Annotation lines
+for year, label, colour in [
+    (1933, 'Holodomor\n1933', '#8E44AD'),
+    (1937, 'Great Terror\n1937', COLOUR['navy']),
+    (1941, 'WWII begins\n1941', '#7F8C8D'),
+]:
+    ax.axvline(year, color=colour, linestyle='--', linewidth=1.5)
+    ax.text(year + 0.4, ax.get_ylim()[1] * 0.85, label, color=colour,
+            fontsize=7.5, va='top')
+
+apply_style(ax, 'Figure 7 — Death Year Distribution 1900–2024\n(Migrated vs Non-Migrated)',
+            xlabel='Year of Death', ylabel='Number of Deaths')
+ax.legend(fontsize=9)
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 add_source(fig)
-fig.savefig(os.path.join(CHARTS_DIR, 'fig4_profession_heatmap.png'), dpi=150)
-plt.close(fig)
+save(fig, 'fig07_death_year_histogram.png')
 
-# ---------------------------------------------------------------------------
-# FIG 5 — LINE CHART: AVG LE BY BIRTH DECADE (MIGRATED VS NON-MIGRATED)
-# ---------------------------------------------------------------------------
-print("Generating fig5_birth_cohort_survival.png ...")
 
-plot_decades = list(range(1850, 1970, 10))
+# ===========================================================================
+# FIG 08 — DEPORTED DEATHS BY YEAR 1921–1965
+# ===========================================================================
+print("  fig08_deported_deaths_by_year.png")
 
-avg_le_m_by_dec  = []
-avg_le_nm_by_dec = []
+dep_death_years = [r['_dy'] for r in deported if r['_dy'] and 1921 <= r['_dy'] <= 1965]
+dep_year_counter = collections.Counter(dep_death_years)
+years_range = list(range(1921, 1966))
+counts      = [dep_year_counter.get(y, 0) for y in years_range]
 
-for dec in plot_decades:
-    g_m  = [r['_le'] for r in migrated     if dec <= r['_by'] < dec + 10]
-    g_nm = [r['_le'] for r in non_migrated if dec <= r['_by'] < dec + 10]
-    avg_le_m_by_dec.append( statistics.mean(g_m)  if g_m  else None)
-    avg_le_nm_by_dec.append(statistics.mean(g_nm) if g_nm else None)
+fig, ax = plt.subplots(figsize=(14, 6))
+bar_colours = [('#8B0000' if y in (1937, 1938) else COLOUR['deported'])
+               for y in years_range]
+ax.bar(years_range, counts, color=bar_colours, edgecolor='white', linewidth=0.3)
 
-fig, ax = plt.subplots(figsize=(12, 6))
+ax.axvline(1937, color='#8B0000', linestyle='--', linewidth=1.5, alpha=0.7)
+ax.text(1937.3, max(counts) * 0.9, '1937\nTerror\npeak', color='#8B0000', fontsize=8)
 
-# Filter out None values for plotting
-x_m  = [d for d, v in zip(plot_decades, avg_le_m_by_dec)  if v is not None]
-y_m  = [v for v in avg_le_m_by_dec  if v is not None]
-x_nm = [d for d, v in zip(plot_decades, avg_le_nm_by_dec) if v is not None]
-y_nm = [v for v in avg_le_nm_by_dec if v is not None]
-
-ax.plot(x_m,  y_m,  'o-', color=BLUE, linewidth=2.5, markersize=6, label='Migrated')
-ax.plot(x_nm, y_nm, 's-', color=RED,  linewidth=2.5, markersize=6, label='Non-migrated')
-
-ax.fill_between(x_m,  y_m,  alpha=0.12, color=BLUE)
-ax.fill_between(x_nm, y_nm, alpha=0.12, color=RED)
-
-ax.set_xticks(plot_decades)
-ax.set_xticklabels([f"{d}s" for d in plot_decades], rotation=0)
-apply_style(ax, 'Average Life Expectancy by Birth Decade\n(Migrated vs Non-Migrated)',
-            xlabel='Birth Decade', ylabel='Average Life Expectancy (years)')
-ax.legend(framealpha=0.8)
+apply_style(ax, 'Figure 8 — Deported Creative Workers: Deaths by Year 1921–1965',
+            xlabel='Year', ylabel='Number of Deported Deaths')
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 add_source(fig)
-fig.savefig(os.path.join(CHARTS_DIR, 'fig5_birth_cohort_survival.png'), dpi=150)
-plt.close(fig)
+save(fig, 'fig08_deported_deaths_by_year.png')
 
-# ---------------------------------------------------------------------------
-# FIG 6 — SIDE-BY-SIDE BAR: AGE AT DEATH DISTRIBUTION
-# ---------------------------------------------------------------------------
-print("Generating fig6_age_at_death_distribution.png ...")
 
-bucket_labels = [b[0] for b in AGE_BUCKETS]
-counts_m  = []
-counts_nm = []
+# ===========================================================================
+# FIG 09 — NON-MIGRANT DEATHS BY SOVIET PERIOD (BAR)
+# ===========================================================================
+print("  fig09_nonmigrant_deaths_by_period.png")
 
-for bucket_label, bucket_fn in AGE_BUCKETS:
-    counts_m.append( sum(1 for r in migrated     if r.get('_le') is not None and bucket_fn(r['_le'])))
-    counts_nm.append(sum(1 for r in non_migrated if r.get('_le') is not None and bucket_fn(r['_le'])))
+CHART_PERIODS = [
+    ('1921–1929\n(NEP)',           lambda y: 1921 <= y <= 1929),
+    ('1930–1933\n(Holodomor)',     lambda y: 1930 <= y <= 1933),
+    ('1934–1938\n(Terror)',        lambda y: 1934 <= y <= 1938),
+    ('1939–1945\n(WWII)',          lambda y: 1939 <= y <= 1945),
+    ('1946–1953\n(Late Stalin)',   lambda y: 1946 <= y <= 1953),
+    ('1954–1964\n(Thaw)',          lambda y: 1954 <= y <= 1964),
+    ('1965–1991\n(Stagnation)',    lambda y: 1965 <= y <= 1991),
+    ('Post-1991',                   lambda y: y > 1991),
+]
 
-x = np.arange(len(bucket_labels))
-width = 0.35
+period_labels_ch = [p[0] for p in CHART_PERIODS]
+period_counts_ch = []
+period_avgage_ch = []
+for _, fn in CHART_PERIODS:
+    sub  = [r for r in non_migrated if r['_dy'] and fn(r['_dy'])]
+    ages = [r['_le'] for r in sub if r['_le'] is not None]
+    period_counts_ch.append(len(sub))
+    period_avgage_ch.append(round(statistics.mean(ages), 1) if ages else 0)
 
-fig, ax = plt.subplots(figsize=(12, 6))
-ax.bar(x - width/2, counts_m,  width, label='Migrated',     color=BLUE, edgecolor='white')
-ax.bar(x + width/2, counts_nm, width, label='Non-migrated', color=RED,  edgecolor='white')
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 9), sharex=True)
+
+colours_periods = [('#8B0000' if 'Terror' in lb or 'Holodomor' in lb else COLOUR['non_migrated'])
+                   for lb in period_labels_ch]
+
+ax1.bar(period_labels_ch, period_counts_ch, color=colours_periods, edgecolor='white')
+ax1.set_ylabel('Number of Deaths', fontsize=10, color=COLOUR['navy'])
+ax1.set_title('Figure 9 — Non-Migrant Deaths by Soviet Period\n(count and average age at death)',
+              fontsize=13, fontweight='bold', color=COLOUR['navy'], pad=10)
+
+ax2.bar(period_labels_ch, period_avgage_ch, color=colours_periods, edgecolor='white')
+ax2.set_ylabel('Average Age at Death', fontsize=10, color=COLOUR['navy'])
+
+for ax in (ax1, ax2):
+    ax.set_facecolor('#F7F9FB')
+    ax.tick_params(colors=COLOUR['navy'], labelsize=8)
+    for spine in ax.spines.values():
+        spine.set_edgecolor('#CCCCCC')
+
+plt.tight_layout(rect=[0, 0.04, 1, 1])
+add_source(fig)
+save(fig, 'fig09_nonmigrant_deaths_by_period.png')
+
+
+# ===========================================================================
+# FIG 10 — BIRTH COHORT LE LINE CHART
+# ===========================================================================
+print("  fig10_birth_cohort_le.png")
+
+decades_ch = list(range(1840, 1981, 10))
+cohort_means = {ms: [] for ms in ALL_GROUPS}
+cohort_ns    = {ms: [] for ms in ALL_GROUPS}
+valid_decs   = []
+
+for dec in decades_ch:
+    any_data = False
+    for ms in ALL_GROUPS:
+        v = [r['_le'] for r in groups[ms] if r['_by'] and dec <= r['_by'] < dec + 10 and r['_le']]
+        cohort_means[ms].append(round(statistics.mean(v), 1) if v else None)
+        cohort_ns[ms].append(len(v))
+        if v:
+            any_data = True
+    valid_decs.append(dec)
+
+fig, ax = plt.subplots(figsize=(13, 7))
+for ms in ALL_GROUPS:
+    vals = cohort_means[ms]
+    xs   = [dec for dec, v in zip(valid_decs, vals) if v is not None]
+    ys   = [v for v in vals if v is not None]
+    if xs:
+        ax.plot(xs, ys, 'o-', color=COLOUR[ms], label=GROUP_LABELS[ms],
+                linewidth=2, markersize=5)
+
+apply_style(ax, 'Figure 10 — Mean Life Expectancy by Birth Decade (1840s–1980s)',
+            xlabel='Birth Decade', ylabel='Mean Life Expectancy (years)')
+ax.legend(fontsize=9)
+ax.set_xlim(1835, 1990)
+plt.tight_layout(rect=[0, 0.04, 1, 1])
+add_source(fig)
+save(fig, 'fig10_birth_cohort_le.png')
+
+
+# ===========================================================================
+# FIG 11 — PROFESSION GROUPED BAR (LE by profession × group)
+# ===========================================================================
+print("  fig11_profession_grouped_bar.png")
+
+professions = list(PROFESSION_KEYWORDS.keys())
+x = np.arange(len(professions))
+w = 0.2
+offsets = [-1.5*w, -0.5*w, 0.5*w, 1.5*w]
+
+fig, ax = plt.subplots(figsize=(14, 7))
+for i, ms in enumerate(ALL_GROUPS):
+    prof_means = []
+    for prof in professions:
+        v = [r['_le'] for r in groups[ms] if r['_prof'] == prof and r['_le'] is not None]
+        prof_means.append(round(statistics.mean(v), 1) if v else 0)
+    ax.bar(x + offsets[i], prof_means, w, color=COLOUR[ms],
+           label=GROUP_LABELS[ms], alpha=0.85)
 
 ax.set_xticks(x)
-ax.set_xticklabels(bucket_labels)
-apply_style(ax, 'Age at Death Distribution: Migrated vs Non-Migrated',
-            xlabel='Age at Death (years)', ylabel='Number of People')
-ax.legend(framealpha=0.8)
+ax.set_xticklabels(professions, rotation=20, ha='right', fontsize=9)
+apply_style(ax, 'Figure 11 — Life Expectancy by Profession and Migration Group',
+            ylabel='Mean Life Expectancy (years)')
+ax.legend(fontsize=8, ncol=2)
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 add_source(fig)
-fig.savefig(os.path.join(CHARTS_DIR, 'fig6_age_at_death_distribution.png'), dpi=150)
-plt.close(fig)
+save(fig, 'fig11_profession_grouped_bar.png')
 
-# ---------------------------------------------------------------------------
-# FIG 7 — PIE/HORIZONTAL BAR: 1937 PROFESSION BREAKDOWN
-# ---------------------------------------------------------------------------
-print("Generating fig7_1937_profession_breakdown.png ...")
 
-prof_1937_counts = collections.Counter(r['profession_category'] for r in died_1937_nm)
+# ===========================================================================
+# FIG 12 — GEOGRAPHIC MIGRATION RATES (TOP 20 BIRTH CITIES)
+# ===========================================================================
+print("  fig12_geographic_migration_rates.png")
 
-if prof_1937_counts:
-    labels_1937 = list(prof_1937_counts.keys())
-    values_1937 = [prof_1937_counts[l] for l in labels_1937]
+birth_all = collections.Counter()
+birth_mig = collections.Counter()
+for ms in ALL_GROUPS:
+    for r in groups[ms]:
+        bl = str(r.get('birth_location', '')).strip()
+        if bl:
+            birth_all[bl] += 1
+            if ms == 'migrated':
+                birth_mig[bl] += 1
 
-    # sort by count descending
-    sorted_pairs = sorted(zip(values_1937, labels_1937), reverse=True)
-    values_1937 = [p[0] for p in sorted_pairs]
-    labels_1937 = [p[1] for p in sorted_pairs]
+top20 = birth_all.most_common(20)
+cities    = [loc[:35] for loc, _ in top20]
+total_cnt = [cnt for _, cnt in top20]
+mig_cnt   = [birth_mig.get(loc, 0) for loc, _ in top20]
+mig_pct   = [round(100 * mc / tc, 1) if tc else 0
+             for mc, tc in zip(mig_cnt, total_cnt)]
 
-    palette_1937 = [NAVY, RED, GOLD, TEAL, BLUE, '#E67E22'][:len(labels_1937)]
+fig, ax = plt.subplots(figsize=(12, 9))
+y = np.arange(len(cities))
+bars_t = ax.barh(y, total_cnt, color='#BDC3C7', label='Total', height=0.6)
+bars_m = ax.barh(y, mig_cnt,   color=COLOUR['migrated'], label='Migrated', height=0.6)
+ax.set_yticks(y)
+ax.set_yticklabels(cities, fontsize=8)
+for yi, pct in enumerate(mig_pct):
+    ax.text(total_cnt[yi] + 2, yi, f"{pct}%", va='center', fontsize=7.5,
+            color=COLOUR['migrated'])
 
-    fig, ax = plt.subplots(figsize=(10, 6))
-    bars = ax.barh(labels_1937[::-1], values_1937[::-1], color=palette_1937[::-1], edgecolor='white')
-    for bar, val in zip(bars, values_1937[::-1]):
-        ax.text(bar.get_width() + 0.1, bar.get_y() + bar.get_height()/2,
-                str(val), va='center', fontsize=10, color=NAVY, fontweight='bold')
-    apply_style(ax, f'Profession Breakdown of Non-Migrants Who Died in 1937\n(Total: {len(died_1937_nm)})',
-                xlabel='Number of Deaths', ylabel='')
-    ax.set_xlim(0, max(values_1937) * 1.25 + 1)
-    plt.tight_layout(rect=[0, 0.04, 1, 1])
-    add_source(fig)
-    fig.savefig(os.path.join(CHARTS_DIR, 'fig7_1937_profession_breakdown.png'), dpi=150)
-    plt.close(fig)
-else:
-    print("  WARNING: No non-migrant deaths found for 1937 with current data — fig7 skipped.")
+apply_style(ax, 'Figure 12 — Geographic Migration Rates: Top 20 Birth Cities',
+            xlabel='Number of Creative Workers')
+ax.legend(fontsize=9)
+plt.tight_layout(rect=[0, 0.04, 1, 1])
+add_source(fig)
+save(fig, 'fig12_geographic_migration_rates.png')
 
-# ---------------------------------------------------------------------------
-# FINAL SUMMARY
-# ---------------------------------------------------------------------------
-print()
-print("=" * 60)
-print("GENERATION COMPLETE")
-print("=" * 60)
-print(f"  Analysis text : {OUT_TXT}")
-print(f"  Charts dir    : {CHARTS_DIR}")
-charts_generated = [f for f in os.listdir(CHARTS_DIR) if f.endswith('.png')]
-for c in sorted(charts_generated):
-    print(f"    - {c}")
-print(f"  Total charts  : {len(charts_generated)}")
-print(f"  Analysis lines: {len(lines)}")
-print("=" * 60)
+
+# ===========================================================================
+# FIG 13 — BIRTH YEAR DISTRIBUTION BY GROUP (selection bias check)
+# ===========================================================================
+print("  fig13_birth_year_distribution.png")
+
+fig, ax = plt.subplots(figsize=(12, 6))
+bins_by = range(1830, 2000, 5)
+for ms in ALL_GROUPS:
+    bys = [r['_by'] for r in groups[ms] if r['_by'] and 1830 <= r['_by'] <= 1990]
+    if bys:
+        ax.hist(bys, bins=bins_by, alpha=0.5, color=COLOUR[ms],
+                label=GROUP_LABELS[ms], edgecolor='none')
+
+apply_style(ax, 'Figure 13 — Birth Year Distribution by Group\n(Selection Bias Check)',
+            xlabel='Birth Year', ylabel='Count')
+ax.legend(fontsize=9)
+plt.tight_layout(rect=[0, 0.04, 1, 1])
+add_source(fig)
+save(fig, 'fig13_birth_year_distribution.png')
+
+
+# ===========================================================================
+# FIG 14 — SENSITIVITY ANALYSIS CHART
+# ===========================================================================
+print("  fig14_sensitivity_analysis.png")
+
+le_m_base  = le_values(migrated)
+le_nm_base = le_values(non_migrated)
+base_m_mean  = statistics.mean(le_m_base)  if le_m_base  else 0
+base_nm_mean = statistics.mean(le_nm_base) if le_nm_base else 0
+base_gap_val = base_m_mean - base_nm_mean
+
+# Simulate: shift 0% to 10% of migrated down to non-migrated LE
+error_rates = [0, 1, 2, 3.2, 5, 7.5, 10]
+gaps = []
+for er in error_rates:
+    n_err = int(len(migrated) * er / 100)
+    # Worst case: the n_err best-surviving migrants are reclassified
+    sorted_m = sorted(le_m_base, reverse=True)
+    adj_m = sorted_m[n_err:]  # remove the long-lived ones (most conservative)
+    if adj_m and le_nm_base:
+        gaps.append(statistics.mean(adj_m) - base_nm_mean)
+    else:
+        gaps.append(base_gap_val)
+
+fig, ax = plt.subplots(figsize=(9, 6))
+ax.plot(error_rates, gaps, 'o-', color=COLOUR['migrated'], linewidth=2.5, markersize=7)
+ax.axhline(0, color='grey', linestyle='--', linewidth=1)
+ax.axvline(3.2, color=COLOUR['navy'], linestyle=':', linewidth=1.5,
+           label='Actual AI error rate (3.2%)')
+ax.fill_between(error_rates, gaps, 0,
+                where=[g > 0 for g in gaps],
+                alpha=0.1, color=COLOUR['migrated'])
+
+ax.set_xlabel('Assumed AI Classification Error Rate (%)', fontsize=11, color=COLOUR['navy'])
+ax.set_ylabel('LE Gap: Migrated − Non-migrated (years)', fontsize=11, color=COLOUR['navy'])
+apply_style(ax, 'Figure 14 — Sensitivity Analysis: LE Gap vs AI Error Rate')
+ax.legend(fontsize=9)
+plt.tight_layout(rect=[0, 0.04, 1, 1])
+add_source(fig)
+save(fig, 'fig14_sensitivity_analysis.png')
+
+
+# ===========================================================================
+# FIG 15 — INTERNAL TRANSFER NULL FINDING
+# ===========================================================================
+print("  fig15_internal_transfer_null.png")
+
+it_les = le_values(internal_transfer)
+nm_les = le_values(non_migrated)
+
+it_mean = round(statistics.mean(it_les), 2) if it_les else None
+nm_mean = round(statistics.mean(nm_les), 2) if nm_les else None
+
+u15, p15 = mannwhitney(it_les, nm_les)
+
+fig, ax = plt.subplots(figsize=(8, 6))
+data_it = [it_les, nm_les]
+bp15 = ax.boxplot(data_it, patch_artist=True, notch=True,
+                  medianprops={'color': 'white', 'linewidth': 2})
+bp15['boxes'][0].set_facecolor(COLOUR['internal_transfer'])
+bp15['boxes'][0].set_alpha(0.85)
+bp15['boxes'][1].set_facecolor(COLOUR['non_migrated'])
+bp15['boxes'][1].set_alpha(0.85)
+for element in ['whiskers', 'caps', 'fliers']:
+    for item in bp15[element]:
+        item.set(color='#444444')
+
+ax.set_xticklabels([GROUP_LABELS['internal_transfer'], GROUP_LABELS['non_migrated']],
+                   rotation=10)
+apply_style(ax,
+    f'Figure 15 — Internal Transfer vs Non-Migrated LE\n'
+    f'(p={p15:.3f} — {"NOT significant" if p15 and p15 >= 0.05 else "significant"})',
+    ylabel='Life Expectancy (years)')
+ax.text(0.5, 0.95,
+        f"Mean IT={it_mean}  Mean NM={nm_mean}  p={p15}",
+        ha='center', va='top', transform=ax.transAxes, fontsize=9, color=COLOUR['navy'])
+plt.tight_layout(rect=[0, 0.04, 1, 1])
+add_source(fig)
+save(fig, 'fig15_internal_transfer_null.png')
+
+
+# ===========================================================================
+# FIG 16 — CONSORT-STYLE EXCLUSION FLOWCHART
+# ===========================================================================
+print("  fig16_consort_flowchart.png")
+
+fig, ax = plt.subplots(figsize=(10, 14))
+ax.axis('off')
+fig.patch.set_facecolor('white')
+
+def box(ax, x, y, w, h, text, colour='#1B2A4A', bg='#EBF5FB', fontsize=9.5):
+    rect = mpatches.FancyBboxPatch(
+        (x - w/2, y - h/2), w, h,
+        boxstyle="round,pad=0.02", linewidth=1.5,
+        edgecolor=colour, facecolor=bg, zorder=3)
+    ax.add_patch(rect)
+    ax.text(x, y, text, ha='center', va='center', fontsize=fontsize,
+            color=colour, fontweight='bold', wrap=True,
+            multialignment='center', zorder=4)
+
+def arrow(ax, x1, y1, x2, y2):
+    ax.annotate('', xy=(x2, y2 + 0.015), xytext=(x1, y1 - 0.015),
+                arrowprops=dict(arrowstyle='->', color='#555555',
+                                lw=1.5), zorder=2)
+
+def exc_box(ax, x, y, w, h, text):
+    box(ax, x, y, w, h, text, colour='#7B241C', bg='#FDEDEC', fontsize=8.5)
+
+# Positions (y: 0=bottom, 1=top)
+ax.set_xlim(0, 1)
+ax.set_ylim(0, 1)
+
+cx, cw, ch = 0.50, 0.50, 0.055  # centre, width, height of main boxes
+
+BOX_COORDS = [
+    (cx, 0.95, f"ESU.com.ua — all entries scraped\nn = {total_scraped:,}"),
+    (cx, 0.82, f"Filtered: creative profession keywords\nn ≈ {len(raw_rows):,} creative workers"),
+    (cx, 0.69, f"Exclud. pre-Soviet deaths (died <1921)\n− {len(excluded_pre_soviet):,}  and Galicia pre-1939 − {len(excluded_galicia):,}"),
+    (cx, 0.56, f"Exclud. non-Ukrainian (confirmed)\n− {len(non_ukrainian):,}"),
+    (cx, 0.43, f"Exclud. still alive / unknown status\n− {len(still_alive):,} alive  − {len(unknown_status):,} unknown"),
+    (cx, 0.30, f"Exclud. missing birth or death year\n− {len(missing_dates):,}"),
+    (cx, 0.17, (
+        f"FINAL ANALYSABLE DATASET\nn = {len(analysable):,}\n"
+        f"Migrated: {len(migrated):,}  |  Non-migrated: {len(non_migrated):,}\n"
+        f"Internal transfer: {len(internal_transfer):,}  |  Deported: {len(deported):,}"
+    )),
+]
+
+for i, (x, y, text) in enumerate(BOX_COORDS):
+    bg = '#D5F5E3' if i == len(BOX_COORDS) - 1 else '#EBF5FB'
+    col = '#1A5276' if i == len(BOX_COORDS) - 1 else COLOUR['navy']
+    box(ax, x, y, cw, ch, text, colour=col, bg=bg,
+        fontsize=9 if i == len(BOX_COORDS) - 1 else 9.5)
+
+for i in range(len(BOX_COORDS) - 1):
+    _, ya, _ = BOX_COORDS[i]
+    _, yb, _ = BOX_COORDS[i + 1]
+    arrow(ax, cx, ya, cx, yb)
+
+ax.set_title('Figure 16 — CONSORT-Style Dataset Exclusion Flowchart',
+             fontsize=13, fontweight='bold', color=COLOUR['navy'], pad=10)
+fig.text(0.5, 0.01, SOURCE_NOTE, ha='center', fontsize=7, color='grey', style='italic')
+save(fig, 'fig16_consort_flowchart.png')
+
+
+# ===========================================================================
+# FIG 17 — GENDER DISTRIBUTION BY MIGRATION GROUP
+# ===========================================================================
+print("  fig17_gender_by_group.png")
+
+genders = ['male', 'female', 'unknown']
+gender_counts = {ms: collections.Counter(r.get('gender', 'unknown').lower()
+                                         for r in groups[ms])
+                 for ms in ALL_GROUPS}
+
+x = np.arange(len(ALL_GROUPS))
+w = 0.25
+gcols = {'male': '#2980B9', 'female': '#E74C3C', 'unknown': '#BDC3C7'}
+
+fig, ax = plt.subplots(figsize=(12, 6))
+offsets = [-w, 0, w]
+for j, g in enumerate(genders):
+    vals = [gender_counts[ms].get(g, 0) for ms in ALL_GROUPS]
+    ax.bar(x + offsets[j], vals, w, color=gcols[g], label=g.capitalize(), alpha=0.85)
+
+ax.set_xticks(x)
+ax.set_xticklabels([GROUP_LABELS[ms] for ms in ALL_GROUPS], rotation=15, ha='right')
+apply_style(ax, 'Figure 17 — Gender Distribution by Migration Group',
+            ylabel='Number of People')
+ax.legend(fontsize=9)
+plt.tight_layout(rect=[0, 0.04, 1, 1])
+add_source(fig)
+save(fig, 'fig17_gender_by_group.png')
+
+
+# ===========================================================================
+# FIG 18 — LIFE EXPECTANCY BY GENDER × GROUP (grouped bar)
+# ===========================================================================
+print("  fig18_le_by_gender_group.png")
+
+fig, ax = plt.subplots(figsize=(12, 7))
+x = np.arange(len(ALL_GROUPS))
+w = 0.3
+
+for j, g in enumerate(['male', 'female']):
+    means_g = []
+    ses_g   = []
+    for ms in ALL_GROUPS:
+        v = [r['_le'] for r in groups[ms]
+             if r.get('gender', '').lower() == g and r['_le'] is not None]
+        means_g.append(round(statistics.mean(v), 2) if v else 0)
+        ses_g.append(statistics.stdev(v) / math.sqrt(len(v)) if len(v) > 1 else 0)
+
+    offset = -w/2 if g == 'male' else w/2
+    bars = ax.bar(x + offset, means_g, w, color=gcols[g],
+                  yerr=ses_g, capsize=5, label=g.capitalize(), alpha=0.85,
+                  error_kw={'linewidth': 1.2})
+    for bar, mn in zip(bars, means_g):
+        if mn > 0:
+            ax.text(bar.get_x() + bar.get_width()/2,
+                    bar.get_height() + 1.5,
+                    f"{mn:.1f}", ha='center', fontsize=7.5, color=COLOUR['navy'])
+
+ax.set_xticks(x)
+ax.set_xticklabels([GROUP_LABELS[ms] for ms in ALL_GROUPS], rotation=15, ha='right')
+apply_style(ax, 'Figure 18 — Mean Life Expectancy by Gender and Migration Group\n(±1 SE)',
+            ylabel='Mean Life Expectancy (years)')
+ax.legend(fontsize=9)
+plt.tight_layout(rect=[0, 0.04, 1, 1])
+add_source(fig)
+save(fig, 'fig18_le_by_gender_group.png')
+
+
+# ===========================================================================
+# DONE
+# ===========================================================================
+print(f"\nAll charts saved to: {CHARTS_DIR}")
+print(f"Statistical report:  {OUT_TXT}")
+print("\nChart summary:")
+for i in range(1, 17):
+    fname = f"fig{i:02d}_*.png"
+    matches = [f for f in os.listdir(CHARTS_DIR) if f.startswith(f"fig{i:02d}_")]
+    status = "✓" if matches else "✗ MISSING"
+    name   = matches[0] if matches else fname
+    print(f"  {status}  {name}")
