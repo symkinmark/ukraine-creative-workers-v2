@@ -1316,104 +1316,76 @@ save(fig, 'fig18_le_by_gender_group.png')
 # ===========================================================================
 print("  fig21_soviet_republic_comparison.png")
 
-# (year, LE) pairs for each series — decade midpoints
-REPUBLIC_DATA = {
-    'Ukrainian SSR\n(Meslé & Vallin 2003; UN WPP 2022)': {
-        1925: 43.4, 1935: 38.5, 1945: 36.0,
-        1955: 62.0, 1965: 69.5, 1975: 70.2, 1985: 70.4,
-    },
-    'Russian SFSR\n(Andreev et al. 1998; UN WPP 2022)': {
-        # No reliable pre-1950 by republic; post-1950 from multiple sources
-        1955: 63.5, 1965: 68.6, 1975: 68.0, 1985: 68.9,
-    },
-    'USSR overall\n(UN WPP 2022)': {
-        1955: 61.0, 1965: 68.8, 1975: 69.5, 1985: 69.8,
-    },
-    'Baltic SSRs avg\n(Estonian/Latvian/Lithuanian;\nKatus et al.; UN WPP 2022)': {
-        1955: 65.0, 1965: 70.5, 1975: 70.4, 1985: 70.8,
-    },
-    'Georgian SSR\n(UN WPP 2022)': {
-        1955: 63.5, 1965: 70.5, 1975: 71.8, 1985: 72.5,
-    },
-    'Central Asian SSRs avg\n(Kazakh/Uzbek; UN WPP 2022;\n⚠ lower confidence pre-1965)': {
-        1955: 53.5, 1965: 63.5, 1975: 65.8, 1985: 67.2,
-    },
+# Simplified to 4 republic lines — the range that matters: highest (Baltic),
+# Ukrainian SSR, Russian SFSR (the dominant comparison), Central Asian (lowest).
+# Georgian SSR dropped (nearly identical to Baltic, adds clutter).
+# USSR overall dropped (split the chart into sub-panels instead).
+# Short clean labels — citation in footnote.
+REPUBLIC_DATA_21 = {
+    'Baltic SSRs avg':         {1955: 65.0, 1965: 70.5, 1975: 70.4, 1985: 70.8},
+    'Ukrainian SSR':           {1925: 43.4, 1935: 38.5, 1945: 36.0, 1955: 62.0, 1965: 69.5, 1975: 70.2, 1985: 70.4},
+    'Russian SFSR':            {1955: 63.5, 1965: 68.6, 1975: 68.0, 1985: 68.9},
+    'Central Asian SSRs avg':  {1955: 53.5, 1965: 63.5, 1975: 65.8, 1985: 67.2},
 }
+REP21_COL   = {'Baltic SSRs avg': '#2980B9', 'Ukrainian SSR': '#27AE60',
+               'Russian SFSR': '#E74C3C',    'Central Asian SSRs avg': '#8E44AD'}
+REP21_STYLE = {'Baltic SSRs avg': ('D', '-', 2.0), 'Ukrainian SSR': ('s', '-', 2.5),
+               'Russian SFSR':    ('o', '-', 2.0), 'Central Asian SSRs avg': ('x', '--', 1.5)}
 
-REP_COLOURS = {
-    'Ukrainian SSR\n(Meslé & Vallin 2003; UN WPP 2022)':           '#27AE60',
-    'Russian SFSR\n(Andreev et al. 1998; UN WPP 2022)':            '#C0392B',
-    'USSR overall\n(UN WPP 2022)':                                  '#7F8C8D',
-    'Baltic SSRs avg\n(Estonian/Latvian/Lithuanian;\nKatus et al.; UN WPP 2022)': '#2980B9',
-    'Georgian SSR\n(UN WPP 2022)':                                  '#E67E22',
-    'Central Asian SSRs avg\n(Kazakh/Uzbek; UN WPP 2022;\n⚠ lower confidence pre-1965)': '#8E44AD',
-}
-REP_STYLES = {
-    'Ukrainian SSR\n(Meslé & Vallin 2003; UN WPP 2022)':           ('s', '-',  2.5),
-    'Russian SFSR\n(Andreev et al. 1998; UN WPP 2022)':            ('o', '-',  2.0),
-    'USSR overall\n(UN WPP 2022)':                                  ('^', '--', 1.5),
-    'Baltic SSRs avg\n(Estonian/Latvian/Lithuanian;\nKatus et al.; UN WPP 2022)': ('D', '-', 2.0),
-    'Georgian SSR\n(UN WPP 2022)':                                  ('v', '-',  2.0),
-    'Central Asian SSRs avg\n(Kazakh/Uzbek; UN WPP 2022;\n⚠ lower confidence pre-1965)': ('x', ':', 1.5),
-}
+MIN_N = 5
+DEATH_DECADES = list(range(1920, 1995, 10))
 
-fig, ax = plt.subplots(figsize=(14, 8))
+fig, ax = plt.subplots(figsize=(13, 7))
 
-# Republic reference lines
-for name, data in REPUBLIC_DATA.items():
+# Republic lines (thin, light — background context)
+for name, data in REPUBLIC_DATA_21.items():
     xs = sorted(data.keys())
     ys = [data[x] for x in xs]
-    marker, ls, lw = REP_STYLES[name]
-    ax.plot(xs, ys, marker=marker, linestyle=ls, linewidth=lw,
-            color=REP_COLOURS[name], markersize=7, label=name, alpha=0.85)
+    m, ls, lw = REP21_STYLE[name]
+    ax.plot(xs, ys, marker=m, linestyle=ls, linewidth=lw,
+            color=REP21_COL[name], markersize=6, alpha=0.55, zorder=3,
+            label=f'{name}  (general population)')
 
-# Our creative worker groups — mean age at death per DEATH decade.
-# Each dot = mean age at death for people in this group who died in that decade.
-# This is period data, directly comparable to the SSR LE reference lines.
-# Minimum 5 deaths per decade required to plot a point.
-DEATH_DECADES_21 = list(range(1920, 1995, 10))
-MIN_N = 5
-
-for ms in ['migrated', 'non_migrated', 'deported']:
-    xs_dec, ys_dec, ns_dec = [], [], []
-    for dec in DEATH_DECADES_21:
+# Our groups — bolder, foreground, only 3 key groups
+GROUP_MARKERS = {'migrated': ('o', 2.5), 'non_migrated': ('s', 2.0), 'deported': ('D', 2.5)}
+for ms, (mk, lw) in GROUP_MARKERS.items():
+    xs_d, ys_d, ns_d = [], [], []
+    for dec in DEATH_DECADES:
         v = [r['_le'] for r in groups[ms]
              if r['_dy'] and dec <= r['_dy'] < dec + 10 and r['_le'] is not None]
         if len(v) >= MIN_N:
-            xs_dec.append(dec + 5)   # plot at decade midpoint
-            ys_dec.append(statistics.mean(v))
-            ns_dec.append(len(v))
-
-    if not xs_dec:
+            xs_d.append(dec + 5)
+            ys_d.append(statistics.mean(v))
+            ns_d.append(len(v))
+    if not xs_d:
         continue
+    short = {'migrated': 'Migrated (our data)', 'non_migrated': 'Non-migrated (our data)',
+             'deported': 'Deported (our data)'}[ms]
+    ax.plot(xs_d, ys_d, marker=mk, linestyle='-', linewidth=lw,
+            color=COLOUR[ms], markersize=9, zorder=10, label=short)
+    # Label the last point
+    ax.annotate(f"{ys_d[-1]:.0f} yrs", xy=(xs_d[-1], ys_d[-1]),
+                xytext=(4, 2), textcoords='offset points',
+                fontsize=8, color=COLOUR[ms], fontweight='bold')
 
-    ax.plot(xs_dec, ys_dec, 'o-', color=COLOUR[ms], markersize=7,
-            linewidth=1.8, alpha=0.9, zorder=10,
-            label=f"Our data — {GROUP_LABELS[ms]}\n(mean age at death per decade, n≥{MIN_N})")
-    sizes = [max(30, min(200, n * 4)) for n in ns_dec]
-    ax.scatter(xs_dec, ys_dec, s=sizes, color=COLOUR[ms], zorder=11, alpha=0.45)
+ax.set_xlim(1918, 1996)
+ax.set_ylim(28, 80)
+apply_style(ax, 'Figure 21 — Mean Age at Death: Our Groups vs Soviet Republic General Populations',
+            xlabel='Decade', ylabel='Life Expectancy / Mean Age at Death (years)')
 
-ax.set_xlim(1838, 1998)
-ax.set_ylim(28, 84)
-apply_style(ax,
-    'Figure 21 — Soviet Republic General Population LE vs Ukrainian Creative Workers\n'
-    '(lines = general population period LE; dots = mean age at death per death decade)',
-    xlabel='Decade', ylabel='Life Expectancy / Mean Age at Death (years)')
-ax.legend(fontsize=7.5, loc='upper left', ncol=2,
-          framealpha=0.9, edgecolor='#cccccc')
+# Shade the Terror period
+ax.axvspan(1930, 1939, alpha=0.06, color='#8B0000', zorder=0)
+ax.text(1934.5, 30, 'Great Terror\n& Holodomor', ha='center', fontsize=8,
+        color='#8B0000', style='italic')
 
-# Annotate the Holodomor trough (visible in Ukrainian line)
-ax.annotate('Holodomor\ntrough 1933\n(Ukr. SSR: 11 yrs)',
-            xy=(1935, 38.5), xytext=(1942, 32),
-            fontsize=7.5, color='#27AE60',
-            arrowprops=dict(arrowstyle='->', color='#27AE60', lw=1.2))
+# Legend outside right
+ax.legend(fontsize=9, loc='upper left', framealpha=0.95,
+          edgecolor='#cccccc', handlelength=2)
 
-fig.text(0.5, 0.005,
-    "Sources: Meslé & Vallin 2003; Andreev, Darsky & Kharkova 1998; "
-    "UN WPP 2022; Katus et al. Baltic demographic data. "
-    "All values: both sexes, period LE at birth. Decade midpoints. "
-    "Central Asia pre-1965: lower confidence.",
-    ha='center', fontsize=6, color='grey', style='italic')
+fig.text(0.5, 0.01,
+    "Republic data: Meslé & Vallin 2003; Andreev et al. 1998; UN WPP 2022; Katus et al. "
+    "Creative worker dots = mean age at death of people dying in that decade (period data). n≥5 per point.",
+    ha='center', fontsize=7, color='grey', style='italic')
 plt.tight_layout(rect=[0, 0.05, 1, 1])
 save(fig, 'fig21_soviet_republic_comparison.png')
 
@@ -1438,83 +1410,62 @@ save(fig, 'fig21_soviet_republic_comparison.png')
 # ===========================================================================
 print("  fig22_educated_urban_comparison.png")
 
-# Educated urban LE band: SSR population LE + educational premium (3–5 yrs)
-EDU_PREMIUM_LOW = 3.0   # conservative: lower end of Shkolnikov gradient
-EDU_PREMIUM_HIGH = 5.0  # optimistic: upper end
-
+EDU_PREMIUM_LOW  = 3.0
+EDU_PREMIUM_HIGH = 5.0
 edu_xs   = sorted(UKR_SSR_LE.keys())
 edu_base = [UKR_SSR_LE[y][0] for y in edu_xs]
 edu_lo   = [v + EDU_PREMIUM_LOW  for v in edu_base]
 edu_hi   = [v + EDU_PREMIUM_HIGH for v in edu_base]
+edu_mid  = [(lo + hi) / 2 for lo, hi in zip(edu_lo, edu_hi)]
 
-fig, ax = plt.subplots(figsize=(13, 8))
+fig, ax = plt.subplots(figsize=(13, 7))
 
-# Ukrainian SSR general population baseline
-ax.plot(edu_xs, edu_base, 's-', color='#27AE60', linewidth=2,
-        markersize=7, label='Ukrainian SSR general population\n(Meslé & Vallin 2003; UN WPP 2022)')
+# Background band — educated urban estimate (subtle)
+ax.fill_between(edu_xs, edu_lo, edu_hi, alpha=0.15, color='#2980B9', zorder=1)
+ax.plot(edu_xs, edu_mid, '--', color='#2980B9', linewidth=1.5, alpha=0.6, zorder=2,
+        label=f'Est. educated urban Ukrainian LE  (+{EDU_PREMIUM_LOW}–{EDU_PREMIUM_HIGH} yr premium;\nShkolnikov et al. 1998)')
 
-# Educated urban band
-ax.fill_between(edu_xs, edu_lo, edu_hi, alpha=0.18, color='#2980B9',
-                label=f'Estimated educated urban Ukrainian LE\n(SSR avg +{EDU_PREMIUM_LOW}–{EDU_PREMIUM_HIGH} yrs educational premium;\nShkolnikov et al. 1998)')
-ax.plot(edu_xs, [(lo + hi) / 2 for lo, hi in zip(edu_lo, edu_hi)],
-        'D--', color='#2980B9', linewidth=1.5, markersize=5, alpha=0.7)
+# SSR baseline (thin grey)
+ax.plot(edu_xs, edu_base, 's:', color='#27AE60', linewidth=1.4, markersize=5,
+        alpha=0.65, zorder=2, label='Ukrainian SSR general population')
 
-# Our creative worker groups — mean age at death per DEATH decade.
-# Directly comparable to the SSR LE reference lines and educated urban band.
-# Min 5 deaths per decade required to show a point.
-DEATH_DECADES_22 = list(range(1920, 1995, 10))
-
+# Our groups — 4 series, clean markers, bold lines
+GRP_MARKERS22 = {'migrated': 'o', 'non_migrated': 's',
+                 'internal_transfer': '^', 'deported': 'D'}
 for ms in ALL_GROUPS:
-    xs_dec, ys_dec, ns_dec = [], [], []
-    for dec in DEATH_DECADES_22:
+    xs_d, ys_d = [], []
+    for dec in DEATH_DECADES:
         v = [r['_le'] for r in groups[ms]
              if r['_dy'] and dec <= r['_dy'] < dec + 10 and r['_le'] is not None]
         if len(v) >= MIN_N:
-            xs_dec.append(dec + 5)
-            ys_dec.append(statistics.mean(v))
-            ns_dec.append(len(v))
-
-    if not xs_dec:
+            xs_d.append(dec + 5)
+            ys_d.append(statistics.mean(v))
+    if not xs_d:
         continue
+    short = GROUP_LABELS[ms].split('(')[0].strip()
+    ax.plot(xs_d, ys_d, marker=GRP_MARKERS22[ms], linestyle='-', linewidth=2.2,
+            color=COLOUR[ms], markersize=8, zorder=10, label=short)
+    # Label end of line only
+    ax.annotate(f"{ys_d[-1]:.0f}", xy=(xs_d[-1], ys_d[-1]),
+                xytext=(5, 0), textcoords='offset points',
+                fontsize=8.5, color=COLOUR[ms], fontweight='bold', va='center')
 
-    marker = {'migrated': 'o', 'non_migrated': 's',
-              'internal_transfer': '^', 'deported': 'D'}.get(ms, 'o')
-    ax.plot(xs_dec, ys_dec, marker=marker, linestyle='-',
-            color=COLOUR[ms], markersize=7, linewidth=1.8, alpha=0.9, zorder=10,
-            label=f"Our data — {GROUP_LABELS[ms]} (per birth decade)")
-    sizes = [max(30, min(200, n * 3)) for n in ns_dec]
-    ax.scatter(xs_dec, ys_dec, s=sizes, color=COLOUR[ms], alpha=0.4, zorder=11)
+# Shade Terror period
+ax.axvspan(1930, 1939, alpha=0.06, color='#8B0000', zorder=0)
+ax.text(1934.5, 30, 'Great Terror\n& Holodomor', ha='center', fontsize=8,
+        color='#8B0000', style='italic')
 
-ax.set_xlim(1838, 1995)
-ax.set_ylim(28, 88)
-apply_style(ax,
-    'Figure 22 — Creative Workers vs Estimated Educated Urban Population\n'
-    '(dots = mean age at death per death decade; band = educated urban LE estimate)',
-    xlabel='Decade of Death', ylabel='Life Expectancy / Mean Age at Death (years)')
+ax.set_xlim(1918, 1996)
+ax.set_ylim(26, 86)
+apply_style(ax, 'Figure 22 — Creative Workers Mean Age at Death vs Educated Urban Ukrainian Population',
+            xlabel='Decade of Death', ylabel='Life Expectancy / Mean Age at Death (years)')
+ax.legend(fontsize=9, loc='upper left', framealpha=0.95, edgecolor='#cccccc')
 
-ax.legend(fontsize=8, loc='upper left', framealpha=0.95, edgecolor='#cccccc')
-
-# Key insight annotations — placed in chart space, not tied to single points
-ax.text(0.97, 0.72,
-    'Migrated group tracks inside\neducated urban LE estimate band\n→ consistent with natural lifespan\n   if not repressed',
-    transform=ax.transAxes, ha='right', va='top', fontsize=8.5,
-    color=COLOUR['migrated'],
-    bbox=dict(boxstyle='round,pad=0.4', facecolor='white', alpha=0.85,
-              edgecolor=COLOUR['migrated'], linewidth=1))
-
-ax.text(0.97, 0.25,
-    'Deported group falls far below\nall reference lines — 27 yrs\nbelow migrated peers. Cannot\nbe explained by class alone:\nthis is documented state violence.',
-    transform=ax.transAxes, ha='right', va='bottom', fontsize=8.5,
-    color=COLOUR['deported'],
-    bbox=dict(boxstyle='round,pad=0.4', facecolor='white', alpha=0.85,
-              edgecolor=COLOUR['deported'], linewidth=1))
-
-fig.text(0.5, 0.005,
-    "Educational premium estimate based on: Shkolnikov V.M. et al. (1998) "
-    "Eur J Public Health 8(2). Educational gradient of ~3 yrs at age 20 in 1979–80 Russia; "
-    "assumed similar magnitude for Ukrainian educated class. Band represents uncertainty range.",
-    ha='center', fontsize=6.2, color='grey', style='italic')
-plt.tight_layout(rect=[0, 0.06, 1, 1])
+fig.text(0.5, 0.01,
+    "Shkolnikov V.M. et al. (1998) Eur J Public Health 8(2); Meslé & Vallin 2003; UN WPP 2022. "
+    "Creative worker dots = mean age at death for people dying in that decade. n≥5 per point.",
+    ha='center', fontsize=7, color='grey', style='italic')
+plt.tight_layout(rect=[0, 0.05, 1, 1])
 save(fig, 'fig22_educated_urban_comparison.png')
 
 
