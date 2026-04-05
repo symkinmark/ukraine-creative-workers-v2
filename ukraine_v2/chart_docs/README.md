@@ -1,5 +1,7 @@
 # Chart Documentation Index
-**Ukrainian Creative Workers V2.1 — Berdnyk & Symkin 2026**
+**Ukrainian Creative Workers V2.2 — Berdnyk & Symkin 2026**
+
+> ⚠️ **V2.2 DATA** — Charts regenerated 2026-04-05 from `esu_creative_workers_v2_2.csv` (n=8,830 analysable). Individual .md files may still reference V2.1 numbers in their "key finding" sections — treat those as approximate until each is updated. V2.2 headline: migrated:1,305 / non_migrated:6,157 / internal:1,179 / deported:189. LE gap: +4.03 yrs, Cohen's d = 0.288.
 
 One file per figure. Each explains: what the chart shows, the key finding, what to look for, and any known issues.
 
@@ -18,7 +20,7 @@ One file per figure. Each explains: what the chart shows, the key finding, what 
 | [fig03](fig03_version_comparison.md) | V1 vs V2.1 Version Comparison | Gap narrowed from +9.0→+5.4 yrs as dataset grew 15x |
 | [fig13](fig13_birth_year_distribution.md) | Birth Year Distribution | Confound check — groups are generation-matched |
 | [fig14](fig14_sensitivity_analysis.md) | Sensitivity Analysis | Finding holds until AI error rate >8% (ours is 3.2%) |
-| [fig16](fig16_consort_flowchart.md) | CONSORT Flowchart | How 16,213 entries → 6,106 analysable |
+| [fig16](fig16_consort_flowchart.md) | CONSORT Flowchart | How 16,215 entries → 8,830 analysable (V2.2 updated) |
 
 ## Distribution & Shape
 | File | Chart | What it is |
@@ -59,6 +61,14 @@ One file per figure. Each explains: what the chart shows, the key finding, what 
 
 ## Known Bugs to Fix Before Publication
 1. **fig04, fig06, fig15** — Y-axis extends below 0 (physically impossible). Fix: `ax.set_ylim(bottom=0)`
-2. **fig02** — "V1 avg (63)" annotation is outdated. V2.1 avg is ~66.0.
+2. **fig02** — "V1 avg (63)" annotation is outdated. V2.2 non_migrated avg is ~65.x — update after death_cause pipeline completes.
 3. **fig11** — No numeric labels on bars.
 4. **fig17** — Raw counts mislead due to group size difference. Should be % within group.
+5. **fig03** — Version comparison uses V2.1 gap (+5.4 yrs). V2.2 gap is +4.03 yrs — update description text.
+6. **All fig .md files** — "Key finding" sections reference V2.1 numbers. Update each before submission.
+
+## V2.2 Status (2026-04-05)
+- Charts regenerated from V2.2 data ✅
+- fig16 CONSORT numbers updated ✅
+- repressed_names_for_review.csv regenerated (190 entries) ✅
+- Death cause pipeline still running (~2,451 entries queued) — **regenerate charts one more time when done**

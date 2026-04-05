@@ -7,7 +7,7 @@
 **Data source:** Encyclopedia of Modern Ukraine (esu.com.ua)
 **This document version:** 1.1 — revised 2026-04-03 following Phase 5 human accuracy check
 
-> **⚠ RERUN IN PROGRESS:** Phase 5 human review (63 entries, 9.5% error rate) identified three systematic classification errors requiring a pipeline rerun. Corrections are documented in full in Section 3.3 (Inclusion/Exclusion), Section 3.6 (Migration Classification), and the Phase 5 section of AI_METHODOLOGY_LOG.md. All dataset counts in Section 2.4 are provisional pending rerun.
+> **⚠ OUTDATED — V2.1 DATA.** This document references V2.1 dataset counts (n=6,106). V2.2 corrected a critical ESU scraper regex bug — see `fix_dates_v2.py` and AI_METHODOLOGY_LOG.md (Phase 4i). V2.2 final: **n=8,830 analysable**. All counts in Section 2 must be updated. Methodology sections remain valid; only the numbers changed.
 
 ---
 

@@ -4,7 +4,7 @@ add_gender.py — Gender Classification Pass
 Ukrainian Creative Workers V2.1
 Berdnyk & Symkin 2026
 
-Adds a `gender` column to esu_creative_workers_v2_1.csv.
+Adds a `gender` column to esu_creative_workers_v2_2.csv.
 
 Strategy (fastest + cheapest):
   1. Rule-based: Ukrainian/Slavic first-name endings are strongly gendered.
@@ -14,7 +14,7 @@ Strategy (fastest + cheapest):
   2. Claude Haiku for anything the rule engine marks unknown (~5-10% of entries).
      Context: full name + notes field fed to Haiku with a tight prompt.
 
-Output: rewrites esu_creative_workers_v2_1.csv in-place,
+Output: rewrites esu_creative_workers_v2_2.csv in-place,
         adds column `gender` (male / female / unknown) after `migration_reasoning`.
 
 Cost estimate: ~5,000–7,000 Haiku calls at most → < $0.30
@@ -35,7 +35,7 @@ import anthropic
 # ---------------------------------------------------------------------------
 # PATHS
 # ---------------------------------------------------------------------------
-CSV_PATH = os.path.join(os.path.dirname(__file__), 'esu_creative_workers_v2_1.csv')
+CSV_PATH = os.path.join(os.path.dirname(__file__), 'esu_creative_workers_v2_2.csv')
 MODEL    = 'claude-haiku-4-5-20251001'
 DELAY    = 0.25   # seconds between Claude calls
 

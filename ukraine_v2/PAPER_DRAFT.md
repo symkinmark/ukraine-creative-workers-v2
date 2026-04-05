@@ -2,7 +2,8 @@
 
 **Authors:** Elza Berdnyk, Mark Symkin
 
-> **⚠ DRAFT IN REVISION — 2026-04-03:** Phase 5 human accuracy check (9.5% error rate, 63 entries reviewed) identified three systematic classification errors. The methodology has been corrected and a classification rerun is pending. Sections marked ⚠ contain outdated figures that will be updated after rerun. Key corrections: (1) pre-1921 deaths excluded, (2) Galician workers filtered to post-1939 only, (3) migration reclassified into four groups: `migrated`, `non_migrated`, `internal_transfer`, `deported`. All results in Section 4 are provisional.
+> **⚠ OUTDATED — V2.1 DATA. DO NOT CITE THESE NUMBERS.**
+> This draft was written against the V2.1 dataset (n=6,106 analysable). V2.2 corrected a critical ESU scraper regex bug that was silently dropping 8,971 entries (including most Executed Renaissance victims). V2.2 dataset: **n=8,830 analysable** (migrated:1,305 / non_migrated:6,157 / internal:1,179 / deported:189). LE gap: ~+4.03 yrs. All Section 4 numbers must be rewritten against V2.2 results. Charts have been regenerated — see `charts/`. Updated 2026-04-05.
 
 ---
 

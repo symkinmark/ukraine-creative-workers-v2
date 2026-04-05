@@ -2,21 +2,25 @@
 
 **File:** `charts/fig16_consort_flowchart.png`
 
+> ⚠️ **UPDATED FOR V2.2** — Numbers below reflect the corrected V2.2 dataset after fix_dates_v2.py recovered 8,971 previously-missing death years. Old V2.1 numbers were: 6,106 analysable (migrated:927 / non_migrated:4,625 / internal:479 / deported:75).
+
 ## What this chart shows
 A flowchart showing how the dataset was built — how many entries were in the raw ESU scrape, how many were excluded at each step, and why. This is a standard requirement in medical/social science research (based on the CONSORT reporting standard for clinical trials).
 
-The steps:
-1. ESU.com.ua scraped: **16,213** entries
-2. Filtered to creative profession keywords: **16,215** (kept all)
-3. Excluded pre-Soviet deaths (died <1921): −649; Galicia pre-1939: −89
-4. Excluded confirmed non-Ukrainian: −0
-5. Excluded still-alive or unknown status: −9,971 alive, −115 unknown
-6. Excluded missing birth or death year: −283
-7. **Final analysable dataset: 6,106**
-   - Migrated: 927 | Non-migrated: 4,625 | Internal transfer: 479 | Deported: 75
+The steps (V2.2):
+1. ESU.com.ua scraped: **16,215** entries
+2. Excluded pre-Soviet deaths (died <1921): −371; Galicia pre-1939: −89
+3. Excluded confirmed non-Ukrainian: −5
+4. Excluded still-alive or unknown status: −6,680 alive, −197 unknown
+5. Excluded bad/impossible dates: −43
+6. **Final analysable dataset: 8,830** (+45% vs V2.1)
+   - Migrated: 1,305 | Non-migrated: 6,157 | Internal transfer: 1,179 | Deported: 189
 
 ## Key finding
-Of 16,213 scraped entries, **6,106 (37.7%)** are analytically usable. The main exclusion reason is "still alive or unknown status" — most of the encyclopedia covers living people or people whose death date isn't recorded.
+Of 16,215 scraped entries, **8,830 (54.5%)** are analytically usable — up from 37.7% in V2.1 due to date recovery from corrupted ESU bio-header parsing. The main exclusion reason is "still alive or unknown status".
+
+## Why the dataset grew
+V2.1 had a regex bug in the ESU scraper that caused 8,971 entries with Inner parens (`14(26). 04. 1890`) or pseudonym prefixes (`справж. – Name; 1887 – 1937`) to silently fail date extraction. fix_dates_v2.py recovered dates via bio-header analysis, recovering famous Executed Renaissance victims (Курбас, Зеров, Підмогильний, Бабель, Вороний) among many others.
 
 ## What to look for
 - Each exclusion step is justified with a specific criterion

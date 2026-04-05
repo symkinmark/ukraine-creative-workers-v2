@@ -590,3 +590,103 @@ We acknowledge this in the paper's limitations section and recommend that future
 ---
 
 *This document is updated throughout the research process. Final version to be attached as Appendix to V2 paper.*
+
+---
+
+## Phase V2.2 — Critical Data Correction (2026-04-05)
+
+### What triggered this phase
+
+During manual review of the repressed names list, it was noticed that famous Executed Renaissance figures — Лесь Курбас, Микола Зеров, Валер'ян Підмогильний, Іван Бабель, Георгій Вороний, Валер'ян Поліщук — were absent from the analysable dataset despite being clearly dead and documented in the ESU.
+
+### Root cause identified
+
+The ESU scraper uses `\(([^)]{5,200})\)` to extract the biographical parenthetical containing birth–death dates. This regex fails in two distinct cases:
+
+1. **Nested parentheses**: Old Style/New Style dual dates like `14(26). 04. 1890` contain an inner `)` that terminates the regex prematurely. Result: entire bio-header fails, no dates extracted.
+
+2. **Pseudonym prefixes**: Entries like `(справж. – Real Name; 1887 – 1937)` split on the pseudonym em-dash, giving `birth_part = "(справж."` and `birth_year = None`.
+
+**Impact**: 8,971 entries had empty death_year fields despite the date being present in the `notes` text. This included the majority of Executed Renaissance (Розстріляне Відродження) victims, whose ESU entries used Old Style dates.
+
+### Fix implemented
+
+**Script**: `ukraine_v2/fix_dates_v2.py`
+
+**Algorithm change**: Instead of bracket-matching, the fix extracts the bio-header by finding `) –` (closing paren + em-dash) which introduces the profession description. This approach is immune to nested parentheses.
+
+```python
+def extract_bio_header(notes: str) -> str:
+    m = re.search(r'\)\s*[–—]\s', notes)
+    if m:
+        return notes[:m.start() + 1]
+    return notes[:500]
+```
+
+Pseudonym prefixes stripped before em-dash split:
+```python
+def clean_pseudonym_prefix(text: str) -> str:
+    text = re.sub(r'\((?:справж(?:нє)?\.?|псевд\.?:?)[^;]{0,120};\s*', '(', text)
+    return text
+```
+
+### V2.2 results
+
+| Metric | V2.1 | V2.2 | Change |
+|--------|------|------|--------|
+| Analysable entries | 6,106 | 8,606 | +41% |
+| Migrated | 927 | 1,273 | +37% |
+| Non-migrated | 4,625 | 6,000 | +30% |
+| Internal transfer | 479 | 1,155 | +141% |
+| Deported | 75 | 178 | +137% |
+| LE gap (migrated vs non-migrated) | +4.8 yrs | +4.03 yrs | Narrowed |
+| Cohen's d | ~0.34 | 0.288 | More conservative |
+| p-value | <0.001 | <0.001 | Unchanged |
+
+The finding direction held. The gap narrowed slightly (4.8 → 4.03 yrs) as the larger sample included more edge cases. The deported group nearly doubled in size, making the deportation mortality finding significantly more robust.
+
+### Specific figures recovered
+
+- **Лесь Курбас** (1887–1937): theatre director, executed at Sandarmokh. Previously stored with death=1887 (swap bug). Corrected.
+- **Микола Зеров** (1890–1937): poet, executed at Sandarmokh.
+- **Валер'ян Підмогильний** (1901–1937): novelist, executed.
+- **Іван Бабель** (1894–1940): writer, executed by NKVD.
+- **Георгій Вороний** (1868–1908): mathematician — legitimately pre-Soviet, correctly excluded.
+- **Валер'ян Поліщук** (1897–1937): poet, executed.
+
+### Death cause pipeline (V2.2)
+
+Re-ran `add_death_cause.py` on the 2,412 newly recovered entries. Complete as of 2026-04-05.
+
+**Final death cause distribution (V2.2)**:
+
+| Cause | Deported | Non-migrated | Internal | Migrated |
+|-------|----------|-------------|---------|---------|
+| executed | 42 | 25 | 4 | 1 |
+| exile | 49 | 4 | 26 | 20 |
+| gulag | 26 | 2 | 5 | 0 |
+| repression_other | 49 | 41 | 20 | 0 |
+| wwii_combat | 1 | 27 | 6 | 3 |
+| wwii_occupation | 4 | 20 | 4 | 7 |
+| natural | 13 | 5,925 | 1,100 | 1,248 |
+| unknown | 5 | 108 | 12 | 25 |
+| suicide | 0 | 1 | 0 | 0 |
+
+**Deported group**: 90.5% died from repression-related causes (executed/exile/gulag/repression_other/wwii_occupation).
+
+### Files created/modified
+
+| File | Action |
+|------|--------|
+| `fix_dates_v2.py` | Created — date recovery engine |
+| `esu_creative_workers_v2_2.csv` | Created — corrected dataset |
+| `esu_creative_workers_v2_1.csv` | Archived to `archive/v2_1/` |
+| `charts/*.png` | Regenerated from V2.2 data (24 charts) |
+| `repressed_names_for_review.csv` | Regenerated from V2.2 (190 entries, was 177) |
+| `PAPER_DRAFT.md` | Stale warning header added |
+| `SCIENTIFIC_METHODOLOGY.md` | Stale warning header added |
+| `chart_docs/fig16_consort_flowchart.md` | Updated with V2.2 CONSORT numbers |
+| `chart_docs/README.md` | Updated with V2.2 headline numbers |
+| `analysis_v2_1.txt` | Archived; `analysis_v2_2.txt` is current |
+
+*This log phase completed: 2026-04-05*

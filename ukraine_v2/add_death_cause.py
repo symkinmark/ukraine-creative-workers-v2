@@ -4,7 +4,7 @@ add_death_cause.py — Death Cause Classification Pipeline
 Ukrainian Creative Workers V2.1
 Berdnyk & Symkin 2026
 
-Adds a `death_cause` column to esu_creative_workers_v2_1.csv by asking
+Adds a `death_cause` column to esu_creative_workers_v2_2.csv by asking
 Claude Haiku to classify the cause of death for each entry from the
 biography text available in the `notes` field. If notes are too short
 (< 150 chars), the full ESU article is fetched live.
@@ -66,7 +66,7 @@ load_dotenv(_env_path)
 # ---------------------------------------------------------------------------
 # CONFIG
 # ---------------------------------------------------------------------------
-CSV_PATH = os.path.join(os.path.dirname(__file__), 'esu_creative_workers_v2_1.csv')
+CSV_PATH = os.path.join(os.path.dirname(__file__), 'esu_creative_workers_v2_2.csv')
 MODEL    = 'claude-haiku-4-5-20251001'
 DELAY    = 0.30   # seconds between Claude calls
 FETCH_DELAY = 0.50  # seconds between ESU fetches
