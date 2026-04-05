@@ -7,7 +7,7 @@ External validation chart. Plots our four migration groups' mean age at death by
 
 X-axis is death decade (1920s-1980s), clipped at 1990 (Soviet dissolution boundary). Y-axis is mean age at death / life expectancy (years).
 
-## Key finding
+## Key finding (V2.3 — n: migrated 1,280 / non-migrated 6,030 / deported 183)
 - **Migrated group** tracks close to or above Baltic SSR LE — the best-performing Soviet republics. By the 1980s, migrants were dying at age 77, above the Baltic general population.
 - **Non-migrated group** tracks close to Ukrainian SSR general population LE — which is expected and validates the dataset.
 - **Deported group** falls below Central Asian SSR LE in early decades (the worst-performing region in the Soviet Union). Their mortality is that severe.

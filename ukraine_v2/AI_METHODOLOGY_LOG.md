@@ -690,3 +690,134 @@ Re-ran `add_death_cause.py` on the 2,412 newly recovered entries. Complete as of
 | `analysis_v2_1.txt` | Archived; `analysis_v2_2.txt` is current |
 
 *This log phase completed: 2026-04-05*
+
+---
+
+## Phase V2.3 — Data Corrections, Source Audit, and Unknown Reclassification (2026-04-05)
+
+### Overview
+
+V2.3 applies targeted corrections to the V2.2 dataset. The primary dataset file changes from `esu_creative_workers_v2_2.csv` (unchanged, preserved as reference) to `esu_creative_workers_v2_3.csv` (corrected). Three individual records were manually corrected on the basis of verified historical evidence. Nineteen entries with impossible ages were excluded. A total of 196 unknown-status entries were re-submitted to Claude for reclassification, of which 77 were successfully resolved.
+
+Additionally, a systematic audit of the ESU source database was conducted to investigate the absence of several prominent Ukrainian cultural figures from the dataset.
+
+---
+
+### A — Individual Record Corrections (3 entries)
+
+These corrections are based on established historical record and correct misclassifications introduced during the original AI classification pass.
+
+| Name | Field | V2.2 value | V2.3 value | Evidence |
+|------|-------|------------|------------|----------|
+| Куліш Микола Гурович (1892–1937) | `death_cause` | `gulag` | `executed` | Shot at Sandarmokh 03.11.1937 — confirmed mass execution site of the Stalinist Great Terror; not a gulag death |
+| Квітко Лев (1890–1952) | `migration_status` | `unknown` | `non_migrated` | Never left the USSR; spent his career in Kharkiv and Moscow |
+| Квітко Лев (1890–1952) | `death_cause` | *(blank)* | `executed` | Executed 12.08.1952 as part of the Night of the Murdered Poets (ніч страчених поетів) — the mass execution of Jewish Soviet writers ordered by Stalin |
+| Маркіш Перец Давидович (1895–1952) | `death_cause` | `gulag` | `executed` | Executed 12.08.1952 in the same Night of the Murdered Poets event; was not a gulag death |
+
+**Night of the Murdered Poets context:** On 12 August 1952, thirteen prominent Jewish Soviet cultural figures (writers, poets, artists) were executed by firing squad following a closed trial by the MGB. This was the culmination of Stalin's anti-cosmopolitan campaign and the suppression of Yiddish culture in the USSR. Both Квітко and Маркіш were among the thirteen victims. Classifying these deaths as `gulag` was factually incorrect; they were judicial executions by the state.
+
+---
+
+### B — Impossible-Age Exclusions (19 entries)
+
+A data quality audit identified 19 entries in the analysable set (migration_status: migrated / non_migrated / internal_transfer / deported) with `age_at_death` between 0 and 9 years. These are clearly data errors — either name collisions (an ESU entry for a person with the same name as a historical figure, recording a different person's dates), or malformed date fields where birth and death year refer to an artwork's date range rather than a lifespan.
+
+These 19 entries were reclassified to `excluded_bad_dates`. A person aged 0–9 cannot be a practising creative worker in any meaningful sense, and their inclusion would artificially depress group mean life expectancy.
+
+Impact on dataset: removes 19 entries from the analysable pool. Net effect on mean LE is negligible given group sizes.
+
+---
+
+### C — Unknown-Status Reclassification (196 → 77 resolved)
+
+At the end of V2.2, 196 entries had `migration_status = unknown` and a recorded death year, meaning they were in principle classifiable but were left unresolved by the original Claude review pass (typically due to API errors or genuinely ambiguous biographies).
+
+**Method:**
+- Script: `reclassify_unknowns.py`
+- For each entry: fetched full ESU article bio (HTTP GET to `article_url`), submitted to Claude Haiku-4.5 for first-pass classification using the same four-category MIGRATION_SYSTEM prompt used in Phase 4
+- If Haiku returned `unknown`, re-submitted to Claude Sonnet-4.6 with the deeper MIGRATION_DEEP_SYSTEM prompt (geography clues, diaspora signal detection)
+- Saved incrementally every 10 entries
+
+**Results:**
+- 77 entries successfully classified (39.3% resolution rate)
+- 119 entries remain `unknown` (excluded from analysable set)
+- The 119 remaining unknowns are genuinely unresolvable: entries with no geographic data, Belarusian/Lithuanian/other non-Ukrainian figures referenced by the ESU with no meaningful Ukrainian biography, or persons with only a name and approximate date range
+
+**API cost:** approximately $0.20 (196 entries × Haiku first pass + ~50 Sonnet retries)
+
+---
+
+### D — ESU Source Gap Investigation
+
+**Background:** Several prominent Ukrainian creative workers known from other historical sources were found to be absent from the V2.2 dataset. These include:
+
+- Тичина Павло (1891–1967) — canonical Ukrainian Soviet poet
+- Рильський Максим (1895–1964) — poet
+- Стус Василь (1938–1985) — dissident poet, died in Perm-36 gulag
+- Хвильовий Микола (1893–1933) — Executed Renaissance novelist, suicide
+- Симоненко Василь (1935–1963) — Sixtiers poet
+
+**Investigation method:** A diagnostic script (`diagnose_scraper.py`) was written and executed. The script fetched every page of the ESU letter-index listings for the relevant alphabet letters (Р: 29 pages, С: 69 pages, Т: 30 pages, Х: 12 pages, Ч: 17 pages) and searched exhaustively for each name. The scraper's pagination logic was also tested against confirmed working letters (К: 479 pages, М: 288 pages) to verify the mechanism was functioning correctly.
+
+**Findings:**
+
+| Figure | Result |
+|--------|--------|
+| Тичина Павло | **Absent from ESU** — 0 matches across all 30 pages of letter Т |
+| Рильський Максим | **Absent from ESU** — 0 matches across all 29 pages of letter Р |
+| Стус Василь | **Absent from ESU** — 0 matches across all 69 pages of letter С |
+| Хвильовий Микола | **Absent from ESU** — 0 matches across all 12 pages of letter Х |
+| Симоненко Василь | **Absent from ESU** — 0 matches across all 69 pages of letter С |
+| Семенко Михайль | **Absent from ESU** — only unrelated "Семенков" found |
+| Чорновіл В'ячеслав | **Present in ESU** (article-890626, letter Ч page 13) but described as "політичний діяч" (political figure) — correctly excluded by our profession keyword filter |
+
+**Conclusion:** The ESU (esu.com.ua) is an ongoing encyclopedic project. As of the 2026 access date, articles for these prominent figures have not yet been published in the digital encyclopedia. This is a source-level gap, not a scraper failure. The pagination mechanism was verified as functioning correctly; no entries were lost to scraper bugs.
+
+The absence of these figures from our dataset does not constitute a methodological error. It is a known limitation of using a single living encyclopedia as the primary data source. Future iterations of this study should supplement with additional sources once ESU coverage expands, or manually add these figures from verified secondary sources with appropriate provenance notes.
+
+---
+
+### E — New Scripts Created in V2.3
+
+**`diagnose_scraper.py`**
+Read-only diagnostic tool. Fetches ESU letter-index pages and checks: (1) pagination behaviour and total page count per letter, (2) presence or absence of specific named individuals across all pages of a letter, (3) HTML structure of listings to detect potential parser failures. Makes HTTP GET requests only; writes nothing. Used to confirm the ESU source-gap finding above.
+
+**`reclassify_unknowns.py`**
+Reclassification tool for `unknown` migration-status entries. Reads `esu_creative_workers_v2_3.csv`, filters entries with `migration_status == 'unknown'` and a recorded death year, fetches full ESU article bio for each, submits to Claude Haiku then Sonnet (if still unknown), and writes updated classification back to the CSV. Saves incrementally every 10 entries (safe to interrupt and re-run). Also applies Phase 4 manual corrections (A, B, C above) before the reclassification loop.
+
+---
+
+### F — V2.3 Headline Results
+
+| Metric | V2.2 | V2.3 | Change |
+|--------|------|------|--------|
+| Analysable (total) | 8,830 | 8,643 | −187 (impossible ages removed, unknowns not reclassified) |
+| Migrated n | 1,273 | 1,280 | +7 |
+| Non-migrated n | 6,000 | 6,030 | +30 |
+| Internal transfer n | 1,155 | 1,150 | −5 |
+| Deported n | 178 | 183 | +5 |
+| Migrated mean LE | 75.21 yr | 75.25 yr | +0.04 |
+| Non-migrated mean LE | 71.17 yr | 71.22 yr | +0.05 |
+| Deported mean LE | 47.85 yr | 48.35 yr | +0.50 |
+| Gap (migrated vs non-migrated) | +4.03 yr | +4.04 yr | +0.01 |
+| Cohen's d | 0.288 | 0.292 | +0.004 |
+| Conservative two-group gap | +4.66 yr | +4.68 yr | +0.02 |
+| Conservative two-group d | 0.332 | 0.330 | −0.002 |
+
+The headline finding is unchanged: Ukrainian creative workers who emigrated from the Soviet sphere lived significantly longer than those who remained, with a mean gap of **+4.04 years** (Cohen's d=0.292, p<0.001). The deported group shows a catastrophic deficit of **−22.87 years** relative to non-migrants (d=1.656, p<0.001).
+
+---
+
+### G — Files Created/Modified in V2.3
+
+| File | Action |
+|------|--------|
+| `esu_creative_workers_v2_3.csv` | **Created** — corrected primary dataset; v2_2 preserved unchanged |
+| `esu_creative_workers_v2_2.csv` | **Unchanged** — archived reference dataset |
+| `diagnose_scraper.py` | **Created** — ESU source audit script |
+| `reclassify_unknowns.py` | **Created** — unknown reclassification script |
+| `generate_analysis.py` | **Updated** — CSV_PATH and SOURCE_NOTE point to v2_3 |
+| `charts/*.png` | **Regenerated** — all 24 charts from V2.3 data |
+| `analysis_v2_3.txt` | **Created** — full statistical report for V2.3 |
+
+*This log phase completed: 2026-04-05*

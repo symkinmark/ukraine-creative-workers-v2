@@ -7,7 +7,7 @@
 **Data source:** Encyclopedia of Modern Ukraine (esu.com.ua)
 **This document version:** 1.1 — revised 2026-04-03 following Phase 5 human accuracy check
 
-> **⚠ OUTDATED — V2.1 DATA.** This document references V2.1 dataset counts (n=6,106). V2.2 corrected a critical ESU scraper regex bug — see `fix_dates_v2.py` and AI_METHODOLOGY_LOG.md (Phase 4i). V2.2 final: **n=8,830 analysable**. All counts in Section 2 must be updated. Methodology sections remain valid; only the numbers changed.
+> **V2.3 CURRENT.** Primary dataset: `esu_creative_workers_v2_3.csv`. Analysable: **n=8,643**. V2.2 reference dataset archived (unchanged). See AI_METHODOLOGY_LOG.md Phase V2.3 for full correction log.
 
 ---
 
@@ -798,15 +798,16 @@ The birth cohort analysis provides some evidence against a pure selection explan
 
 ## 11. Data Availability
 
-### 11.1 Primary Data File (V2.2)
+### 11.1 Primary Data File (V2.3)
 
-**Filename:** `esu_creative_workers_v2_2.csv`
-**Location:** `/Users/symkinmark_/projects/Ai agent basic/ukraine_v2/esu_creative_workers_v2_2.csv`
+**Filename:** `esu_creative_workers_v2_3.csv`
+**Location:** `/Users/symkinmark_/projects/Ai agent basic/ukraine_v2/esu_creative_workers_v2_3.csv`
 **Format:** CSV, UTF-8 encoded, comma-separated
 **Rows:** 16,215 — one row per individual in the initial dataset
-**Analysable rows:** 8,606 (migration_status in: migrated, non_migrated, internal_transfer, deported, AND valid birth/death years)
+**Analysable rows:** 8,643 (migration_status in: migrated, non_migrated, internal_transfer, deported, AND valid birth/death years with age 10–110)
 
 **Previous versions archived:**
+- V2.2: `esu_creative_workers_v2_2.csv` (8,830 analysable — unchanged reference dataset; 19 impossible-age entries not yet excluded)
 - V2.1: `archive/v2_1/esu_creative_workers_v2_1.csv` (6,106 analysable — contains date parsing errors)
 - Raw scrape: `esu_creative_workers_raw.csv` (no classification, no date recovery)
 
@@ -842,11 +843,11 @@ The birth cohort analysis provides some evidence against a pure selection explan
 **Location:** `/Users/symkinmark_/projects/Ai agent basic/ukraine_v2/esu_creative_workers_raw.csv`
 **Description:** The raw output from the scraper before any nationality or migration classification. Contains all entries that matched the creative profession keywords. This file is the starting point for any replication; all subsequent processing steps are applied to this file programmatically.
 
-### 11.4 Reproducing the Dataset (V2.2 full pipeline)
+### 11.4 Reproducing the Dataset (V2.3 full pipeline)
 
-To reproduce the V2.2 primary analysis dataset from scratch:
+To reproduce the V2.3 primary analysis dataset from scratch:
 
-1. **Scrape ESU:** Run `esu_scraper.py` to re-scrape the ESU. Takes several days at a polite rate. Produces `esu_creative_workers_raw.csv`. Note: a fresh 2026+ scrape may differ from our snapshot due to ESU editorial updates.
+1. **Scrape ESU:** Run `esu_scraper.py` to re-scrape the ESU. Takes several days at a polite rate. Produces `esu_creative_workers_raw.csv`. Note: a fresh 2026+ scrape may differ from our snapshot due to ESU editorial updates. Use `diagnose_scraper.py` to verify that all letter-index pages were scraped correctly (checks pagination counts and presence of known entries).
 
 2. **Classify nationality + migration:** Run `claude_review.py` to perform nationality (Tier 1/2/3) and migration classification using Claude Haiku. Produces intermediate classified CSV.
 
@@ -858,11 +859,13 @@ To reproduce the V2.2 primary analysis dataset from scratch:
 
 6. **Add gender:** Run `add_gender.py` on the V2.2 CSV. Uses rule-based name-ending detection (Ukrainian feminine suffixes) + Claude Haiku fallback for ambiguous cases.
 
-7. **Generate analysis + charts:** Run `generate_analysis.py` to compute all LE statistics, run Mann-Whitney U tests, Cohen's d, and generate all 24 figures.
+7. **Apply V2.3 corrections and reclassify unknowns:** Run `reclassify_unknowns.py` on the V2.2 output. This script: (a) applies three manual corrections (Куліш, Квітко, Маркіш — see AI_METHODOLOGY_LOG.md Phase V2.3-A); (b) reclassifies 19 impossible-age entries to `excluded_bad_dates`; (c) re-submits 196 `unknown` migration_status entries to Claude Haiku/Sonnet for a second classification attempt. Output: `esu_creative_workers_v2_3.csv`.
 
-**Exact reproduction note:** Re-running `claude_review.py` and `add_death_cause.py` will make new API calls to Claude and may produce slightly different classifications (stochastic LLM output). For exact numerical reproduction, use the archived `esu_creative_workers_v2_2.csv` rather than re-running the Claude steps.
+8. **Generate analysis + charts:** Run `generate_analysis.py` (with `CSV_PATH` pointing to `v2_3.csv`) to compute all LE statistics, run Mann-Whitney U tests, Cohen's d, and generate all 24 figures.
 
-**Estimated cost for full re-run from scratch:** ~$3-8 (Claude Haiku at current API pricing, 2026).
+**Exact reproduction note:** Re-running `claude_review.py`, `add_death_cause.py`, and `reclassify_unknowns.py` will make new API calls to Claude and may produce slightly different classifications (stochastic LLM output). For exact numerical reproduction, use the archived `esu_creative_workers_v2_3.csv` directly.
+
+**Estimated cost for full re-run from scratch:** ~$4–10 (Claude Haiku/Sonnet at current API pricing, 2026). V2.3 corrections step alone: ~$0.20.
 
 ---
 
@@ -891,6 +894,8 @@ The following scripts are located in `/Users/symkinmark_/projects/Ai agent basic
 **Dependencies:** `requests`, `beautifulsoup4`, `lxml`, `pandas`
 
 ### 12.1b `fix_dates_v2.py` (V2.2 addition)
+
+
 
 **Purpose:** Recovers birth/death years that were silently dropped by the original ESU scraper regex.
 
@@ -924,6 +929,38 @@ def clean_pseudonym_prefix(text: str) -> str:
 
 **Runtime:** ~30 seconds (pure Python, no API calls for date recovery)
 **Dependencies:** `pandas`, `re` (stdlib)
+
+### 12.1c `diagnose_scraper.py` (V2.3 addition)
+
+**Purpose:** Read-only audit tool to verify ESU scraper coverage. Confirms that all letter-index pages were scraped and identifies specific named individuals as present or absent from the ESU source database.
+
+**What it does:**
+1. Fetches every page of the ESU letter-index listing for specified alphabet letters (e.g. С: 69 pages, Т: 30 pages)
+2. Verifies pagination logic by comparing detected page count against known working letters
+3. Searches page HTML for specified individual names
+4. Reports: pagination count per letter, presence/absence of target individuals, HTML structure of listings
+
+**Key finding from V2.3 run:** Several prominent Ukrainian cultural figures (Тичина Павло, Рильський Максим, Стус Василь, Хвильовий Микола, Симоненко Василь) were confirmed absent from the ESU source database entirely — not a scraper failure. ESU is an ongoing encyclopedia; these articles are not yet published.
+
+**Makes HTTP GET requests only. Writes nothing.**
+**Runtime:** ~10–15 minutes (reads 200+ pages across 8 letters at polite rate)
+
+### 12.1d `reclassify_unknowns.py` (V2.3 addition)
+
+**Purpose:** Re-classify `unknown` migration_status entries from V2.2 using a second Claude pass, and apply manual V2.3 corrections.
+
+**What it does:**
+1. Reads `esu_creative_workers_v2_3.csv`
+2. Applies three manual corrections: Куліш Микола Гурович (`death_cause` gulag→executed), Квітко Лев (status unknown→non_migrated, cause→executed), Маркіш Перец Давидович (`death_cause` gulag→executed)
+3. Flags 19 impossible-age entries (age_at_death 0–9 yrs) as `excluded_bad_dates`
+4. For all 196 entries with `migration_status = 'unknown'` and a recorded death year: fetches full ESU article bio, submits to Claude Haiku-4.5 (first pass), then Claude Sonnet-4.6 (deep retry if still unknown)
+5. Saves incrementally every 10 entries (safe to interrupt and resume)
+
+**Prompts used:** Same four-category `MIGRATION_SYSTEM` and `MIGRATION_DEEP_SYSTEM` prompts as `claude_review.py` (reproduced in this script for self-containedness)
+
+**V2.3 results:** 77 entries newly classified; 119 remain `unknown` (genuinely unresolvable biographies)
+**Runtime:** ~8–12 minutes for 196 entries
+**API cost:** ~$0.20
 
 ### 12.2 `claude_review.py`
 
@@ -1020,64 +1057,72 @@ A sample check of profession category assignments should be performed:
 
 ---
 
-## Appendix A: Summary of Key Numbers for Verification (V2.2)
+## Appendix A: Summary of Key Numbers for Verification (V2.3)
 
 A replicating researcher who has successfully reproduced the dataset and analysis should obtain the following numbers. Significant deviation from these figures indicates an error in the replication.
 
 **Dataset scale:**
-| Metric | V2.1 (superseded) | V2.2 (current) |
-|--------|-------------------|----------------|
-| Total ESU entries | 16,215 | 16,215 |
-| Analysable entries | 6,106 | **8,606** |
-| Migrated | 927 | **1,273** |
-| Non-migrated | 4,625 | **6,000** |
-| Internal transfer | 479 | **1,155** |
-| Deported | 75 | **178** |
-| Excluded (alive/unknown/bad dates) | ~10,109 | **~7,609** |
+| Metric | V2.1 (superseded) | V2.2 (reference) | V2.3 (current) |
+|--------|-------------------|------------------|----------------|
+| Total ESU entries | 16,215 | 16,215 | 16,215 |
+| Analysable entries | 6,106 | 8,830 | **8,643** |
+| Migrated | 927 | 1,273 | **1,280** |
+| Non-migrated | 4,625 | 6,000 | **6,030** |
+| Internal transfer | 479 | 1,155 | **1,150** |
+| Deported | 75 | 178 | **183** |
+| Excluded (alive/unknown/bad dates) | ~10,109 | ~7,385 | **~7,572** |
 
-**Primary life expectancy statistics (V2.2):**
+**Primary life expectancy statistics (V2.3):**
 | Metric | Value |
 |--------|-------|
-| Migrated mean LE | **75.21 yrs** |
+| Migrated mean LE | **75.25 yrs** |
 | Migrated median LE | 77 |
-| Migrated SD | 13.98 |
-| Migrated 95% CI | [74.44, 75.98] |
-| Non-migrated mean LE | **71.17 yrs** |
+| Migrated SD | 13.89 |
+| Migrated 95% CI | [74.49, 76.01] |
+| Non-migrated mean LE | **71.22 yrs** |
 | Non-migrated median LE | 73 |
-| Non-migrated SD | 13.99 |
-| Non-migrated 95% CI | [70.82, 71.53] |
-| Internal transfer mean LE | 70.21 yrs |
-| Deported mean LE | **47.85 yrs** |
+| Non-migrated SD | 13.81 |
+| Non-migrated 95% CI | [70.86, 71.57] |
+| Internal transfer mean LE | 70.70 yrs |
+| Deported mean LE | **48.35 yrs** |
 | Deported median LE | 45 |
-| **LE gap (migrated − non-migrated)** | **+4.03 yrs** |
+| **LE gap (migrated − non-migrated)** | **+4.04 yrs** |
 | Mann-Whitney U p-value | < 0.001 (≈0.0) |
-| **Cohen's d** | **0.288** |
-| Deported vs non-migrated gap | −23.32 yrs |
-| Deported Cohen's d | 1.667 |
+| **Cohen's d** | **0.292** |
+| Deported vs non-migrated gap | −22.87 yrs |
+| Deported Cohen's d | 1.656 |
 
-**Two-group conservative framing:**
+**Two-group conservative framing (V2.3):**
 | Metric | Value |
 |--------|-------|
-| Migrated n | 1,272 |
-| Stayed (all others) n | 7,317 |
-| Gap | +4.66 yrs |
-| Cohen's d | 0.332 |
+| Migrated n | 1,280 |
+| Stayed (all others) n | 7,362 |
+| Gap | +4.68 yrs |
+| Cohen's d | 0.330 |
 
-**Repression data:**
+**Repression data (V2.3):**
 | Metric | Value |
 |--------|-------|
-| 1937 deported deaths | **65 (36.5% of deported group)** |
+| 1937 deported deaths | **65 (35.5% of deported group, n=183)** |
 | 1937 non-migrated deaths | 24 |
 | 1937 combined creative deaths | **89** |
-| Mean age at death, 1937 combined | ~43.8 yrs |
-| Deported with repression-cause death | 90.5% |
+| Mean age at death, 1937 deported | 42.4 yrs |
+| Deported with repression-cause death | ~90% |
 
-**Date recovery (V2.2 fix):**
+**Date recovery (V2.2 fix — unchanged in V2.3):**
 | Metric | Value |
 |--------|-------|
 | Entries with recovered dates | 8,971 |
 | Entries re-classified after date recovery | ~2,000 |
 | Script | `fix_dates_v2.py` |
+
+**V2.3 corrections applied:**
+| Metric | Value |
+|--------|-------|
+| Manual individual corrections | 3 (Куліш, Квітко, Маркіш) |
+| Impossible-age entries excluded | 19 |
+| Unknown entries re-classified | 77 of 196 |
+| Scripts | `reclassify_unknowns.py`, `diagnose_scraper.py` |
 
 ---
 

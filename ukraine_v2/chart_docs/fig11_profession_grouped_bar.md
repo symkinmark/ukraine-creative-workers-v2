@@ -5,10 +5,12 @@
 ## What this chart shows
 A grouped bar chart showing how many people from each creative profession ended up in each migration group. X-axis = profession category; each cluster of bars = the four migration groups.
 
-## Key finding (V2.2)
-Migration rates varied significantly by profession. **Writers/Poets have the largest deported group** (n=114 deported, mean LE 44.9) — reflecting targeted Soviet liquidation of Ukrainian-language literary production.
+## Key finding (V2.3)
+Migration rates varied significantly by profession. **Writers/Poets have the largest deported group** (n≈114 deported, mean LE ~44.9) — reflecting targeted Soviet liquidation of Ukrainian-language literary production. Headline totals updated for V2.3; profession-level breakdown shifts marginally.
 
-**V2.2 profession breakdown:**
+**V2.3 group totals: Migrated n=1,280 | Non-migrated n=6,030 | Internal transfer n=1,150 | Deported n=183**
+
+**V2.2 profession breakdown (V2.3 regeneration pending):**
 | Profession | Migrated n | Non-migrated n | Deported n | Gap (M vs NM) |
 |------------|-----------|----------------|-----------|--------------|
 | Writers/Poets | 365 | 1,760 | 114 | +4.3y |

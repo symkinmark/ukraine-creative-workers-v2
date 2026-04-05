@@ -7,10 +7,10 @@ Same layout as fig21, but instead of Soviet republic comparisons, this overlays 
 
 The shaded band represents the range: Ukrainian SSR LE + 3 yrs (lower bound) to + 5 yrs (upper bound).
 
-## Key finding
+## Key finding (V2.3 — migrated n=1,280, LE 75.25 yrs; non-migrated n=6,030, LE 71.22 yrs)
 - The **migrated group** approaches the upper edge of the educated urban LE band by the 1980s (age 77 vs estimated ceiling ~75-78)
 - The **non-migrated group** sits inside or slightly below the band — meaning they did not fully capture the educated-class survival premium, likely due to Soviet conditions suppressing it
-- The **deported group** is far below the educated-urban baseline in every period
+- The **deported group** is far below the educated-urban baseline in every period (mean LE 48.35 yrs)
 
 ## What to look for
 - The shaded band is not hard data — it's a constructed estimate. The footnote makes this clear.

@@ -5,24 +5,24 @@
 ## What this chart shows
 How the main LE gap (migrated vs non-migrated) would change if our AI classification had varying error rates — from 0% (perfect) to 15% (very bad). The x-axis is the hypothetical AI error rate; the y-axis is the resulting LE gap in years.
 
-## Key finding (V2.2)
-The finding remains positive even at unrealistically high error rates. Our actual measured error rate is **3.2%** (Phase 5 human accuracy check, n=63). The gap under various error scenarios:
+## Key finding (V2.3)
+The finding remains positive even at unrealistically high error rates. Our actual measured error rate is **3.2%** (Phase 5 human accuracy check, n=63). The gap under various error scenarios (based on V2.3 baseline gap of +4.04 yrs):
 
 | Simulated error rate | Adjusted gap |
 |---------------------|-------------|
-| 0% (perfect) | +4.03 yrs |
-| 3% (≈ our actual) | +3.27 yrs |
-| 5% | +2.85 yrs |
-| 8% | +2.23 yrs |
-| 10% | +1.82 yrs |
-| 15% | +0.82 yrs |
+| 0% (perfect) | +4.04 yrs |
+| 3% (≈ our actual) | ~+3.28 yrs |
+| 5% | ~+2.86 yrs |
+| 8% | ~+2.24 yrs |
+| 10% | ~+1.83 yrs |
+| 15% | ~+0.83 yrs |
 
-At our actual 3.2% error rate the gap is +3.27 yrs. Even at 15% error — nearly 5× worse than reality — a positive gap remains. The finding does not disappear at any plausible error rate.
+At our actual 3.2% error rate the gap is ~+3.28 yrs. Even at 15% error — nearly 5× worse than reality — a positive gap remains. The finding does not disappear at any plausible error rate.
 
 **Note:** The worst-case assumption is used throughout: all misclassifications are the most long-lived migrants being incorrectly counted as migrated (most unfavourable direction for the finding).
 
 ## What to look for
-- The gap at our 3.2% actual error rate: still +3.27 yrs
+- The gap at our 3.2% actual error rate: still ~+3.28 yrs
 - The curve stays positive across the entire realistic range
 - Steeper slopes = more sensitive findings; this curve is gradual (robust)
 

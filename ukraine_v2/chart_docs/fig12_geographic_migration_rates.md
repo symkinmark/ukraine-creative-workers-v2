@@ -6,7 +6,7 @@
 Where the migrants went — destination countries or regions for the 1,273 people in the migrated group (V2.2). Either a bar chart of destination frequencies or a map-style visualisation.
 
 ## Key finding
-The diaspora concentrated in Western Europe and North America — primarily Germany, USA, France, UK, and Canada. This matches the historical record of the post-WWII Ukrainian diaspora (DPs — displaced persons — who settled in Western occupation zones and were resettled abroad).
+The diaspora concentrated in Western Europe and North America — primarily Germany, USA, France, UK, and Canada. This matches the historical record of the post-WWII Ukrainian diaspora (DPs — displaced persons — who settled in Western occupation zones and were resettled abroad). **V2.3 migrated n=1,280.**
 
 ## What to look for
 - The top destinations — Germany, USA, France dominate
@@ -19,6 +19,6 @@ Most Ukrainian creative workers who emigrated did so during two waves:
 2. **WWII / DP era (1941-1948):** Fled the Nazi or Soviet occupation, ended up in DP camps in Germany/Austria, then resettled in USA/Canada/UK/Australia
 
 ## Known issues / improvements
-- V2.2 migrated n = 1,273 (was 927 in V2.1). The destination distribution may have shifted slightly — regenerate from V2.2 data.
+- V2.3 migrated n = 1,280 (was 1,273 in V2.2, was 927 in V2.1). The destination distribution shifts minimally — regenerate from V2.3 data.
 - If shown as a bar chart, adding percentage labels would help.
 - Consider a choropleth map for the paper version — more visually compelling for international readers.

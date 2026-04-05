@@ -7,7 +7,7 @@ Each data point = "people born in this decade, how long did they live?" This is 
 
 Minimum 10 people per data point (n≥10) — sparser points are suppressed.
 
-## Key finding (V2.2)
+## Key finding (V2.3 — cohort breakdown consistent with V2.2)
 People born in the **1890s-1910s** (who came of age during the Terror) show the starkest mortality differences. The deported line for 1890s births shows mean LE of **44.4 years** (n=58) — the cohort most destroyed by the Executed Renaissance liquidations. The migrated line stays high across all birth decades.
 
 **V2.2 key cohort gaps (migrated vs non-migrated):**

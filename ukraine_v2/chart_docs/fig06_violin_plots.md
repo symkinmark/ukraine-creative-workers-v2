@@ -17,5 +17,5 @@ This gives a richer view of distribution shape than box plots — you can see wh
 - Deported violin is much fatter lower down than the others
 - Migrated violin is the tallest and fattest at high ages
 
-## ⚠️ Y-axis bug — FIXED in V2.2
-`ax.set_ylim(0, 110)` added to `generate_analysis.py`. Y-axis no longer extends below 0. Regenerated chart is clean.
+## ⚠️ Y-axis bug — FIXED in V2.2 (still clean in V2.3)
+`ax.set_ylim(0, 110)` is in `generate_analysis.py`. Y-axis no longer extends below 0. V2.3 regenerated chart is clean.

@@ -10,7 +10,7 @@ This is a standard tool from medical research — same method used to compare ca
 ## Key finding
 The migrated group's curve stays higher for longer — they have a higher probability of surviving to any given age compared to the other groups. The deported group's curve drops earliest and steepest. The non-migrated and internal transfer curves sit in between, close to each other.
 
-**V2.2 median survival ages:**
+**V2.3 median survival ages (approximate — V2.3 shifts minimal):**
 - Migrated: 77 yrs
 - Non-migrated: 73 yrs
 - Internal transfer: 72 yrs
@@ -23,7 +23,7 @@ The migrated group's curve stays higher for longer — they have a higher probab
 - **Median survival:** The age where each curve crosses 0.5 (50% probability) gives the median life expectancy.
 
 ## Known issues / improvements
-- ~~"V1 avg (63)" annotation is outdated.~~ Update to V2.2 overall non-migrated median = 73 yrs, migrated median = 77 yrs.
+- ~~"V1 avg (63)" annotation is outdated.~~ Update to V2.3 overall non-migrated median = 73 yrs, migrated median = 77 yrs.
 - Consider adding a table of median survival ages per group below the chart.
 
 ## Technical note
