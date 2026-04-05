@@ -798,13 +798,17 @@ The birth cohort analysis provides some evidence against a pure selection explan
 
 ## 11. Data Availability
 
-### 11.1 Primary Data File
+### 11.1 Primary Data File (V2.2)
 
-**Filename:** `esu_creative_workers_reviewed.csv`
-**Location:** `/Users/symkinmark_/projects/Ai agent basic/ukraine_v2/esu_creative_workers_reviewed.csv`
+**Filename:** `esu_creative_workers_v2_2.csv`
+**Location:** `/Users/symkinmark_/projects/Ai agent basic/ukraine_v2/esu_creative_workers_v2_2.csv`
 **Format:** CSV, UTF-8 encoded, comma-separated
-**Rows:** One row per individual included in the initial dataset
-**Row count:** Approximately 16,215 (all entries passing initial creative profession filter)
+**Rows:** 16,215 — one row per individual in the initial dataset
+**Analysable rows:** 8,606 (migration_status in: migrated, non_migrated, internal_transfer, deported, AND valid birth/death years)
+
+**Previous versions archived:**
+- V2.1: `archive/v2_1/esu_creative_workers_v2_1.csv` (6,106 analysable — contains date parsing errors)
+- Raw scrape: `esu_creative_workers_raw.csv` (no classification, no date recovery)
 
 ### 11.2 Column Descriptions
 
@@ -838,17 +842,27 @@ The birth cohort analysis provides some evidence against a pure selection explan
 **Location:** `/Users/symkinmark_/projects/Ai agent basic/ukraine_v2/esu_creative_workers_raw.csv`
 **Description:** The raw output from the scraper before any nationality or migration classification. Contains all entries that matched the creative profession keywords. This file is the starting point for any replication; all subsequent processing steps are applied to this file programmatically.
 
-### 11.4 Reproducing the Dataset
+### 11.4 Reproducing the Dataset (V2.2 full pipeline)
 
-To reproduce the primary analysis dataset from scratch:
+To reproduce the V2.2 primary analysis dataset from scratch:
 
-1. Run `esu_scraper.py` to re-scrape the ESU (note: this will take several days of scraping at a polite rate and will produce a fresh snapshot of the current ESU — which may differ from our 2026 snapshot due to editorial updates).
-2. Run the profession filter step (documented in `generate_analysis.py`) to apply the creative worker keyword filter.
-3. Run `claude_review.py` to perform the nationality and migration classification using Claude.
-4. Run the analysis steps in `generate_analysis.py` to calculate life expectancy, run the Mann-Whitney U test, calculate Cohen's d, and generate the period, cohort, profession, and geographic breakdowns.
-5. Run the chart generation scripts in `generate_analysis.py` to produce the figures.
+1. **Scrape ESU:** Run `esu_scraper.py` to re-scrape the ESU. Takes several days at a polite rate. Produces `esu_creative_workers_raw.csv`. Note: a fresh 2026+ scrape may differ from our snapshot due to ESU editorial updates.
 
-**Note:** Re-running `claude_review.py` will make new API calls to Claude and may produce slightly different classifications due to the stochastic nature of the language model (even at default temperature). Exact numerical reproduction of our results requires using the archived `esu_creative_workers_reviewed.csv` rather than re-running the Claude review step.
+2. **Classify nationality + migration:** Run `claude_review.py` to perform nationality (Tier 1/2/3) and migration classification using Claude Haiku. Produces intermediate classified CSV.
+
+3. **Recover corrupted dates:** Run `fix_dates_v2.py --write --reclassify` on the classified CSV. This recovers birth/death years for entries where the ESU scraper's original regex failed (Old Style dates with nested parentheses; pseudonym prefixes). V2.2 recovered 8,971 entries this way. The script also flags entries needing migration re-classification.
+
+4. **Re-classify flagged entries:** After date recovery, `fix_dates_v2.py` uses keyword shortcuts (Sandarmokh, розстріляний, ГУЛАГ signals) for obvious cases, then calls `claude_review.py`'s `run_migration_phase()` for the remainder. This brings previously "alive" or wrongly excluded entries back into the analysable dataset.
+
+5. **Add death causes:** Run `add_death_cause.py` on the V2.2 CSV. Uses Claude Haiku to classify cause of death (natural / executed / gulag / exile / repression_other / wwii_combat / wwii_occupation / suicide / accident / unknown) from ESU biographical text.
+
+6. **Add gender:** Run `add_gender.py` on the V2.2 CSV. Uses rule-based name-ending detection (Ukrainian feminine suffixes) + Claude Haiku fallback for ambiguous cases.
+
+7. **Generate analysis + charts:** Run `generate_analysis.py` to compute all LE statistics, run Mann-Whitney U tests, Cohen's d, and generate all 24 figures.
+
+**Exact reproduction note:** Re-running `claude_review.py` and `add_death_cause.py` will make new API calls to Claude and may produce slightly different classifications (stochastic LLM output). For exact numerical reproduction, use the archived `esu_creative_workers_v2_2.csv` rather than re-running the Claude steps.
+
+**Estimated cost for full re-run from scratch:** ~$3-8 (Claude Haiku at current API pricing, 2026).
 
 ---
 
@@ -875,6 +889,41 @@ The following scripts are located in `/Users/symkinmark_/projects/Ai agent basic
 **Runtime:** Several days for a full ESU scrape. The scraper saves progress incrementally so it can be stopped and resumed.
 
 **Dependencies:** `requests`, `beautifulsoup4`, `lxml`, `pandas`
+
+### 12.1b `fix_dates_v2.py` (V2.2 addition)
+
+**Purpose:** Recovers birth/death years that were silently dropped by the original ESU scraper regex.
+
+**Root cause fixed:** The original scraper used `\(([^)]{5,200})\)` to extract the biographical parenthetical containing birth–death dates. This fails in two cases:
+1. **Old Style/New Style dual dates** like `14(26). 04. 1890` — the inner `)` terminates the regex prematurely
+2. **Pseudonym prefixes** like `(справж. – Real Name; 1887 – 1937)` — the em-dash after the pseudonym marker splits incorrectly, giving `birth_part = "(справж."` and `birth_year = None`
+
+**Fix:** Instead of bracket-matching, the script extracts the bio-header by finding `) –` (closing paren + em-dash), which marks the end of the date block and start of the profession description. Immune to nested parentheses.
+
+**What it does:**
+1. For every row in the CSV, runs `extract_years(notes)` using the corrected algorithm
+2. If result improves on existing birth_year/death_year → fills in / corrects
+3. Detects and corrects "Курбас-style swaps" (birth year stored in death_year field due to parsing order failure)
+4. Resets migration_status from `alive`/`excluded_pre_soviet` to `unknown` for rows with newly recovered death years
+5. Applies keyword shortcuts for obvious repression cases (Sandarmokh, розстріляний, ГУЛАГ signals) before calling Claude
+6. Writes corrected dataset to `esu_creative_workers_v2_2.csv`
+7. Adds columns: `dates_fixed` (bool), `needs_migration_reclassify` (bool)
+
+**Key functions:**
+```python
+def extract_bio_header(notes: str) -> str:
+    """Find ') –' separator instead of bracket-matching."""
+    m = re.search(r'\)\s*[–—]\s', notes)
+    return notes[:m.start() + 1] if m else notes[:500]
+
+def clean_pseudonym_prefix(text: str) -> str:
+    """Strip (справж. – Name; ...) or (псевд.: ...; ...) prefixes."""
+    text = re.sub(r'\((?:справж(?:нє)?\.?|псевд\.?:?)[^;]{0,120};\s*', '(', text)
+    return text
+```
+
+**Runtime:** ~30 seconds (pure Python, no API calls for date recovery)
+**Dependencies:** `pandas`, `re` (stdlib)
 
 ### 12.2 `claude_review.py`
 
@@ -971,34 +1020,64 @@ A sample check of profession category assignments should be performed:
 
 ---
 
-## Appendix A: Summary of Key Numbers for Verification
+## Appendix A: Summary of Key Numbers for Verification (V2.2)
 
 A replicating researcher who has successfully reproduced the dataset and analysis should obtain the following numbers. Significant deviation from these figures indicates an error in the replication.
 
+**Dataset scale:**
+| Metric | V2.1 (superseded) | V2.2 (current) |
+|--------|-------------------|----------------|
+| Total ESU entries | 16,215 | 16,215 |
+| Analysable entries | 6,106 | **8,606** |
+| Migrated | 927 | **1,273** |
+| Non-migrated | 4,625 | **6,000** |
+| Internal transfer | 479 | **1,155** |
+| Deported | 75 | **178** |
+| Excluded (alive/unknown/bad dates) | ~10,109 | **~7,609** |
+
+**Primary life expectancy statistics (V2.2):**
 | Metric | Value |
 |--------|-------|
-| Total ESU entries scraped | ~70,000 |
-| Entries matching creative profession keywords | 16,215 |
-| Entries passing all inclusion criteria | 6,310 |
-| Non-migrants | 5,272 |
-| Migrants | 1,038 |
-| Non-migrant mean LE | 69.81 |
-| Non-migrant median LE | 72 |
-| Non-migrant SD | 15.04 |
-| Migrant mean LE | 74.58 |
-| Migrant median LE | 77 |
-| Migrant SD | 14.47 |
-| LE gap (migrant - non-migrant) | +4.77 |
-| Mann-Whitney U p-value | ≈0.0 |
-| Cohen's d | 0.319 |
-| Tier 2 entries reviewed by Claude | 1,356 |
-| Claude INCLUDE decisions | 137 |
-| Claude EXCLUDE decisions | 1,218 |
-| Claude UNCERTAIN decisions | 1 |
-| 1937 non-migrant deaths | 38 |
-| Mean age at death, 1937 | 43 years |
-| Avg birth year, non-migrants | 1923.6 |
-| Avg birth year, migrants | 1905.5 |
+| Migrated mean LE | **75.21 yrs** |
+| Migrated median LE | 77 |
+| Migrated SD | 13.98 |
+| Migrated 95% CI | [74.44, 75.98] |
+| Non-migrated mean LE | **71.17 yrs** |
+| Non-migrated median LE | 73 |
+| Non-migrated SD | 13.99 |
+| Non-migrated 95% CI | [70.82, 71.53] |
+| Internal transfer mean LE | 70.21 yrs |
+| Deported mean LE | **47.85 yrs** |
+| Deported median LE | 45 |
+| **LE gap (migrated − non-migrated)** | **+4.03 yrs** |
+| Mann-Whitney U p-value | < 0.001 (≈0.0) |
+| **Cohen's d** | **0.288** |
+| Deported vs non-migrated gap | −23.32 yrs |
+| Deported Cohen's d | 1.667 |
+
+**Two-group conservative framing:**
+| Metric | Value |
+|--------|-------|
+| Migrated n | 1,272 |
+| Stayed (all others) n | 7,317 |
+| Gap | +4.66 yrs |
+| Cohen's d | 0.332 |
+
+**Repression data:**
+| Metric | Value |
+|--------|-------|
+| 1937 deported deaths | **65 (36.5% of deported group)** |
+| 1937 non-migrated deaths | 24 |
+| 1937 combined creative deaths | **89** |
+| Mean age at death, 1937 combined | ~43.8 yrs |
+| Deported with repression-cause death | 90.5% |
+
+**Date recovery (V2.2 fix):**
+| Metric | Value |
+|--------|-------|
+| Entries with recovered dates | 8,971 |
+| Entries re-classified after date recovery | ~2,000 |
+| Script | `fix_dates_v2.py` |
 
 ---
 
