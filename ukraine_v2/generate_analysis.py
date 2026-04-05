@@ -34,12 +34,12 @@ from lifelines import KaplanMeierFitter
 # PATHS
 # ---------------------------------------------------------------------------
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-CSV_PATH     = os.path.join(PROJECT_ROOT, 'esu_creative_workers_v2_2.csv')
-OUT_TXT      = os.path.join(PROJECT_ROOT, 'analysis_v2_1.txt')
+CSV_PATH     = os.path.join(PROJECT_ROOT, 'esu_creative_workers_v2_3.csv')
+OUT_TXT      = os.path.join(PROJECT_ROOT, 'analysis_v2_3.txt')
 CHARTS_DIR   = os.path.join(PROJECT_ROOT, 'charts')
 os.makedirs(CHARTS_DIR, exist_ok=True)
 
-SOURCE_NOTE = ("Source: Encyclopedia of Modern Ukraine (esu.com.ua), V2.1 dataset, "
+SOURCE_NOTE = ("Source: Encyclopedia of Modern Ukraine (esu.com.ua), V2.3 dataset, "
                "Berdnyk & Symkin 2026")
 
 # ---------------------------------------------------------------------------
