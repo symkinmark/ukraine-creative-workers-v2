@@ -674,6 +674,7 @@ sns.violinplot(data=df_violin, x='group', y='le', palette=palette,
 apply_style(ax, 'Figure 6 — Life Expectancy Full Distribution (Violin Plots)',
             xlabel='', ylabel='Life Expectancy (years)')
 ax.set_xticklabels([GROUP_LABELS[ms] for ms in ALL_GROUPS], rotation=15, ha='right')
+ax.set_ylim(0, 110)
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 add_source(fig)
 save(fig, 'fig06_violin_plots.png')

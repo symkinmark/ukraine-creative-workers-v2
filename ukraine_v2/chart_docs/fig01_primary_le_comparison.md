@@ -5,21 +5,22 @@
 ## What this chart shows
 The headline result of the entire study. Four bars showing mean age at death (life expectancy proxy) for each migration group, with 95% confidence intervals as error bars.
 
-## The four groups
-| Group | N | Mean LE | What they are |
-|---|---|---|---|
-| Migrated (left USSR) | 927 | 75.9 yrs | Left Soviet sphere voluntarily |
-| Non-migrated (stayed) | 4,625 | 70.6 yrs | Stayed in Soviet Ukraine |
-| Internal transfer (USSR) | 479 | 69.2 yrs | Moved within USSR (not westward) |
-| Deported by Soviet state | 75 | 47.8 yrs | Forcibly displaced by state |
+## The four groups (V2.2)
+| Group | N | Mean LE | 95% CI | What they are |
+|---|---|---|---|---|
+| Migrated (left USSR) | 1,273 | 75.21 yrs | [74.44, 75.98] | Left Soviet sphere voluntarily |
+| Non-migrated (stayed) | 6,000 | 71.17 yrs | [70.82, 71.53] | Stayed in Soviet Ukraine |
+| Internal transfer (USSR) | 1,155 | 70.21 yrs | [69.36, 71.06] | Moved within USSR (not westward) |
+| Deported by Soviet state | 178 | 47.85 yrs | [45.78, 49.93] | Forcibly displaced by state |
 
 ## Key finding
-**+5.3 year gap** between migrants and those who stayed (non-migrated). Statistically significant (p < 0.001, Cohen's d = 0.374). The deported group is a separate catastrophe — dying on average 28 years younger than migrants.
+**+4.03 year gap** between migrants and those who stayed (non-migrated). Statistically significant (p < 0.001, Cohen's d = 0.288). The deported group is a separate catastrophe — dying on average **27.35 years younger** than migrants, and **23.32 years younger** than non-migrants (Cohen's d = 1.667).
 
 ## What to look for
 - The error bars on migrated and non-migrated are tight → reliable estimates
-- Deported has a wide CI (small n=75) → treat that number as directional, not precise
-- Internal transfer (USSR internal movers) are close to non-migrated — supports the finding that leaving the USSR was the meaningful variable, not just moving
+- Deported CI is wider (small n=178 vs others) → treat as directional and robust
+- Internal transfer (USSR internal movers) track close to non-migrated — the meaningful variable is leaving the USSR, not just moving
+- Deported group n=178 is 137% larger than V2.1 (was n=75) — V2.2 date recovery brought in previously missing executed victims
 
 ## Known issues / improvements
 - None structural. Chart is clean and readable.

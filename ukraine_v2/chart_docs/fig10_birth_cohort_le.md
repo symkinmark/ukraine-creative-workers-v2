@@ -7,8 +7,17 @@ Each data point = "people born in this decade, how long did they live?" This is 
 
 Minimum 10 people per data point (n≥10) — sparser points are suppressed.
 
-## Key finding
-People born in the **1900-1920 birth decades** (who came of age during the Terror and WWII) died younger across all groups. The deported line drops most sharply. The migrated line stays high across all birth decades, suggesting that leaving the USSR was protective regardless of when you were born.
+## Key finding (V2.2)
+People born in the **1890s-1910s** (who came of age during the Terror) show the starkest mortality differences. The deported line for 1890s births shows mean LE of **44.4 years** (n=58) — the cohort most destroyed by the Executed Renaissance liquidations. The migrated line stays high across all birth decades.
+
+**V2.2 key cohort gaps (migrated vs non-migrated):**
+| Birth decade | Migrated LE | Non-migrated LE | Deported LE |
+|-------------|------------|-----------------|------------|
+| 1880s | 73.3 | 68.9 | 56.7 |
+| 1890s | 75.2 | 70.7 | **44.4** |
+| 1900s | 75.4 | 72.4 | 41.4 |
+| 1910s | 78.1 | 75.1 | 41.1 |
+| 1920s | 78.9 | 75.1 | 47.0 |
 
 ## What to look for
 - The annotation "Born 1900-1920: peak repression victim cohort" — this birth decade produced the people who were in their 30s-40s during the Terror (prime target age for Soviet authorities)

@@ -3,20 +3,32 @@
 **File:** `charts/fig08_deported_deaths_by_year.png`
 
 ## What this chart shows
-A year-by-year count of deaths in the deported group only (n=75). Shows the precise timing of when deportees died, which maps directly onto Soviet historical events.
+A year-by-year count of deaths in the deported group only (V2.2: n=178). Shows the precise timing of when deportees died, which maps directly onto Soviet historical events.
 
 ## Key finding
-**1937 is the single worst year.** A visible spike in the chart corresponding to the Great Terror (Stalin's peak purge year). A second cluster appears during WWII (1941-45). After 1950, deaths drop to near-zero — almost no deportees survived.
+**1937 is the single worst year by an enormous margin.** 65 of 178 deportees (36.5%) died in 1937 alone — the Stalinist Great Terror's peak. This is not a gradual rise; it's a cliff. The year 1938 saw the second worst death toll: 28 deaths (15.7%). Together, 1937-1938 account for 52% of all deported deaths.
+
+**Year-by-year top deaths (V2.2):**
+| Year | Deaths | % of deported group |
+|------|--------|---------------------|
+| 1937 | 65 | 36.5% |
+| 1938 | 28 | 15.7% |
+| 1942 | 12 | 6.7% |
+| 1941 | 9 | 5.1% |
+| 1944 | 7 | 3.9% |
+
+A secondary cluster appears during WWII (1941-45). After 1950, deaths drop to near-zero — the cohort is effectively gone.
 
 ## What to look for
-- The 1937 spike — the peak of the Stalinist Great Terror
-- Secondary peaks in 1941-1944 — WWII occupation and ongoing deportations
-- The flat zone before 1936 — no deported deaths recorded before this, consistent with the historical record (large-scale deportations of cultural workers began in mid-1930s)
-- The flat zone after 1950 — the cohort is effectively gone
+- The 1937 spike — 36.5% of the entire group in a single year
+- The 1938 spike — still 15.7%; this was not a one-day event but a sustained campaign
+- Secondary peaks in 1941-1944 — WWII occupation and ongoing repression
+- The flat zone before 1936 — historically accurate: large-scale deportations of Ukrainian cultural workers began in mid-1930s
+- The flat zone after 1950 — the cohort is gone
 
-## The blank space 1921-1935
-There are no deported deaths before 1936 in our dataset. This is historically accurate — the Soviet state's systematic targeting of Ukrainian creative workers through deportation escalated sharply in the mid-1930s. The blank is not a data gap; it reflects the historical timeline.
+## V2.2 note
+The deported group grew from n=75 (V2.1) to n=178 (V2.2) after date recovery. The 1937 spike is now far more visible and historically accurate — most of the newly recovered entries are Sandarmokh massacre victims whose ESU dates had the nested-paren parsing bug.
 
 ## Known issues / improvements
-- Clean chart, no bugs.
-- The wide blank region 1921-1935 could look like missing data to uninformed readers. Consider adding a text note: "No deportation deaths recorded pre-1936 — consistent with historical record."
+- The wide blank region 1921-1935 could look like missing data. Consider adding a note: "No deportation deaths recorded pre-1936 — consistent with historical record."
+- Add numeric labels to the 1937 and 1938 bars (65 deaths, 28 deaths).
