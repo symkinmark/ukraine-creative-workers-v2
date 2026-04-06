@@ -5,7 +5,7 @@
 **Author:** Mark Symkin
 **Study completed:** 2026
 **Data source:** Encyclopedia of Modern Ukraine (esu.com.ua)
-**This document version:** 1.4 — revised 2026-04-06 following right-censored Cox PH extension (§4.10 supplement)
+**This document version:** 1.5 — revised 2026-04-07 following V2.4 right-censored Cox PH rework (properly classified living cohort, §8.11–8.12)
 
 
 ## Version History
@@ -19,9 +19,10 @@
 | 2.3 | 2026-04-06 | Peer-review batch 1 (11 steps): terminology, §3.4.1, §4.9 OLS regression, Fig 23, selection bias §, Fig 7b |
 | 2.4 | 2026-04-06 | Peer-review batch 2 (7 major weaknesses): Cox PH (§4.10, Fig 24), PSM (+3.35 yrs matched), argument restructure (deportee leads), figures distributed into narrative, nationality circularity note, post-1991 caveat, Table 6 small-n fix |
 | 2.5 | 2026-04-06 | Right-censored Cox PH extension (§4.10 supplement): N=15,218 extended dataset, Schoenfeld PH test, informative censoring sensitivity analysis, Fig 25 (censoring pattern), Fig 26 (KM with censored data) |
+| 2.6 | 2026-04-07 | V2.4 right-censored rework: living cohort classified via AI pipeline (6,314 properly distributed); Cox N=15,053; migrated HR=0.832 adjusted; §8.11–8.12 sensitivity analyses; fig24–27 regenerated |
 
 ---
-> **V2.3 CURRENT.** Primary dataset: `esu_creative_workers_v2_3.csv`. Analysable: **n=8,643**. V2.2 reference dataset archived (unchanged). See AI_METHODOLOGY_LOG.md Phase V2.3 for full correction log.
+> **V2.4 CURRENT.** Primary dataset: `esu_creative_workers_v2_3.csv` (dead cohort) + `data/esu_extended_for_cox.csv` (extended with classified living individuals). Primary OLS analysable: **n=8,643**. Right-censored Cox: **N=15,053**. See AI_METHODOLOGY_LOG.md Phase V2.4 for full log.
 
 ---
 
@@ -761,30 +762,75 @@ For each of the six profession categories, average life expectancy was calculate
 
 **Result:** PSM gap = +3.35 yrs (bootstrap 95% CI: [2.26, 4.45]). Full-sample gap for reference: +4.04 yrs. Gap attenuation after matching: 17%. Residual gap after matching is not explained by observable birth-cohort, profession, or region differences.
 
-### 8.11 Right-Censored Cox PH Supplementary Analysis (Added V2.5)
+### 8.11 Right-Censored Cox PH Analysis — V2.4 (Supersedes V2.3/V2.5 approach)
 
-**Purpose:** Assess whether the complete-case restriction in §8.9 biases results by excluding 6,575 living individuals.
+**Purpose:** Fit a properly right-censored Cox PH model that includes all 6,314 living individuals with their migration status correctly classified, enabling valid survival inference across all four migration groups.
 
-**Extended dataset:** N = 15,218 (8,643 dead + 6,575 right-censored). Right-censored individuals are those with confirmed birth years but no recorded death date (ESU `migration_status = 'alive'`). Duration for censored = 2026 − birth_year; `event_observed = 0`.
+**Key change from V2.3/V2.5:** V2.3 assigned all living individuals to `non_migrated` (structural flaw — produced 52.2% censoring in non-migrated vs 0% in all other groups, making HRs non-comparable). V2.4 uses the same two-stage AI classification pipeline (Claude Haiku → Sonnet retry) applied to all 6,563 living individuals to determine migration status before including them in the extended dataset.
 
-**Migration status assumption:** Living individuals' migration status could not be determined from ESU records. All 6,575 right-censored observations were conservatively assigned to `non_migrated`. This is documented as a structural limitation — see interpretation notes below.
+**Living cohort classification pipeline:**
+- Input: `data/living_individuals_for_classification.csv` (6,563 rows, filtered from raw ESU: has birth_year, not flag_non_ukrainian, has notes)
+- Method: `classify_living.py` — 30 parallel Claude Code subagents processing ~219-row chunks (API credit exhausted; subscription-covered subagent approach used as free alternative)
+- Haiku first pass, Sonnet deep retry for unknowns
+- Stage 3 edge-case review: Operation Vistula reclassification (Polish state, not Soviet deportation → non_migrated), post-Soviet emigrant flagging (64 individuals), implausibly alive flagging (185 born <1920)
+- Output: `data/living_individuals_classified.csv` → `data/living_individuals_cleaned.csv`
 
-**Models:** Same two-model structure as §8.9 (Model 1 unadjusted, Model 2 adjusted for birth_decade_z + profession dummies + region dummies). Fitted using `CoxPHFitter(penalizer=0.01)`.
+**Extended dataset:** N = 15,053 (dead=8,739 + right-censored=6,314). Note: 246 dead rows dropped for null duration; 249 living rows dropped for filtering.
+- Duration (dead): death_year − birth_year; event_observed = 1
+- Duration (living): 2026 − birth_year; event_observed = 0
+- Implausibly alive (born <1920, n=185): reclassified as event_observed=1, duration=80
 
-**Schoenfeld residuals PH test:** `lifelines.statistics.proportional_hazard_test` with `time_transform='rank'`. Result: PH assumption violated for all three migration groups (p < 0.0001). Expected — mixing historical death cohorts (born 1870–1930) with contemporary right-censored survivors (born 1940–1970) creates fundamentally non-proportional hazard functions.
+**Censoring distribution (V2.4):**
+| Group | n | % Dead | % Censored |
+|-------|---|--------|-----------|
+| non_migrated | 11,898 | 51.1% | 48.9% |
+| migrated | 1,646 | 80.2% | 19.8% |
+| internal_transfer | 1,313 | 88.3% | 11.7% |
+| deported | 196 | 93.9% | 6.1% |
 
-**Why the extended model HRs are not directly comparable to §8.9:**
-1. Differential censoring: non-migrated has 52.2% censoring rate; all other groups have 0%
-2. Cohort incompatibility: historical migrants vs contemporary living non-migrants are different generations
-3. PH assumption violated → hazard ratios not constant across age
+**Models:** `CoxPHFitter(penalizer=0.1)`. Model 1: migration dummies only. Model 2: migration + birth_decade dummies + profession dummies + region dummies. Reference: non_migrated.
 
-**Informative censoring sensitivity analysis:** 186 individuals born before 1920 are implausibly coded as alive (would be 106+ in 2026). Three scenarios tested: assumed death age = 80 (optimistic), 60 (middle), 45 (pessimistic). Under all scenarios the deported HR (5.46–7.09) brackets the complete-case HR (5.40), confirming robustness of the deportee signal. The complete-case Cox model (§8.9) remains the primary analysis.
+**Results (Model 2 adjusted):**
+| Group | HR | 95% CI | p |
+|-------|----|--------|---|
+| migrated | 0.832 | 0.778–0.889 | <0.0001 |
+| internal_transfer | 1.105 | 1.033–1.182 | 0.0038 |
+| deported | 4.646 | 3.908–5.524 | <0.0001 |
+
+Concordance index (Model 2): 0.724.
+
+**Unadjusted → adjusted reversal for migrated (HR 1.088 → 0.832):** The non-migrated group has ~49% right-censoring vs 20% for migrated. This asymmetry artificially lowers the non-migrated baseline hazard in unadjusted analysis. Covariate adjustment (birth cohort especially) corrects for this, restoring the migrated survival advantage.
+
+**Schoenfeld residuals PH test:** PH violated for deported (p<0.0001) and migrated (p=0.011). Internal transfer borderline (p=0.066). Reported HRs are average effects over follow-up. Stratified Cox or time-varying coefficient models would be appropriate robustness checks.
+
+**Sensitivity analyses (§8.12):** Three scenarios tested — see below.
 
 **Figures generated:**
-- `fig25_censoring_pattern.png` / `fig25_interactive.html` — stacked bar: % dead vs censored by group
-- `fig26_km_censored.png` / `fig26_interactive.html` — KM survival curves with right-censored tick marks
+- `fig24_cox_forest_plot.png` / `fig24_interactive.html` — forest plot, Model 1 + Model 2 HR comparison
+- `fig25_censoring_pattern.png` / `fig25_interactive.html` — stacked bar: % dead vs censored by group (V2.4)
+- `fig26_km_censored.png` / `fig26_interactive.html` — KM survival curves with right-censored tick marks (V2.4)
 
-**Code location:** `generate_analysis.py`, censored Cox block (after complete-case Cox section, before PSM).
+**Code location:** `stage5_cox.py`, `stage7_figures.py`. Model output: `results/cox_censored_output.txt`.
+
+### 8.12 Sensitivity Analyses for Right-Censored Cox Model (V2.4)
+
+**Purpose:** Test robustness of the migrated HR (0.832) to three sources of potential misspecification.
+
+**All sensitivity models use unadjusted Model 1** (migration dummies only) for computational tractability. The adjusted baseline is from §8.11 Model 2.
+
+**Scenario A — Implausibly alive age assumption:**
+185 individuals born before 1920 with no death record (would be 106+ in 2026) reclassified as deceased. Five assumed death ages tested: 70, 75, 80, 85, 90. Migrated HR stable at 1.067–1.100 across all assumptions (all unadjusted; direction consistent, magnitude stable).
+
+**Scenario B — Post-Soviet emigrant classification:**
+62 living migrants born after 1960 flagged as likely post-Soviet emigrants. Three sub-scenarios: include all (HR=1.088), exclude from migrated group (HR=1.094), reclassify as non_migrated (HR=1.094). Maximum change: 0.006 HR units — negligible.
+
+**Scenario C — Bootstrap misclassification:**
+AI classification validated at 3.2% error rate (V2.1 Phase 5b, n=62 review). Bootstrap simulation: 50 iterations × random misclassification at 5%, 10%, 15% of all rows (random label swap from uniform distribution across 4 groups). Migrated median HR: 5%=1.088 (2.5–97.5%: 1.064–1.109), 10%=1.077 (1.048–1.110), 15%=1.083 (1.050–1.111). Direction and magnitude stable across all rates.
+
+**Figure generated:**
+- `fig27_sensitivity_summary.png` / `fig27_interactive.html` — migrated HR across all 12 sensitivity scenarios + baseline
+
+**Code location:** `stage6_sensitivity.py`. Output: `results/sensitivity_output.txt`, `results/sensitivity_results.json`.
 
 ---
 

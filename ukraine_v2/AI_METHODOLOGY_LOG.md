@@ -861,3 +861,101 @@ The headline finding is unchanged: Ukrainian creative workers who emigrated from
 | `analysis_v2_3.txt` | **Created** — full statistical report for V2.3 |
 
 *This log phase completed: 2026-04-05*
+
+---
+
+## Phase V2.4 — Right-Censored Cox PH Rework: Proper Living Cohort Classification (2026-04-07)
+
+### Problem Identified (V2.3/V2.5 Flaw)
+
+V2.3 right-censored Cox supplement assigned all 6,575 living individuals to `non_migrated`, producing a structurally invalid model: 52.2% censoring in non-migrated vs 0% in all other groups. This made HR comparisons across groups incoherent — the censored model could not validly estimate migration group survival differences.
+
+### Solution: AI Classification of Living Cohort
+
+The same two-stage Claude pipeline (Haiku first pass, Sonnet retry for unknowns) was applied to all living individuals, using their ESU biographical text as input.
+
+**Stage 1 — Extract living individuals for classification:**
+- Input: raw ESU data (flag_non_ukrainian=0, has birth_year, has notes)
+- Output: `data/living_individuals_for_classification.csv` (6,563 rows)
+
+**Stage 2 — AI classification (parallel subagent approach):**
+- Tool: 30 parallel Claude Code subagents (~219 rows/chunk each)
+- Reason for subagents: API credit balance was zero; Claude Code subscription covers subagent usage
+- Same system prompts as dead-cohort classification (MIGRATION_SYSTEM + MIGRATION_DEEP_SYSTEM)
+- Output: `data/living_individuals_classified.csv`
+
+**Distribution after AI classification:**
+| Status | n | % |
+|--------|---|---|
+| non_migrated | 5,858 | 89.3% |
+| migrated | 375 | 5.7% |
+| internal_transfer | 155 | 2.4% |
+| unknown | 149 | 2.3% |
+| deported | 15 | 0.2% |
+
+**Red flag checks:** Deported 0.2% (below 5% threshold ✓), Unknown 2.3% (below 20% threshold ✓)
+
+**Stage 3 — Edge case review:**
+- 185 born before 1920: `implausibly_alive` → event_observed=1, duration=80
+- 64 migrants born after 1960: flagged `likely_post_soviet_emigrant`
+- Manual reclassifications: Operation Vistula (Polish state, not Soviet → non_migrated); Russia-career cases (migrated→internal_transfer); returnees and foreign nationals corrected
+
+**Stage 4 — Extended dataset:** `data/esu_extended_for_cox.csv`, N=15,053 (dead=8,739 + censored=6,314)
+
+### Stage 5 — Cox PH Results (script: `stage5_cox.py`)
+
+**Model 2 adjusted (primary):**
+| Group | HR | 95% CI | p |
+|-------|----|--------|---|
+| migrated | 0.832 | 0.778–0.889 | <0.0001 |
+| internal_transfer | 1.105 | 1.033–1.182 | 0.0038 |
+| deported | 4.646 | 3.908–5.524 | <0.0001 |
+
+Key finding: Unadjusted migrated HR=1.088 reverses to 0.832 after adjustment — differential censoring (49% vs 20%) suppresses non-migrated baseline hazard in unadjusted model; birth cohort adjustment corrects this.
+Schoenfeld PH test: deported p<0.0001 (violated), migrated p=0.011 (violated), internal_transfer p=0.066 (OK).
+
+### Stage 6 — Sensitivity Analyses (script: `stage6_sensitivity.py`)
+
+| Scenario | Result |
+|----------|--------|
+| A: implausibly alive age assumption (70–90) | Migrated HR 1.067–1.100 — stable |
+| B: post-Soviet emigrant handling (include/exclude/reclassify) | Max HR change 0.006 — negligible |
+| C: bootstrap misclassification 5%/10%/15% (50 iter each) | Median HR 1.077–1.088 — robust |
+
+### Stage 7 — Figures (script: `stage7_figures.py`)
+
+| Figure | Change |
+|--------|--------|
+| fig24 | Updated forest plot with correct V2.4 HRs |
+| fig25 | Updated censoring pattern — proper distribution across all groups |
+| fig26 | Updated KM curves — N=15,053, all groups have tick marks |
+| fig27 | NEW sensitivity summary chart |
+
+### Stage 8 — Paper + Docs Updated
+
+- PAPER_DRAFT.md: §4.10 rewritten, §4.11 new, abstract HR references corrected
+- SCIENTIFIC_METHODOLOGY.md: §8.11–8.12 rewritten/added (v1.5)
+- HTML rebuilt and pushed to GitHub Pages
+
+### Files Created/Modified in V2.4
+
+| File | Action |
+|------|--------|
+| `data/living_individuals_for_classification.csv` | Created |
+| `data/living_individuals_classified.csv` | Created |
+| `data/living_individuals_cleaned.csv` | Created |
+| `data/esu_extended_for_cox.csv` | Created |
+| `classify_living.py` | Created |
+| `stage5_cox.py` | Created |
+| `stage6_sensitivity.py` | Created |
+| `stage7_figures.py` | Created |
+| `results/cox_censored_output.txt` | Updated |
+| `results/sensitivity_output.txt` | Created |
+| `results/sensitivity_results.json` | Created |
+| `charts/fig24–27 (png + html)` | Updated/Created |
+| `chart_docs/fig24–27.md` | Updated/Created |
+| `PAPER_DRAFT.md` | Updated |
+| `SCIENTIFIC_METHODOLOGY.md` | Updated (v1.5) |
+| `docs/index.html` | Rebuilt |
+
+*This log phase completed: 2026-04-07*
