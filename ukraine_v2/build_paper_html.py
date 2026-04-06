@@ -18,7 +18,7 @@ CHARTS   = os.path.join(PROJECT, 'charts')
 
 # Figures that have interactive Plotly versions (figXX_interactive.html)
 INTERACTIVE_FIGS = {
-    '1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+    '1', '2', '3', '4', '5', '6', '7', '7b', '8', '9', '10',
     '11', '12', '13', '14', '15', '15b', '17', '18', '19', '19b',
     '20', '21', '22', '23',
 }
@@ -32,6 +32,7 @@ FIGURE_MAP = {
     '5':   'fig05_deported_age_histogram.png',
     '6':   'fig06_violin_plots.png',
     '7':   'fig07_death_year_histogram.png',
+    '7b':  'fig07b_deported_death_year.png',
     '8':   'fig08_deported_deaths_by_year.png',
     '9':   'fig09_nonmigrant_deaths_by_period.png',
     '10':  'fig10_birth_cohort_le.png',

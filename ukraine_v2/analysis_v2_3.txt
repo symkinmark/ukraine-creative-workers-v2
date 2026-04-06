@@ -21,7 +21,7 @@ Berdnyk & Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)
 
 2. LIFE EXPECTANCY BY MIGRATION GROUP
 --------------------------------------------------------------------------------
-  Group                                      n   Mean LE   Median      SD            95% CI
+  Group                                      n   Mean age at death   Median      SD            95% CI
   ------------------------------------------------------------------------------------------
   Migrated (left USSR)                    1280     75.25     77.0   13.88    [74.49, 76.01]
   Non-migrated (stayed)                   6030     71.22     73.0   13.79    [70.87, 71.57]

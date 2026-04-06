@@ -1,11 +1,11 @@
 # Scientific Methodology and Replication Guide
 
-## Life Expectancy of Ukrainian Creative Industry Workers During the Soviet Occupation: An Expanded Study (V2)
+## Mortality Differentials Among Ukrainian Creative Industry Workers During the Soviet Occupation: An Expanded Study (V2)
 
 **Author:** Mark Symkin
 **Study completed:** 2026
 **Data source:** Encyclopedia of Modern Ukraine (esu.com.ua)
-**This document version:** 1.1 — revised 2026-04-03 following Phase 5 human accuracy check
+**This document version:** 1.2 — revised 2026-04-06 following peer-review 11-step revision
 
 
 ## Version History
@@ -16,6 +16,7 @@
 | 2.0 | 2026 | V2 expanded dataset (4-group, n=8,643), full AI disclosure |
 | 2.1 | 2026-04-03 | Phase 5 human check; pre-1921 and Galicia filters added |
 | 2.2 | 2026-04 | Author corrected to Mark Symkin; sample sizes updated to V2.3; Cliff's delta and CI added |
+| 2.3 | 2026-04-06 | Peer-review 11-step revision: terminology (mean age at death), §3.4.1 missing data, §4.9 regression, Fig 23, selection bias §, Fig 7b |
 
 ---
 > **V2.3 CURRENT.** Primary dataset: `esu_creative_workers_v2_3.csv`. Analysable: **n=8,643**. V2.2 reference dataset archived (unchanged). See AI_METHODOLOGY_LOG.md Phase V2.3 for full correction log.
@@ -34,11 +35,11 @@ If you are replicating this study, you should read this document in its entirety
 
 ### 1.1 Primary Research Question
 
-**Did Ukrainian creative industry workers who emigrated from the Soviet Union live statistically significantly longer than those who remained within Soviet-controlled territory, and if so, by how much?**
+**Did Ukrainian creative industry workers who emigrated from the Soviet Union show a statistically significant mean age at death advantage compared to those who remained within Soviet-controlled territory, and if so, by how much?**
 
 ### 1.2 Secondary Research Questions
 
-1. Does the life expectancy gap vary by creative profession?
+1. Does the mean age at death gap vary by creative profession?
 2. Does the gap vary by birth cohort, and if so, in which cohorts is it largest?
 3. Are there identifiable historical periods of anomalously elevated premature mortality among non-migrant creative workers, consistent with documented Soviet repression campaigns?
 4. Are there geographic patterns in migration rates among Ukrainian creative workers, and what is the likely explanation?
@@ -46,7 +47,7 @@ If you are replicating this study, you should read this document in its entirety
 
 ### 1.3 What This Study Does Not Claim to Answer
 
-This study does not establish clean causal identification of the mortality effect of Soviet conditions. It establishes an observational association between migration status and life expectancy in a specific professional population. Selection effects — the possibility that migrants and non-migrants differed before emigration in ways correlated with longevity — cannot be fully controlled for in this observational design. Readers should not interpret the life expectancy gap as a precise estimate of "how many additional years you would have lived if you had emigrated" at the individual level.
+This study does not establish clean causal identification of the mortality effect of Soviet conditions. It establishes an observational association between migration status and observed age at death in a specific professional population. Selection effects — the possibility that migrants and non-migrants differed before emigration in ways correlated with longevity — cannot be fully controlled for in this observational design. Readers should not interpret the mean age at death gap as a precise estimate of "how many additional years you would have lived if you had emigrated" at the individual level.
 
 ---
 
@@ -100,7 +101,7 @@ The ESU does not provide an official API or bulk data download. Data were collec
 
 - **Total ESU entries scraped:** approximately 70,000
 - **Entries matching creative worker profession keywords:** 16,215
-- **Entries usable for primary life expectancy analysis (birth date + death date + determinable migration status + confirmed Ukrainian nationality):** 8,643 (V2.3)
+- **Entries usable for primary age-at-death analysis (birth date + death date + determinable migration status + confirmed Ukrainian nationality):** 8,643 (V2.3)
 - **Of which non-migrants:** 6,030
 - **Of which migrants:** 1,280
 - **Of which internal transfers:** 1,150
@@ -113,7 +114,7 @@ The ESU does not provide an official API or bulk data download. Data were collec
 
 ## 3. Inclusion Criteria
 
-An entry was included in the primary life expectancy analysis if and only if ALL of the following conditions were met:
+An entry was included in the primary age-at-death analysis if and only if ALL of the following conditions were met:
 
 **Condition 1: Confirmed Ukrainian nationality.**
 The individual was determined to be Ukrainian according to the three-tier nationality determination protocol described in Section 6. This does not require ethnic Ukrainian heritage; it requires that the individual participated in Ukrainian cultural life and identified with Ukrainian cultural or national identity. Criteria are detailed in Section 6.
@@ -138,7 +139,7 @@ An entry was excluded from the primary analysis if ANY of the following applied.
 
 ### 4.1 Living Individuals
 
-Entries with no death year recorded were classified as potentially living and excluded from life expectancy analysis. Some of these individuals may in fact be deceased but lack a recorded death date in the ESU; this is a data availability issue, not a classification error.
+Entries with no death year recorded were classified as potentially living and excluded from age-at-death analysis. Some of these individuals may in fact be deceased but lack a recorded death date in the ESU; this is a data availability issue, not a classification error.
 
 ### 4.2 Uncertain or Approximate Dates
 

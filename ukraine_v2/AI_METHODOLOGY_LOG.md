@@ -1,6 +1,6 @@
 # AI Methodology Log — Ukrainian Creative Workers Life Expectancy V2
 
-**Paper:** Life Expectancy of Ukrainian Creative Industry Workers During the Soviet Occupation
+**Paper:** Mortality Differentials Among Ukrainian Creative Industry Workers During the Soviet Occupation
 **Author:** Mark Symkin
 **AI used:** Claude Sonnet 4.6 (Anthropic) — primary research & writing AI
 **Cross-check AI:** Claude Sonnet 4.6 (second independent instance, no shared context)
@@ -224,6 +224,8 @@ All three corrections require a rerun of the Claude classification pass on `esu_
 
 **Assessment:** Phase 5b passed. The four-way reclassification eliminated migration errors entirely. The 3.2% error rate is within acceptable range for AI-assisted academic classification. Both remaining errors are non-systematic edge cases rather than indicators of a classification rule problem. **Cleared to proceed to full analysis.**
 
+95% CI: approximately 0.9%–7.9% (exact binomial, n=62, 2 errors)
+
 ---
 
 ## Phase 4c — Full Analysis & Chart Generation (COMPLETED 2026-04-04, updated to V2.3)
@@ -236,7 +238,7 @@ Phase 5b clearance received → full analysis run executed on `esu_creative_work
 
 ### Key findings
 
-| Group | n | Mean LE | 95% CI | vs Non-migrated |
+| Group | n | Mean age at death | 95% CI | vs Non-migrated |
 |-------|---|---------|--------|----------------|
 | Migrated | 1,280 | 75.25 yrs | [74.49, 76.01] | +4.04 yrs |
 | Non-migrated | 6,030 | 71.22 yrs | [70.87, 71.57] | — |
@@ -247,7 +249,7 @@ Phase 5b clearance received → full analysis run executed on `esu_creative_work
 
 **Deported finding** (Cohen's d = 1.656 = "huge" effect) is the strongest single finding in the paper. 183 individuals is a solid group, and the effect size is so large that the 95% CI (46.3–50.4) does not overlap with the non-migrated CI (70.87–71.57) by more than 20 years.
 
-### Charts generated (24 total, after revisions)
+### Charts generated (26 total, after revisions)
 
 | File | Description |
 |------|-------------|
@@ -258,6 +260,7 @@ Phase 5b clearance received → full analysis run executed on `esu_creative_work
 | fig05 | Deported group: age-at-death histogram |
 | fig06 | Split violin plots by gender (Male=blue left, Female=red right) — full distribution shape per group × gender |
 | fig07 | Death year histogram 1900–2024 (migrated vs non-migrated, annotated) |
+| fig07b | Deported group: death year histogram 1920–1960 (1937 peak = 65 deaths = 35.5% of all deported) |
 | fig08 | Deported deaths by year 1921–1965 (1937 peak highlighted) |
 | fig09 | Non-migrant deaths by Soviet period — count and avg age, dual panel |
 | fig10 | Birth cohort LE line chart, all four groups + SSR reference overlay |
@@ -275,6 +278,7 @@ Phase 5b clearance received → full analysis run executed on `esu_creative_work
 | fig20 | Conservative two-group comparison: migrated vs entire Soviet sphere (n=7,363) |
 | fig21 | Soviet republic LE comparison: Ukrainian SSR vs Russian SFSR, Baltic SSRs, Central Asian SSRs |
 | fig22 | Educated urban comparison: creative workers vs Ukrainian SSR + Shkolnikov +3–5 yr premium band |
+| fig23 | Regression coefficient plot — grouped bars: Model 1 (unadjusted) vs Model 2 (adjusted, +cohort +profession +region). Shows gap stability |
 
 ### Statistical methods used
 
@@ -525,6 +529,24 @@ Used in: fig22
 ## Phase 6 — Paper Writing
 
 **Status: COMPLETED (2026-04-05/06).** Paper draft (`PAPER_DRAFT.md`) updated to V2.3 numbers throughout. All 24 figures referenced with captions (Figures 1–22 plus 15b and 19b). Cliff's delta (δ=0.18) and 95% confidence intervals added to abstract and §3.8. Deported group analysis, internal transfer null finding, gender analysis, and Soviet republic contextualisation incorporated. Author corrected to Mark Symkin (sole V2 author). V1 citation updated to all three co-authors (Berdnyk, Symkin, Motiashova) with GitHub repository link. V2 paper is at final-draft stage as of 2026-04-06.
+
+**Peer-review revision completed 2026-04-06 (11-step process):**
+
+| Step | Change |
+|------|--------|
+| 1 | Title changed: "Life Expectancy..." → "Mortality Differentials..."; 37 instances of "life expectancy" → "mean age at death" throughout paper |
+| 2 | Causal language softened: 7 instances of "confirms/demonstrates/constitute corroboration" → "is consistent with/suggests/documents" |
+| 3 | Paper reframed as descriptive historical-demographic study in abstract, intro, and conclusion |
+| 4 | §3.4.1 "Sample Construction and Missing Data" added: Table B exclusion flow + 3 bias direction paragraphs |
+| 5 | §8 AI quality assurance rewritten with actual validation numbers (n=63, seed=99, 3.2% error rate, 95% CI 0.9%–7.9%); Appendix A template added |
+| 6 | Dedicated self-selection bias subsection added to §5.4: direction analysis (two offsetting mechanisms), regression partial response, 4 recommended additional analyses (IV, PSM, heterogeneity, diaspora comparison) |
+| 7 | OLS regression added to generate_analysis.py; §4.9 + Table A (markdown) + Figure 23 (grouped bar, unadjusted vs adjusted) added to paper. Key result: migrated +4.04y → +3.31y after adjustment; gap persists |
+| 8 | §3.4.1 cross-reference added to Galician survival bias paragraph in §5.4 |
+| 9 | Definitional note added after Table 1 clarifying "deported" = state-ordered Gulag/deportation, ≠ wartime civilian displacement |
+| 10 | Cliff's δ column added to §4.2 pairwise comparison table (δ=0.18 for primary comparison; explanatory note on why not reported for deported comparisons) |
+| 11 | Tone audit — no further causal language found beyond Steps 2–3 |
+| + | Chart titles/axis labels updated: "Life Expectancy" → "Mean Age at Death" throughout all figures |
+| + | Figure 7b added: deported group death year histogram 1920–1960 |
 
 ---
 

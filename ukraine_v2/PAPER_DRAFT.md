@@ -238,9 +238,9 @@ The non-migrated group (n=6,030) achieved a mean age at death of 71.22 years and
 
 The migrated group (n=1,280) achieved a mean age at death of 75.25 years and a median of 77 years (SD=13.88). Migrants were largely spared the systematic political violence that produced the left tail of the non-migrated distribution, though they faced other mortality risks including wartime conditions, poverty in exile, and the psychological consequences of displacement.
 
-The internal transfer group (n=1,150) — workers who relocated within the Soviet Union under voluntary or professional pressure — shows a mean LE of 70.70 years, statistically indistinguishable from non-migrated (gap = +0.52 yrs, p=0.094, d=0.038). This near-null finding is itself significant: moving within the Soviet system conferred no meaningful survival advantage.
+The internal transfer group (n=1,150) — workers who relocated within the Soviet Union under voluntary or professional pressure — shows a mean age at death of 70.70 years, statistically indistinguishable from non-migrated (gap = +0.52 yrs, p=0.094, d=0.038). This near-null finding is itself significant: moving within the Soviet system conferred no meaningful survival advantage.
 
-The most extreme finding is the deported group (n=183): mean LE of 48.35 years, median 45 years — a 22.87-year deficit relative to non-migrants and a 26.90-year deficit relative to migrants. This group, comprising workers forcibly expelled to Central Asia, Siberia, or the Gulag[^9], experienced mortality conditions equivalent to those observed in wartime populations.
+The most extreme finding is the deported group (n=183): mean age at death of 48.35 years, median 45 years — a 22.87-year deficit relative to non-migrants and a 26.90-year deficit relative to migrants. This group, comprising workers forcibly expelled to Central Asia, Siberia, or the Gulag[^9], experienced mortality conditions equivalent to those observed in wartime populations.
 
 ### 4.2 Statistical Significance
 
@@ -261,7 +261,7 @@ For the primary comparison (migrated vs non-migrated), Cohen's d = 0.292 indicat
 
 ### 4.3 Profession-Level Breakdown
 
-The mean age at death gap between migrants and non-migrants is consistent across all creative professions. Table 2 reports mean LE by group for each profession category.
+The mean age at death gap between migrants and non-migrants is consistent across all creative professions. Table 2 reports mean age at death by group for each profession category.
 
 **Table 2: Mean Age at Death by Profession**
 
@@ -274,7 +274,7 @@ The mean age at death gap between migrants and non-migrants is consistent across
 | Architects | 78.6 | 61 | 72.5 | 404 | 64.7 | 3 | +6.1y |
 | Other Creative | 78.0 | 107 | 73.1 | 222 | 60.0 | 4 | +4.9y |
 
-The gap is present across every profession. Writers/Poets contribute the largest deported cohort (n=117, mean LE 45.2) — reflecting the particular intensity of Soviet targeting of Ukrainian-language literary production. The Executed Renaissance (*Rozstriliane Vidrodzhennia*) was overwhelmingly a literary phenomenon: writers and poets were arrested, shot at Sandarmokh, or died in the Gulag at rates far exceeding other creative professions.
+The gap is present across every profession. Writers/Poets contribute the largest deported cohort (n=117, mean age at death of 45.2) — reflecting the particular intensity of Soviet targeting of Ukrainian-language literary production. The Executed Renaissance (*Rozstriliane Vidrodzhennia*) was overwhelmingly a literary phenomenon: writers and poets were arrested, shot at Sandarmokh, or died in the Gulag at rates far exceeding other creative professions.
 
 Architects show the largest migrant/non-migrant gap (+6.1 years) with relatively small deported n (n=3), suggesting that architectural professionals who remained were not primarily targeted by the state but benefited from emigration through access to Western professional markets and living standards.
 
@@ -329,7 +329,7 @@ The deported group's concentration of deaths in 1937 corresponds directly to the
 
 ### 4.6 Birth Cohort Analysis
 
-The mean age at death gap between migrants and non-migrants is strongly concentrated in specific birth cohorts. Table 5 presents mean LE by decade of birth for both groups.
+The mean age at death gap between migrants and non-migrants is strongly concentrated in specific birth cohorts. Table 5 presents mean age at death by decade of birth for both groups.
 
 **Table 5: Mean Age at Death by Birth Cohort**
 
@@ -342,7 +342,7 @@ The mean age at death gap between migrants and non-migrants is strongly concentr
 | 1920s | 78.8 | 164 | 75.4 | 1,256 | 53.2 | 6 | +3.4y |
 | 1930s | 74.8 | 89 | 73.2 | 1,136 | 78.3 | 3 | +1.6y |
 
-The 1890s cohort shows the most extreme deported mortality: mean LE of 44.6 years among those 60 deported individuals, nearly all of whom died in the Terror years. This cohort — those born 1890–1899, who were in their thirties and forties during the peak repression — formed the core of the Executed Renaissance and bears the full weight of state-organised liquidation.
+The 1890s cohort shows the most extreme deported mortality: mean age at death of 44.6 years among those 60 deported individuals, nearly all of whom died in the Terror years. This cohort — those born 1890–1899, who were in their thirties and forties during the peak repression — formed the core of the Executed Renaissance and bears the full weight of state-organised liquidation.
 
 The pattern across cohorts is consistent with a differential impact of Soviet repression by birth generation: the gap persists across all birth decades but is most severe where the cohort's prime years overlapped with peak repression. The 1930s cohort shows the smallest gap (+1.6 years) — those workers were children during the Terror and came of age in post-war Soviet Ukraine, facing bureaucratic repression rather than physical elimination.
 
@@ -414,7 +414,7 @@ The 4.04-year gap in mean age at death between migrant and non-migrant Ukrainian
 
 The gap reflects, we argue, primarily four mechanisms:
 
-**Direct political mortality.** The most evident mechanism is execution, imprisonment, and Gulag death. The 89 non-migrated and deported deaths concentrated in 1937 alone (average age ~44 for those two groups, versus 68.9 for the 10 migrants who died the same year of natural causes), the deported group's 88.0% repression-cause mortality (executed, Gulag, exile, and other state-violence causes combined), and the near-total destruction of the 1890s deported cohort (mean LE 44.6) all point to a substantial excess mortality from direct state violence that had no equivalent in migrant communities.
+**Direct political mortality.** The most evident mechanism is execution, imprisonment, and Gulag death. The 89 non-migrated and deported deaths concentrated in 1937 alone (average age ~44 for those two groups, versus 68.9 for the 10 migrants who died the same year of natural causes), the deported group's 88.0% repression-cause mortality (executed, Gulag, exile, and other state-violence causes combined), and the near-total destruction of the 1890s deported cohort (mean age at death of 44.6) all point to a substantial excess mortality from direct state violence that had no equivalent in migrant communities.
 
 **Indirect mortality from Soviet conditions.** Beyond direct political violence, Soviet conditions — poor nutrition, restricted medical care, psychological stress from constant surveillance and self-censorship, the health consequences of Gulag survival, and enforced poverty — likely contributed to excess mortality among non-migrants across the entire Soviet period. This mechanism is not directly measurable from our data but is consistent with the lower average age at death in every Soviet-era period compared to the post-1991 period.
 
@@ -502,11 +502,13 @@ All figures were generated computationally from the dataset described in §3 and
 
 **Figure 7:** Overlapping histogram of death years (2-year bins, 1900–2024) for the migrated and non-migrated groups, with vertical marker lines at 1933 (Holodomor), 1937 (Great Terror), and 1941 (WWII begins). Shows the temporal distribution of deaths across the two largest groups and makes visible the period clusters associated with Soviet mortality crises (peaks in the 1930s–1940s for non-migrants) versus the more gradual post-war distribution for migrants.
 
+**Figure 7b:** Death year histogram for the deported group only (n=183), restricted to 1920–1960 where the majority of deaths occurred. The 1937 peak — 65 deaths (35.5% of all deported deaths) in a single year — is the single most concentrated mortality event in the dataset, consistent with mass execution during the Stalinist Great Terror. The 1934–1938 period accounts for 95 of 183 deported deaths (51.9%).
+
 **Figure 8:** Year-by-year bar chart of recorded deaths in the deported group (n=183), 1920–2000. The 1937 spike — 65 deaths, 35.5% of the entire cohort in a single calendar year — is the visual centrepiece of the repression analysis and the strongest single-year mortality signal in the dataset. A secondary cluster in 1941–1945 reflects wartime Gulag conditions. After approximately 1950, deaths in the deported cohort drop to near-zero; the cohort is, in demographic terms, effectively destroyed.
 
 **Figure 9:** Grouped bar chart of mean age at death by Soviet historical period (NEP 1921–1928, Holodomor 1929–1933, Great Terror 1934–1938, WWII 1939–1945, Late Stalinist 1946–1953, Thaw 1954–1964, Stagnation 1965–1991, Post-independence 1992–present) for each migration group. Repression-period bars are visually distinguished. The deported group's Terror-period bar (mean 43.4 yrs) is the lowest of any group in any period. The post-independence bar for non-migrants (74.7 yrs) is the highest, illustrating why excluding post-Soviet deaths systematically underestimates non-migrant longevity.
 
-**Figure 10:** Line chart showing mean age at death by birth decade for migrants, non-migrants, internal transfers, and deported workers (minimum n=10 per data point to suppress noise). The 1880s and 1890s cohorts — the Executed Renaissance generation — show the largest between-group gaps (5.1 yrs for both). The deported 1890s cohort (mean LE 44.6 yrs, n=60) represents the most concentrated mortality event in the dataset. Gaps narrow for post-1920 cohorts, consistent with declining Soviet political targeting of creative workers after the Great Terror.
+**Figure 10:** Line chart showing mean age at death by birth decade for migrants, non-migrants, internal transfers, and deported workers (minimum n=10 per data point to suppress noise). The 1880s and 1890s cohorts — the Executed Renaissance generation — show the largest between-group gaps (5.1 yrs for both). The deported 1890s cohort (mean age at death of 44.6 yrs, n=60) represents the most concentrated mortality event in the dataset. Gaps narrow for post-1920 cohorts, consistent with declining Soviet political targeting of creative workers after the Great Terror.
 
 **Figure 11:** Grouped bar chart showing group sizes and mean age at death by creative profession (Writers/Poets, Visual Artists, Musicians/Composers, Theatre/Film, Architects, Other Creative). The migrated-versus-non-migrated gap is present in every profession category without exception. Writers/Poets contribute the largest deported sub-cohort (n=117), reflecting the particular intensity of Soviet targeting of Ukrainian-language literary production. Architects show the largest between-group gap (+6.1 yrs).
 

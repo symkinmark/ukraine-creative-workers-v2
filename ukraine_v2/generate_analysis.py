@@ -1,6 +1,6 @@
 """
 generate_analysis.py — V2.1 Full Analysis & Chart Suite
-Ukrainian Creative Workers Life Expectancy During Soviet Occupation
+Mortality Differentials Among Ukrainian Creative Workers During Soviet Occupation
 Berdnyk & Symkin 2026
 
 Generates:
@@ -305,7 +305,7 @@ hr('-')
 
 descs = {ms: describe(groups[ms], GROUP_LABELS[ms]) for ms in ALL_GROUPS}
 
-h(f"  {'Group':38s} {'n':>5}  {'Mean LE':>8}  {'Median':>7}  {'SD':>6}  {'95% CI':>16}")
+h(f"  {'Group':38s} {'n':>5}  {'Mean age at death':>18}  {'Median':>7}  {'SD':>6}  {'95% CI':>16}")
 h("  " + "-" * 90)
 for ms in ALL_GROUPS:
     d = descs[ms]
@@ -492,8 +492,8 @@ for bar, mean, se, n in zip(bars, means, ses, ns):
             f"{mean:.1f} yrs\n(n={n})",
             ha='center', va='bottom', fontsize=9, color=COLOUR['navy'])
 
-apply_style(ax, 'Figure 1 — Mean Life Expectancy by Migration Group\n(±1 SE error bars)',
-            ylabel='Mean Life Expectancy (years)')
+apply_style(ax, 'Figure 1 — Mean Age at Death by Migration Group\n(±1 SE error bars)',
+            ylabel='Mean Age at Death (years)')
 ax.set_xticks(x)
 ax.set_xticklabels(labels, rotation=15, ha='right')
 ax.set_ylim(0, max(means) * 1.3 + 5)
@@ -600,8 +600,8 @@ for xi, (mv, nv) in enumerate(zip(mig_vals, nm_vals)):
     ax.text(xi + w/2 + 0.06, mid, f"+{gap:.1f} yrs", va='center',
             fontsize=9, color='#333', fontweight='bold')
 
-apply_style(ax, 'Figure 3 — Mean Life Expectancy: V1 vs V2.3 (consistent two-group framing)',
-            ylabel='Mean Life Expectancy (years)')
+apply_style(ax, 'Figure 3 — Mean Age at Death: V1 vs V2.3 (consistent two-group framing)',
+            ylabel='Mean Age at Death (years)')
 ax.set_xticks(x)
 ax.set_xticklabels(labels_v, fontsize=11)
 ax.set_ylim(0, max(mig_vals + nm_vals) * 1.25)
@@ -631,8 +631,8 @@ for element in ['whiskers', 'caps', 'fliers']:
         item.set(color='#444444')
 
 ax.set_xticklabels([GROUP_LABELS[ms] for ms in ALL_GROUPS], rotation=15, ha='right')
-apply_style(ax, 'Figure 4 — Life Expectancy Distribution by Group (Box Plots)',
-            ylabel='Life Expectancy (years)')
+apply_style(ax, 'Figure 4 — Mean Age at Death Distribution by Group (Box Plots)',
+            ylabel='Mean Age at Death (years)')
 ax.set_ylim(0, 110)
 
 # Annotate medians
@@ -700,8 +700,8 @@ for i, ms in enumerate(ALL_GROUPS):
     ax.text(i, -6, f"M:{nm}\nF:{nf}", ha='center', va='top',
             fontsize=7, color=COLOUR['navy'])
 
-apply_style(ax, 'Figure 6 — Life Expectancy Distribution by Group and Gender (Split Violin)',
-            xlabel='', ylabel='Life Expectancy (years)')
+apply_style(ax, 'Figure 6 — Mean Age at Death Distribution by Group and Gender (Split Violin)',
+            xlabel='', ylabel='Mean Age at Death (years)')
 ax.set_xticklabels(_order, rotation=15, ha='right')
 ax.set_ylim(-12, 110)
 ax.legend(title='Gender', fontsize=9, loc='lower right')
@@ -740,6 +740,46 @@ ax.legend(fontsize=9)
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 add_source(fig)
 save(fig, 'fig07_death_year_histogram.png')
+
+
+# ===========================================================================
+# FIG 07b — DEPORTED GROUP: DEATH YEAR HISTOGRAM 1920–1960
+# ===========================================================================
+print("  fig07b_deported_death_year.png")
+
+dep_dy_07b = [r['_dy'] for r in deported if r['_dy'] and 1920 <= r['_dy'] <= 1960]
+dep_counter_07b = collections.Counter(dep_dy_07b)
+n_dep_total_07b = len(deported)
+
+fig07b, ax07b = plt.subplots(figsize=(12, 6))
+bins_07b = range(1920, 1962, 2)
+ax07b.hist(dep_dy_07b, bins=bins_07b, color=COLOUR['deported'],
+           edgecolor='white', linewidth=0.4, alpha=0.85)
+
+# Annotate Great Terror 1937 with a vertical dashed line
+ax07b.axvline(1937, color='#8B0000', linestyle='--', linewidth=2)
+ax07b.text(1937.4, ax07b.get_ylim()[1] * 0.88 if ax07b.get_ylim()[1] > 0 else 30,
+           'Great Terror\n1937', color='#8B0000', fontsize=8.5, va='top')
+
+# Find peak bin count near 1937 and annotate it
+peak_1937_count = dep_counter_07b.get(1937, 0) + dep_counter_07b.get(1938, 0)
+peak_y = max((dep_counter_07b.get(1937, 0), dep_counter_07b.get(1938, 0)))
+peak_x = 1937 if dep_counter_07b.get(1937, 0) >= dep_counter_07b.get(1938, 0) else 1938
+ax07b.text(peak_x, peak_y + 0.5, f'{peak_y}', ha='center', va='bottom',
+           fontsize=9, fontweight='bold', color='#8B0000')
+
+# n= annotation
+ax07b.text(0.02, 0.96, f'n={n_dep_total_07b} total deported workers',
+           transform=ax07b.transAxes, fontsize=9, va='top', ha='left',
+           color=COLOUR['navy'],
+           bbox=dict(boxstyle='round,pad=0.3', facecolor='#EBF5FB',
+                     edgecolor='#AED6F1', linewidth=1))
+
+apply_style(ax07b, 'Figure 7b — Deported Group: Death Year Distribution 1920–1960',
+            xlabel='Year of Death', ylabel='Number of Deaths')
+plt.tight_layout(rect=[0, 0.04, 1, 1])
+add_source(fig07b)
+save(fig07b, 'fig07b_deported_death_year.png')
 
 
 # ===========================================================================
@@ -962,8 +1002,8 @@ for i, ms in enumerate(ALL_GROUPS):
 
 ax.set_xticks(x)
 ax.set_xticklabels(professions, rotation=20, ha='right', fontsize=9)
-apply_style(ax, 'Figure 11 — Life Expectancy by Profession and Migration Group',
-            ylabel='Mean Life Expectancy (years)')
+apply_style(ax, 'Figure 11 — Mean Age at Death by Profession and Migration Group',
+            ylabel='Mean Age at Death (years)')
 ax.legend(fontsize=8, ncol=2)
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 add_source(fig)
@@ -1065,8 +1105,8 @@ ax.fill_between(error_rates, gaps, 0,
                 alpha=0.1, color=COLOUR['migrated'])
 
 ax.set_xlabel('Assumed AI Classification Error Rate (%)', fontsize=11, color=COLOUR['navy'])
-ax.set_ylabel('LE Gap: Migrated − Non-migrated (years)', fontsize=11, color=COLOUR['navy'])
-apply_style(ax, 'Figure 14 — Sensitivity Analysis: LE Gap vs AI Error Rate')
+ax.set_ylabel('Mean Age at Death Gap: Migrated − Non-migrated (years)', fontsize=11, color=COLOUR['navy'])
+apply_style(ax, 'Figure 14 — Sensitivity Analysis: Mean Age at Death Gap vs AI Error Rate')
 ax.legend(fontsize=9)
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 add_source(fig)
@@ -1101,9 +1141,9 @@ for element in ['whiskers', 'caps', 'fliers']:
 ax.set_xticklabels([GROUP_LABELS['internal_transfer'], GROUP_LABELS['non_migrated']],
                    rotation=10)
 apply_style(ax,
-    f'Figure 15 — Internal Transfer vs Non-Migrated LE\n'
+    f'Figure 15 — Internal Transfer vs Non-Migrated Mean Age at Death\n'
     f'(p={p15:.3f} — {"NOT significant" if p15 and p15 >= 0.05 else "significant"})',
-    ylabel='Life Expectancy (years)')
+    ylabel='Mean Age at Death (years)')
 ax.text(0.5, 0.95,
         f"Mean IT={it_mean}  Mean NM={nm_mean}  p={p15}",
         ha='center', va='top', transform=ax.transAxes, fontsize=9, color=COLOUR['navy'])
@@ -1169,7 +1209,7 @@ concl = (
     f" = +{statistics.mean(mig_les)-statistics.mean(nm_les2):.1f} yrs  (p={p_mig_nm:.4f})\n"
     f"• Internal transfer vs Non-migrated:  Δ={statistics.mean(it_les2):.1f}−{statistics.mean(nm_les2):.1f}"
     f" = {statistics.mean(it_les2)-statistics.mean(nm_les2):+.1f} yrs  (p={p_it_nm:.3f} — NULL RESULT)\n"
-    f"• Moving within the USSR gives no LE benefit — leaving the Soviet sphere was what mattered."
+    f"• Moving within the USSR gives no mean age at death benefit — leaving the Soviet sphere was what mattered."
 )
 ax.text(0.02, 0.97, concl, transform=ax.transAxes,
         fontsize=8.5, va='top', ha='left',
@@ -1178,7 +1218,7 @@ ax.text(0.02, 0.97, concl, transform=ax.transAxes,
         fontfamily='monospace')
 
 apply_style(ax,
-    'Figure 15b — Life Expectancy: All Four Groups Compared\n'
+    'Figure 15b — Mean Age at Death: All Four Groups Compared\n'
     '(Box = IQR; line = median; whiskers = 1.5×IQR; dots = outliers)',
     ylabel='Age at Death (years)')
 add_source(fig)
@@ -1428,7 +1468,7 @@ ax_bar.set_xticklabels(bar_labels, fontsize=9)
 ax_bar.set_ylim(0, max(bar_means) * 1.35)
 apply_style(ax_bar,
     f'Conservative Two-Group Comparison\nGap = +{gap_2g} yrs  |  Cohen\'s d = {cd2g}  |  p < 0.001',
-    ylabel='Mean Life Expectancy (years)')
+    ylabel='Mean Age at Death (years)')
 ax_bar.axhline(UKR_SSR_SOVIET_MEAN, color='#27AE60', linestyle=':',
                linewidth=2, label=f'Ukrainian SSR pop. avg ≈{UKR_SSR_SOVIET_MEAN} yrs')
 ax_bar.legend(fontsize=8)
@@ -1537,8 +1577,8 @@ for j, g in enumerate(['male', 'female']):
 
 ax.set_xticks(x)
 ax.set_xticklabels([GROUP_LABELS[ms] for ms in ALL_GROUPS], rotation=15, ha='right')
-apply_style(ax, 'Figure 18 — Mean Life Expectancy by Gender and Migration Group\n(±1 SE)',
-            ylabel='Mean Life Expectancy (years)')
+apply_style(ax, 'Figure 18 — Mean Age at Death by Gender and Migration Group\n(±1 SE)',
+            ylabel='Mean Age at Death (years)')
 ax.legend(fontsize=9)
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 add_source(fig)
@@ -1799,9 +1839,9 @@ if _PLOTLY_AVAIL:
             customdata=[[n_val, ci_lo, ci_hi, d['median'], _cd_vs_nm[ms]]],
             hovertemplate=(
                 '<b>%{x}</b><br>'
-                'Mean LE: <b>%{y:.2f} years</b><br>'
+                'Mean age at death: <b>%{y:.2f} years</b><br>'
                 '95% CI: [%{customdata[1]:.2f} – %{customdata[2]:.2f}]<br>'
-                'Median LE: %{customdata[3]:.1f} years<br>'
+                'Median age at death: %{customdata[3]:.1f} years<br>'
                 'n = %{customdata[0]:,}<br>'
                 '%{customdata[4]}<extra></extra>'
             ),
@@ -1833,10 +1873,10 @@ if _PLOTLY_AVAIL:
 
     fig_p01.update_layout(
         title=dict(
-            text='Figure 1 — Mean Life Expectancy by Migration Group',
+            text='Figure 1 — Mean Age at Death by Migration Group',
             font=dict(size=15),
         ),
-        yaxis_title='Mean Life Expectancy (years)',
+        yaxis_title='Mean Age at Death (years)',
         xaxis_title='Migration Group',
         showlegend=False,
         plot_bgcolor='white',
@@ -2014,7 +2054,7 @@ if _PLOTLY_AVAIL:
         customdata=[[round(g, 2), er] for g, er in zip(gaps, error_rates)],
         hovertemplate=(
             'Error rate: <b>%{x}%</b><br>'
-            'LE gap: <b>%{y:.2f} years</b><br>'
+            'Mean age at death gap: <b>%{y:.2f} years</b><br>'
             '<i>Above 0 = migrated lived longer</i><extra></extra>'
         ),
     ))
@@ -2038,11 +2078,11 @@ if _PLOTLY_AVAIL:
 
     fig_p14.update_layout(
         title=dict(
-            text='Figure 14 — Sensitivity Analysis: LE Gap vs AI Classification Error Rate',
+            text='Figure 14 — Sensitivity Analysis: Mean Age at Death Gap vs AI Classification Error Rate',
             font=dict(size=15),
         ),
         xaxis_title='Assumed AI Classification Error Rate (%)',
-        yaxis_title='LE Gap: Migrated − Non-migrated (years)',
+        yaxis_title='Mean Age at Death Gap: Migrated − Non-migrated (years)',
         plot_bgcolor='white',
         paper_bgcolor='white',
         font=dict(family='Georgia, serif', size=12),
@@ -2167,9 +2207,9 @@ if _PLOTLY_AVAIL:
         ))
 
     fig_p04.update_layout(
-        title=dict(text='Figure 4 — Life Expectancy Distribution by Group (Box Plots)',
+        title=dict(text='Figure 4 — Mean Age at Death Distribution by Group (Box Plots)',
                    font=dict(size=15)),
-        yaxis_title='Life Expectancy (years)',
+        yaxis_title='Mean Age at Death (years)',
         plot_bgcolor='white',
         paper_bgcolor='white',
         font=dict(family='Georgia, serif', size=12),
@@ -2229,6 +2269,65 @@ if _PLOTLY_AVAIL:
     _save_interactive(fig_p08, 'fig08_interactive.html')
 
     # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 07b — Deported group: death year histogram 1920–1960
+    # -----------------------------------------------------------------------
+    dep_dy_07b_p = [r['_dy'] for r in deported if r['_dy'] and 1920 <= r['_dy'] <= 1960]
+    dep_counter_07b_p = collections.Counter(dep_dy_07b_p)
+    years_07b_p = list(range(1920, 1961, 2))
+    counts_07b_p = [sum(1 for d in dep_dy_07b_p if lo <= d < lo + 2) for lo in years_07b_p]
+    pct_07b_p = [round(100 * c / n_dep_total_07b, 1) if n_dep_total_07b else 0 for c in counts_07b_p]
+    bar_colours_07b = ['#8B0000' if (lo == 1936 or lo == 1938) else _PCOLOUR['deported']
+                       for lo in years_07b_p]
+
+    fig_p07b = go.Figure()
+    fig_p07b.add_trace(go.Bar(
+        name='Deaths (2-yr bin)',
+        x=[f'{lo}–{lo+1}' for lo in years_07b_p],
+        y=counts_07b_p,
+        marker_color=bar_colours_07b,
+        customdata=list(zip(pct_07b_p, years_07b_p)),
+        hovertemplate=(
+            'Years: <b>%{x}</b><br>'
+            'Deaths: <b>%{y}</b><br>'
+            '% of deported group: %{customdata[0]:.1f}%<extra></extra>'
+        ),
+    ))
+    # Annotate the 1936–1937 bin (the Great Terror peak) with a shape + annotation
+    peak_bin_label_07b = '1936–1937'
+    peak_deaths_07b = dep_counter_07b_p.get(1937, 0)
+    peak_pct_07b = round(100 * peak_deaths_07b / n_dep_total_07b, 1) if n_dep_total_07b else 0
+    fig_p07b.add_shape(
+        type='line',
+        x0=peak_bin_label_07b, x1=peak_bin_label_07b,
+        y0=0, y1=1, yref='paper',
+        line=dict(color='#8B0000', width=2, dash='dash'),
+    )
+    fig_p07b.add_annotation(
+        x=peak_bin_label_07b,
+        y=max(counts_07b_p) * 0.95 if counts_07b_p else 10,
+        text=f'1937 — {peak_deaths_07b} deaths ({peak_pct_07b}% of group)',
+        showarrow=True, arrowhead=2, arrowsize=1, arrowwidth=1.5,
+        arrowcolor='#8B0000', ax=60, ay=-30,
+        font=dict(color='#8B0000', size=11, family='Georgia, serif'),
+        bgcolor='rgba(255,235,235,0.9)', bordercolor='#8B0000', borderwidth=1, borderpad=5,
+    )
+    fig_p07b.update_layout(
+        title=dict(text='Figure 7b — Deported Group: Death Year Distribution 1920–1960',
+                   font=dict(size=15)),
+        xaxis_title='Year of Death',
+        yaxis_title='Number of Deaths',
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee'),
+        xaxis=dict(gridcolor='#eee'),
+        showlegend=False,
+        margin=dict(t=60, b=80, l=60, r=20),
+        height=450,
+    )
+    _save_interactive(fig_p07b, 'fig07b_interactive.html')
+
+    # -----------------------------------------------------------------------
     # INTERACTIVE FIG 11 — LE by profession × migration group
     # -----------------------------------------------------------------------
     professions_p = list(PROFESSION_KEYWORDS.keys())
@@ -2249,15 +2348,15 @@ if _PLOTLY_AVAIL:
             hovertemplate=(
                 '<b>%{x}</b><br>'
                 f'{GROUP_LABELS[ms]}<br>'
-                'Mean LE: <b>%{y:.1f} years</b><br>'
+                'Mean age at death: <b>%{y:.1f} years</b><br>'
                 'n = %{customdata[0]}<extra></extra>'
             ),
         ))
 
     fig_p11.update_layout(
-        title=dict(text='Figure 11 — Mean Life Expectancy by Creative Profession and Migration Group',
+        title=dict(text='Figure 11 — Mean Age at Death by Creative Profession and Migration Group',
                    font=dict(size=15)),
-        yaxis_title='Mean Life Expectancy (years)',
+        yaxis_title='Mean Age at Death (years)',
         xaxis_title='Creative Profession',
         barmode='group',
         plot_bgcolor='white',
@@ -2357,7 +2456,7 @@ if _PLOTLY_AVAIL:
         customdata=[[V1_n, v1_gap], [V23_mig_n, v23_gap]],
         hovertemplate=(
             '<b>Left USSR / Migrated</b><br>'
-            'Mean LE: <b>%{y:.1f} years</b><br>'
+            'Mean age at death: <b>%{y:.1f} years</b><br>'
             'Gap vs stayed: <b>+%{customdata[1]:.1f} yrs</b><br>'
             'n = %{customdata[0]:,}<extra></extra>'
         ),
@@ -2372,14 +2471,14 @@ if _PLOTLY_AVAIL:
         customdata=[[V1_n, v1_gap], [V23_nm_n, v23_gap]],
         hovertemplate=(
             '<b>Stayed in Soviet sphere</b><br>'
-            'Mean LE: <b>%{y:.1f} years</b><br>'
+            'Mean age at death: <b>%{y:.1f} years</b><br>'
             'n = %{customdata[0]:,}<extra></extra>'
         ),
     ))
     fig_p03.update_layout(
-        title=dict(text='Figure 3 — Mean Life Expectancy: V1 vs V2.3 (Two-Group Framing)',
+        title=dict(text='Figure 3 — Mean Age at Death: V1 vs V2.3 (Two-Group Framing)',
                    font=dict(size=15)),
-        yaxis_title='Mean Life Expectancy (years)',
+        yaxis_title='Mean Age at Death (years)',
         barmode='group',
         plot_bgcolor='white', paper_bgcolor='white',
         font=dict(family='Georgia, serif', size=12),
@@ -2478,7 +2577,7 @@ if _PLOTLY_AVAIL:
                 ),
             ))
     fig_p06.update_layout(
-        title=dict(text='Figure 6 — Life Expectancy Distribution by Group and Gender (Violin)',
+        title=dict(text='Figure 6 — Mean Age at Death Distribution by Group and Gender (Violin)',
                    font=dict(size=15)),
         yaxis_title='Age at Death (years)',
         violinmode='overlay',
@@ -2613,7 +2712,7 @@ if _PLOTLY_AVAIL:
         bgcolor='rgba(250,250,250,0.9)', bordercolor='#ccc', borderwidth=1, borderpad=5,
     )
     fig_p15.update_layout(
-        title=dict(text='Figure 15 — Internal Transfer vs Non-Migrated LE (Null Finding)',
+        title=dict(text='Figure 15 — Internal Transfer vs Non-Migrated Mean Age at Death (Null Finding)',
                    font=dict(size=15)),
         yaxis_title='Age at Death (years)',
         plot_bgcolor='white', paper_bgcolor='white',
@@ -2663,7 +2762,7 @@ if _PLOTLY_AVAIL:
         bgcolor='rgba(250,250,250,0.9)', bordercolor='#ccc', borderwidth=1, borderpad=6,
     )
     fig_p15b.update_layout(
-        title=dict(text='Figure 15b — All Four Groups: Life Expectancy Distribution',
+        title=dict(text='Figure 15b — All Four Groups: Mean Age at Death Distribution',
                    font=dict(size=15)),
         yaxis_title='Age at Death (years)',
         plot_bgcolor='white', paper_bgcolor='white',
@@ -2715,7 +2814,7 @@ if _PLOTLY_AVAIL:
     _save_interactive(fig_p17, 'fig17_interactive.html')
 
     # -----------------------------------------------------------------------
-    # INTERACTIVE FIG 18 — Mean LE by gender × migration group
+    # INTERACTIVE FIG 18 — Mean age at death by gender × migration group
     # -----------------------------------------------------------------------
     fig_p18 = go.Figure()
     for gender in ['male', 'female']:
@@ -2736,15 +2835,15 @@ if _PLOTLY_AVAIL:
             customdata=list(zip(ns_18, [round(s * 1.96, 2) for s in ses_18])),
             hovertemplate=(
                 f'<b>{gender.capitalize()}</b> — %{{x}}<br>'
-                'Mean LE: <b>%{y:.2f} years</b><br>'
+                'Mean age at death: <b>%{y:.2f} years</b><br>'
                 '±1.96 SE: ±%{customdata[1]:.2f} yrs<br>'
                 'n = %{customdata[0]:,}<extra></extra>'
             ),
         ))
     fig_p18.update_layout(
-        title=dict(text='Figure 18 — Mean Life Expectancy by Gender and Migration Group',
+        title=dict(text='Figure 18 — Mean Age at Death by Gender and Migration Group',
                    font=dict(size=15)),
-        yaxis_title='Mean Life Expectancy (years)',
+        yaxis_title='Mean Age at Death (years)',
         barmode='group',
         plot_bgcolor='white', paper_bgcolor='white',
         font=dict(family='Georgia, serif', size=12),
@@ -2880,7 +2979,7 @@ if _PLOTLY_AVAIL:
         f'Stayed in Soviet sphere<br>(non-mig + deported + IT,<br>n={len(stayed_in_ussr):,})',
     ]
     fig_p20.add_trace(go.Bar(
-        name='Mean LE',
+        name='Mean age at death',
         x=bar_labels_20,
         y=[mean_left, mean_stayed],
         error_y=dict(type='data', array=[round(se_left, 3), round(se_stayed, 3)],
@@ -2890,7 +2989,7 @@ if _PLOTLY_AVAIL:
                     [len(stayed_in_ussr), ci_stayed_lo, ci_stayed_hi]],
         hovertemplate=(
             'Group: <b>%{x}</b><br>'
-            'Mean LE: <b>%{y:.2f} years</b><br>'
+            'Mean age at death: <b>%{y:.2f} years</b><br>'
             '95% CI: [%{customdata[1]:.2f} – %{customdata[2]:.2f}]<br>'
             'n = %{customdata[0]:,}<extra></extra>'
         ),
@@ -2904,9 +3003,9 @@ if _PLOTLY_AVAIL:
         bgcolor='rgba(240,248,255,0.9)', bordercolor='#2980B9', borderwidth=1, borderpad=6,
     )
     fig_p20.update_layout(
-        title=dict(text='Figure 20 — Conservative Two-Group Life Expectancy Comparison',
+        title=dict(text='Figure 20 — Conservative Two-Group Mean Age at Death Comparison',
                    font=dict(size=15)),
-        yaxis_title='Mean Life Expectancy (years)',
+        yaxis_title='Mean Age at Death (years)',
         plot_bgcolor='white', paper_bgcolor='white',
         font=dict(family='Georgia, serif', size=12),
         yaxis=dict(gridcolor='#eee', range=[0, max(mean_left, mean_stayed) * 1.25]),
@@ -2977,7 +3076,7 @@ if _PLOTLY_AVAIL:
                       annotation_position='bottom left',
                       annotation_font_size=9, annotation_font_color='#8B0000')
     fig_p21.update_layout(
-        title=dict(text='Figure 21 — Soviet Republic LE Comparison: Creative Workers vs General Population',
+        title=dict(text='Figure 21 — Soviet Republic Mean Age at Death Comparison: Creative Workers vs General Population',
                    font=dict(size=15)),
         xaxis_title='Decade of Death (midpoint year)',
         yaxis_title='Life Expectancy / Mean Age at Death (years)',
