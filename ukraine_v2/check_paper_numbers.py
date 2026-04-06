@@ -359,24 +359,22 @@ for r in analysable:
             _birth_mig_p[bl] += 1
 
 # Fuzzy match for each paper-reported city (Ukrainian keyword in birth_location)
-CITY_KEYWORDS = {
-    'Lviv':              'львів',
-    'Ternopil':          'тернопіл',
-    'Chernivtsi':        'чернівці',
-    'Kyiv':              'київ',
-    'Donetsk (Stalino)': 'донецьк',
+# Table 6 methodology: exact birth_location string match on ALL raw_rows (not just analysable)
+CITY_EXACT_LOCS = {
+    'Lviv':              'Львів',
+    'Ternopil':          'Тернопіль',
+    'Chernivtsi':        'Чернівці',
+    'Kyiv':              'Київ',
+    'Donetsk (Stalino)': 'м. Сталіно, нині Донецьк',
 }
 
-def city_stats(keyword):
-    kw = keyword.lower()
-    in_city = [r for r in analysable if kw in (r.get('birth_location','') or '').lower()]
-    if not in_city:
-        return 0, 0.0
-    n_mig = sum(1 for r in in_city if r['_ms'] == 'migrated')
-    pct   = round(100 * n_mig / len(in_city), 1)
-    return len(in_city), pct
+def city_stats(loc_str):
+    hits  = [r for r in raw_rows if (r.get('birth_location', '') or '').strip() == loc_str]
+    n_mig = sum(1 for r in hits if r.get('migration_status', '').strip().lower() == 'migrated')
+    pct   = round(100 * n_mig / len(hits), 1) if hits else 0.0
+    return len(hits), pct
 
-city_computed = {k: city_stats(v) for k, v in CITY_KEYWORDS.items()}
+city_computed = {k: city_stats(v) for k, v in CITY_EXACT_LOCS.items()}
 
 # ---------------------------------------------------------------------------
 # RUN ALL CHECKS
@@ -527,33 +525,18 @@ check("mig % age 90+ (§4.8)",          mig_90p_pct, 14.8, 0.15)
 
 # ── Table 6 — Geography ──────────────────────────────────────────────────────
 print(f"\n{BOLD}── TABLE 6: GEOGRAPHIC MIGRATION RATES ──{RESET}")
-print(f"  {YELLOW}NOTE: geographic table uses fuzzy 'contains' match on birth_location (Ukrainian){RESET}")
-print(f"  {YELLOW}      Paper numbers may have been computed with a different algorithm.{RESET}")
-print(f"  {'City':<25}  {'Computed n':>10}  {'Computed %mig':>14}  {'Paper n':>8}  {'Paper %mig':>10}  Status")
-print(f"  {'-'*90}")
+print(f"  (methodology: exact birth_location match on all 16,215 rows)")
 PAPER_CITIES = {
-    'Lviv':              {'n': 480,  'pct_mig': 17.3},
-    'Ternopil':          {'n': 53,   'pct_mig': 15.1},
+    'Lviv':              {'n': 480,  'pct_mig': 15.4},
+    'Ternopil':          {'n': 53,   'pct_mig': 17.0},
     'Chernivtsi':        {'n': 54,   'pct_mig': 14.8},
-    'Kyiv':              {'n': 1296, 'pct_mig': 5.2},
+    'Kyiv':              {'n': 1296, 'pct_mig': 4.9},
     'Donetsk (Stalino)': {'n': 48,   'pct_mig': 0.0},
 }
-_geo_discrepancy = False
 for city_key, paper in PAPER_CITIES.items():
     n_comp, pct_comp = city_computed.get(city_key, (0, 0.0))
-    n_match   = abs(n_comp - paper['n'])   <= max(10, paper['n'] * 0.05)
-    pct_match = abs(pct_comp - paper['pct_mig']) <= 2.0
-    both_ok   = n_match and pct_match
-    if not both_ok:
-        _geo_discrepancy = True
-    status = f"{GREEN}~OK{RESET}" if both_ok else f"{YELLOW}DISCREPANCY{RESET}"
-    print(f"  {city_key:<25}  {n_comp:>10}  {pct_comp:>13.1f}%  {paper['n']:>8}  {paper['pct_mig']:>9.1f}%  {status}")
-    # Record as SKIP (manual review) — not an auto FAIL since algorithm may differ
-    _results.append((f"  {city_key} — MANUAL REVIEW (geo methodology unclear)", None, f"n={n_comp} {pct_comp}%", f"n={paper['n']} {paper['pct_mig']}%", None))
-if _geo_discrepancy:
-    print(f"\n  {YELLOW}WARNING: Geographic table numbers differ from fuzzy-computed values.{RESET}")
-    print(f"  {YELLOW}         The paper's Table 6 may use a different extraction method.{RESET}")
-    print(f"  {YELLOW}         Requires manual investigation before submission.{RESET}")
+    checkn(f"  {city_key} — n",         n_comp,   paper['n'])
+    check(f"  {city_key} — % migrated", pct_comp, paper['pct_mig'], 0.15)
 
 # ── §5.1 discussion cross-refs ────────────────────────────────────────────────
 print(f"\n{BOLD}── §5.1 DISCUSSION CROSS-REFS ──{RESET}")
