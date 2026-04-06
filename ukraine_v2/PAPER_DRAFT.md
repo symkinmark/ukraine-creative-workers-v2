@@ -469,7 +469,44 @@ The forest plot of hazard ratios for both models is shown below, with 95% CI err
 
 **Figure 24.** Cox PH forest plot — hazard ratios for all migration groups relative to non-migrated reference (HR=1.0, dashed line), for both Model 1 (unadjusted) and Model 2 (adjusted for birth decade, profession, and region). Error bars = 95% CI. Non-migrated is shown as the reference row at HR=1.000 (grey diamond). Migrated: HR=0.76 (Model 2); Internal Transfer: HR=1.08; Deported: HR=5.40. n=8,643.
 
-*Censoring caveat: This Cox model fits complete cases only (all event_observed = 1). A Cox model including right-censored living individuals would require ESU follow-up data not currently available. The complete-case restriction is identical to the OLS analysis and does not affect interpretation.*
+#### Right-Censored Supplementary Analysis
+
+To assess whether the complete-case restriction biases results, a supplementary right-censored Cox model was estimated including all 6,575 individuals with confirmed birth years but no recorded death date (ESU status: alive as of 2026). These were treated as right-censored at their current age (duration = 2026 − birth year; event_observed = 0). Since the migration status of living individuals could not be determined from ESU records, all censored observations were conservatively assigned to the non-migrated reference group — the largest group and the one most plausibly represented among contemporary living Ukrainian creative workers.
+
+**Table A-Cox-2 — Cox PH Results: Right-Censored Model (N=15,218)**
+
+| Group (vs. Non-migrated) | Model 2 HR | 95% CI | p |
+|--------------------------|-----------|--------|---|
+| Migrated | 1.3353 | [1.252, 1.424] | <0.001 |
+| Internal Transfer | 1.7406 | [1.628, 1.861] | <0.001 |
+| Deported | 7.0866 | [6.084, 8.254] | <0.001 |
+
+The direction of the migrated and internal transfer HRs **reversed** relative to the complete-case model. This reversal is not a substantive finding; it is an artefact of the differential censoring structure and should be interpreted with caution:
+
+1. **Differential censoring by group.** All 6,575 right-censored observations were assigned to non-migrated (censoring rate 52.2% for non-migrated vs 0% for all other groups). The non-migrated group now includes a large cohort of living individuals born 1944–1962 (median duration ≈ 68 years as of 2026) who are right-censored with potentially many more years of survival ahead. Cox correctly infers that non-migrated has higher long-run survival than groups containing only confirmed deaths.
+
+2. **Cohort incompatibility.** The historical migrants (first and second wave, predominantly born 1870–1930) are an entirely different birth cohort from the contemporary living non-migrants (born 1940–1970). These cohorts have fundamentally different baseline mortality rates. The censored Cox model conflates mortality patterns across cohorts in a way that OLS on complete cases does not.
+
+3. **PH assumption violated for all groups.** The Schoenfeld residuals test yielded p < 0.0001 for every migration group, confirming that hazard ratios are not constant across age — expected when mixing historical deaths (concentrated at ages 40–80 in specific political periods) with contemporary right-censored survivors (durations 60–80 years).
+
+4. **Deported HR increases.** The deported group remains all-dead (no censored observations). The increase in their HR (from 5.40 to 7.09) reflects that the non-migrated baseline now looks healthier (due to added long-lived censored individuals), making the deportee deficit appear larger — a mechanically expected result, not a new finding.
+
+**Figure 25.** Censoring pattern by migration group: proportion of dead (event observed) vs alive/right-censored (no death recorded) in the extended dataset (N=15,218). The non-migrated group has a 52.2% censoring rate; all other groups have 0%. This structural imbalance explains why the right-censored Cox model does not produce directly comparable HRs to the complete-case analysis.
+
+**Figure 26.** Kaplan-Meier survival curves using the full right-censored dataset (N=15,218). Tick marks on curves indicate right-censored observations (living individuals). The non-migrated curve now extends toward the right with a flatter tail, reflecting the addition of living workers with long observed follow-up times. The deported group's sharp early decline is unchanged.
+
+**Sensitivity analysis: informative censoring.** The 186 censored individuals born before 1920 are implausibly coded as alive in 2026 (they would be 106+ years old); their death dates are simply missing from ESU records. Three scenarios were tested, reclassifying these individuals as dead at assumed ages of 80, 60, and 45 years:
+
+| Scenario | Migrated HR | Deported HR |
+|----------|------------|-------------|
+| Base (censored-at-2026) | 1.3353 | 7.0866 |
+| Optimistic (pre-1920 → age 80) | 1.1199 | 6.1934 |
+| Middle (pre-1920 → age 60) | 1.0645 | 5.7181 |
+| Pessimistic (pre-1920 → age 45) | 1.0555 | 5.4626 |
+
+Under the pessimistic scenario (pre-1920 individuals assumed to have died young, consistent with repression), the migrated HR converges toward 1.0 and the deported HR converges toward the complete-case estimate of 5.40 — confirming that the suspicious pre-1920 censored observations are responsible for a portion of the direction reversal.
+
+**Conclusion on right-censored analysis.** The right-censored supplementary model is not an alternative to the complete-case model — it addresses a different, unanswerable question ("what would the HRs be if we could follow everyone to death?") using an assumption (all alive = non-migrated) that mechanically distorts the comparison. The complete-case Cox model (Table A-Cox, n = 8,643) remains the primary analysis. The value of the right-censored analysis is the censoring pattern figure (Figure 25), the full KM curves (Figure 26), and the sensitivity analysis confirming that informative censoring in the pre-1920 born cohort partially explains the direction shift. The deported HR of 5.40–7.09 across all scenarios confirms the catastrophic deportee mortality signal regardless of censoring approach.
 
 ---
 
@@ -604,6 +641,8 @@ All figures were generated computationally from the dataset described in §3 and
 | Fig 22 | §5.5 | Comparison vs educated urban Ukrainian baseline |
 | Fig 23 | §4.9 | Regression coefficient plot — OLS Model 1 vs Model 2 |
 | Fig 24 | §4.10 | Cox PH forest plot — hazard ratios for migration groups |
+| Fig 25 | §4.10 | Censoring pattern — % dead vs alive by migration group |
+| Fig 26 | §4.10 | KM survival curves with right-censored living individuals |
 
 ---
 

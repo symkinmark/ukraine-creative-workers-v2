@@ -160,6 +160,34 @@ Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)
 
 
 ================================================================================
+10. COX PH WITH RIGHT-CENSORED DATA (§4.10 supplement)
+--------------------------------------------------------------------------------
+  Extended dataset: N=15218 (8643 dead, 6575 right-censored)
+  Assumption: alive individuals assigned to non_migrated group
+  Suspicious censored (born <1920): 186
+
+  Model 2 (adjusted) HRs — with right-censoring:
+  Group                        HR               95% CI          p
+  ----------------------------------------------------------------
+  Migrated                 1.3353 [1.2523, 1.4238]      0.0000
+  Internal Transfer        1.7406 [1.6278, 1.8612]      0.0000
+  Deported                 7.0866 [6.0840, 8.2543]      0.0000
+
+  PH Assumption (Schoenfeld residuals):
+  Migrated               p=0.0  (VIOLATED)
+  Internal Transfer      p=0.0  (VIOLATED)
+  Deported               p=0.0  (VIOLATED)
+
+  Sensitivity (informative censoring — pre-1920 reclassified):
+  Scenario                                    Migrated HR  Deported HR
+  --------------------------------------------------------------------
+  Base (censored-at-2026)                          1.3353       7.0866
+  Optimistic (pre-1920 → age 80)                   1.1199       6.1934
+  Middle    (pre-1920 → age 60)                    1.0645       5.7181
+  Pessimistic (pre-1920 → age 45)                  1.0555       5.4626
+
+
+================================================================================
 9. PROPENSITY SCORE MATCHING — MIGRATED vs NON-MIGRATED
 --------------------------------------------------------------------------------
   Covariates: birth_decade, profession_code, birth_region_code

@@ -3752,6 +3752,372 @@ try:
 
 except Exception as _e:
     print(f"  Cox model skipped: {_e}")
+    _cx2 = None  # ensure visible for censored block below
+
+# ===========================================================================
+# COX PH WITH RIGHT-CENSORED DATA — EXTENDED ANALYSIS (§4.10 supplement)
+# ===========================================================================
+# Extends the complete-case Cox model to include ~6,575 individuals with
+# confirmed birth years but no recorded death date ('alive' status in CSV).
+# These are right-censored at their current age as of 2026.
+#
+# Assumption: all 'alive' individuals are assigned to the non_migrated group.
+# Rationale: conservative (inflates non-migrated survival → reduces gap);
+# most are born post-1940 and are plausibly living in Ukraine. Documented
+# explicitly in §4.10 with sensitivity analysis for informative censoring.
+# ===========================================================================
+print("\nCox PH with Right-Censored Data (§4.10 supplement)...")
+
+CURRENT_YEAR = 2026
+
+try:
+    from lifelines import CoxPHFitter as _CoxPHC
+    from lifelines import KaplanMeierFitter as _KMF2
+    from lifelines.statistics import proportional_hazard_test as _ph_test_fn
+
+    # ── Step 1: Build extended dataset ────────────────────────────────────────
+    _cens_rows = []
+
+    # Part A: complete cases (all 4 groups, confirmed dead)
+    for r in analysable:
+        _cens_rows.append({
+            'duration':       float(r['_le']),
+            'event_observed': 1,
+            'migration':      r['_ms'],
+            'birth_decade':   (r['_by'] // 10) * 10,
+            'profession':     r['_prof'],
+            'birth_region':   map_region(r.get('birth_location', '')),
+        })
+
+    # Part B: right-censored alive individuals (assigned to non_migrated)
+    _n_alive_added     = 0
+    _n_alive_suspicious = 0  # born before 1920 — likely dead, unrecorded
+    for r in still_alive:
+        _by = r['_by']
+        if _by is None:
+            continue
+        _dur = CURRENT_YEAR - _by
+        if _dur <= 0:
+            continue
+        _cens_rows.append({
+            'duration':       float(_dur),
+            'event_observed': 0,
+            'migration':      'non_migrated',
+            'birth_decade':   (_by // 10) * 10,
+            'profession':     r['_prof'],
+            'birth_region':   map_region(r.get('birth_location', '')),
+        })
+        _n_alive_added += 1
+        if _by < 1920:
+            _n_alive_suspicious += 1
+
+    _df_cens = pd.DataFrame(_cens_rows)
+
+    # ── Step 2: Sanity checks ─────────────────────────────────────────────────
+    assert (_df_cens['duration'] > 0).all(), "Negative/zero durations found"
+    assert _df_cens[_df_cens['event_observed'] == 0]['event_observed'].sum() == 0
+
+    _n_total_cens = len(_df_cens)
+    _n_dead_cens  = int((_df_cens['event_observed'] == 1).sum())
+    _n_cens       = int((_df_cens['event_observed'] == 0).sum())
+
+    print(f"  Extended dataset: N={_n_total_cens} ({_n_dead_cens} dead, {_n_cens} right-censored)")
+    print(f"  Censored born before 1920 (suspicious): {_n_alive_suspicious}")
+
+    # Censoring rate by group
+    _df_cens['migration'] = pd.Categorical(
+        _df_cens['migration'],
+        categories=['non_migrated', 'migrated', 'internal_transfer', 'deported']
+    )
+    _cens_rate = _df_cens.groupby('migration', observed=True)['event_observed'].apply(
+        lambda x: round((x == 0).mean() * 100, 1)
+    )
+    print(f"  Censoring % by group:\n{_cens_rate.to_string()}")
+
+    # ── Step 3: Encode covariates ─────────────────────────────────────────────
+    _mig_dc  = pd.get_dummies(_df_cens['migration'], prefix='mig')
+    for _c in ['mig_non_migrated']:
+        if _c in _mig_dc.columns:
+            _mig_dc = _mig_dc.drop(columns=[_c])
+
+    _prof_dc = pd.get_dummies(_df_cens['profession'], prefix='prof', drop_first=True)
+    _reg_dc  = pd.get_dummies(_df_cens['birth_region'], prefix='reg', drop_first=True)
+    _bd_mean_c = _df_cens['birth_decade'].mean()
+    _bd_std_c  = _df_cens['birth_decade'].std()
+    _df_cens['birth_decade_z'] = (_df_cens['birth_decade'] - _bd_mean_c) / _bd_std_c
+
+    # ── Step 4: Cox Model 1 (unadjusted) ─────────────────────────────────────
+    _df_cc1 = pd.concat([_df_cens[['duration', 'event_observed']], _mig_dc],
+                         axis=1).dropna()
+    _cxc1 = _CoxPHC(penalizer=0.01)
+    _cxc1.fit(_df_cc1, duration_col='duration', event_col='event_observed',
+              show_progress=False)
+
+    # ── Step 5: Cox Model 2 (adjusted) ───────────────────────────────────────
+    _df_cc2 = pd.concat([
+        _df_cens[['duration', 'event_observed', 'birth_decade_z']],
+        _mig_dc, _prof_dc, _reg_dc
+    ], axis=1).dropna()
+    _cxc2 = _CoxPHC(penalizer=0.01)
+    _cxc2.fit(_df_cc2, duration_col='duration', event_col='event_observed',
+              show_progress=False)
+
+    # Helper: extract HR, CI, p
+    def _get_hr_c(cox_model, col):
+        s = cox_model.summary
+        if col not in s.index:
+            return None
+        return (
+            round(float(s.loc[col, 'exp(coef)']),              4),
+            round(float(s.loc[col, 'exp(coef) lower 95%']),    4),
+            round(float(s.loc[col, 'exp(coef) upper 95%']),    4),
+            round(float(s.loc[col, 'p']),                       4),
+        )
+
+    _mig_keys_c = {
+        'mig_migrated':          'Migrated',
+        'mig_internal_transfer': 'Internal Transfer',
+        'mig_deported':          'Deported',
+    }
+
+    print("  Censored Cox Model 2 HRs:")
+    for _col, _grp in _mig_keys_c.items():
+        _r = _get_hr_c(_cxc2, _col)
+        if _r:
+            print(f"    {_grp}: HR={_r[0]:.4f} [{_r[1]:.4f}, {_r[2]:.4f}] p={_r[3]:.4f}")
+
+    # ── Step 6: PH Assumption Test (Schoenfeld residuals) ────────────────────
+    print("  Testing PH assumption (Schoenfeld residuals)...")
+    _schoenfeld_p = {}
+    try:
+        import warnings as _w
+        with _w.catch_warnings():
+            _w.simplefilter("ignore")
+            _ph_res = _ph_test_fn(_cxc2, _df_cc2, time_transform='rank')
+        _ph_df = _ph_res.summary
+        for _col in _mig_keys_c.keys():
+            if _col in _ph_df.index:
+                _schoenfeld_p[_col] = round(float(_ph_df.loc[_col, 'p']), 4)
+        print("  PH test p-values:")
+        for _col, _grp in _mig_keys_c.items():
+            _pv = _schoenfeld_p.get(_col, 'N/A')
+            _flag = '(VIOLATED — non-proportional hazard)' if isinstance(_pv, float) and _pv < 0.05 else '(ok)'
+            print(f"    {_grp}: p={_pv} {_flag}")
+    except Exception as _sch_e:
+        print(f"  Schoenfeld test skipped: {_sch_e}")
+
+    # ── Step 7: Sensitivity Analysis (informative censoring) ─────────────────
+    print("  Running sensitivity analysis...")
+    _sens_scenarios = [
+        ('Base (censored-at-2026)',           None),
+        ('Optimistic (pre-1920 → age 80)',     80),
+        ('Middle    (pre-1920 → age 60)',      60),
+        ('Pessimistic (pre-1920 → age 45)',    45),
+    ]
+    _sens_results = {}
+    for _slabel, _assumed_age in _sens_scenarios:
+        _df_s = _df_cens.copy()
+        if _assumed_age is not None:
+            _susp = (_df_s['event_observed'] == 0) & (_df_s['birth_decade'] < 1920)
+            _df_s.loc[_susp, 'duration']       = float(_assumed_age)
+            _df_s.loc[_susp, 'event_observed'] = 1
+        _mig_ds  = pd.get_dummies(_df_s['migration'], prefix='mig')
+        for _c in ['mig_non_migrated']:
+            if _c in _mig_ds.columns:
+                _mig_ds = _mig_ds.drop(columns=[_c])
+        _prof_ds = pd.get_dummies(_df_s['profession'], prefix='prof', drop_first=True)
+        _reg_ds  = pd.get_dummies(_df_s['birth_region'], prefix='reg', drop_first=True)
+        _df_s['birth_decade_z'] = (_df_s['birth_decade'] - _bd_mean_c) / _bd_std_c
+        _df_ss = pd.concat([
+            _df_s[['duration', 'event_observed', 'birth_decade_z']],
+            _mig_ds, _prof_ds, _reg_ds
+        ], axis=1).dropna()
+        _cxs = _CoxPHC(penalizer=0.01)
+        _cxs.fit(_df_ss, duration_col='duration', event_col='event_observed',
+                 show_progress=False)
+        _sens_results[_slabel] = {col: _get_hr_c(_cxs, col) for col in _mig_keys_c}
+
+    print("  Sensitivity results (Model 2 HRs):")
+    for _sl, _sr in _sens_results.items():
+        _m = _sr.get('mig_migrated')
+        _d = _sr.get('mig_deported')
+        if _m and _d:
+            print(f"    {_sl}: Migrated HR={_m[0]:.4f}  Deported HR={_d[0]:.4f}")
+
+    # ── Step 8: Write results to text report ──────────────────────────────────
+    with open(OUT_TXT, 'a', encoding='utf-8') as _f:
+        _f.write('\n\n' + '=' * 80 + '\n')
+        _f.write('10. COX PH WITH RIGHT-CENSORED DATA (§4.10 supplement)\n')
+        _f.write('-' * 80 + '\n')
+        _f.write(f'  Extended dataset: N={_n_total_cens} ({_n_dead_cens} dead, {_n_cens} right-censored)\n')
+        _f.write(f'  Assumption: alive individuals assigned to non_migrated group\n')
+        _f.write(f'  Suspicious censored (born <1920): {_n_alive_suspicious}\n\n')
+        _f.write('  Model 2 (adjusted) HRs — with right-censoring:\n')
+        _f.write(f'  {"Group":<22} {"HR":>8} {"95% CI":>20} {"p":>10}\n')
+        _f.write('  ' + '-' * 64 + '\n')
+        for _col, _grp in _mig_keys_c.items():
+            _r = _get_hr_c(_cxc2, _col)
+            if _r:
+                _f.write(f'  {_grp:<22} {_r[0]:>8.4f} [{_r[1]:.4f}, {_r[2]:.4f}]  {_r[3]:>10.4f}\n')
+        _f.write('\n  PH Assumption (Schoenfeld residuals):\n')
+        for _col, _grp in _mig_keys_c.items():
+            _pv = _schoenfeld_p.get(_col, 'N/A')
+            _flag = 'VIOLATED' if isinstance(_pv, float) and _pv < 0.05 else 'ok'
+            _f.write(f'  {_grp:<22} p={_pv}  ({_flag})\n')
+        _f.write('\n  Sensitivity (informative censoring — pre-1920 reclassified):\n')
+        _f.write(f'  {"Scenario":<42} {"Migrated HR":>12} {"Deported HR":>12}\n')
+        _f.write('  ' + '-' * 68 + '\n')
+        for _sl, _sr in _sens_results.items():
+            _m = _sr.get('mig_migrated')
+            _d = _sr.get('mig_deported')
+            if _m and _d:
+                _f.write(f'  {_sl:<42} {_m[0]:>12.4f} {_d[0]:>12.4f}\n')
+
+    # ── Step 9: Figure 25 — Censoring Pattern by Group ───────────────────────
+    print("  fig25_censoring_pattern.png")
+    _grp_order25  = ['migrated', 'non_migrated', 'internal_transfer', 'deported']
+    _grp_labels25 = ['Migrated', 'Non-migrated', 'Internal\nTransfer', 'Deported']
+    _ev25 = [float((_df_cens[_df_cens['migration'] == g]['event_observed'] == 1).mean())
+             for g in _grp_order25]
+    _cn25 = [float((_df_cens[_df_cens['migration'] == g]['event_observed'] == 0).mean())
+             for g in _grp_order25]
+    _n25  = [int((_df_cens['migration'] == g).sum()) for g in _grp_order25]
+
+    fig25, ax25 = plt.subplots(figsize=(9, 5))
+    ax25.bar(_grp_labels25, _ev25, color='#d62728', alpha=0.85,
+             label='Dead (confirmed death date)')
+    ax25.bar(_grp_labels25, _cn25, bottom=_ev25, color='#aec7e8', alpha=0.85,
+             label='Alive (right-censored at 2026)')
+    ax25.set_ylim(0, 1)
+    ax25.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f'{y:.0%}'))
+    ax25.legend(fontsize=9)
+    for i, (ev, cn, n) in enumerate(zip(_ev25, _cn25, _n25)):
+        if ev > 0.02:
+            ax25.text(i, ev / 2, f'{ev:.0%}', ha='center', va='center',
+                      fontsize=9, color='white', fontweight='bold')
+        if cn > 0.02:
+            ax25.text(i, ev + cn / 2, f'{cn:.0%}', ha='center', va='center',
+                      fontsize=9, color='#222')
+        ax25.text(i, -0.04, f'n={n:,}', ha='center', va='top', fontsize=8, color='#555',
+                  transform=ax25.get_xaxis_transform())
+    apply_style(ax25, 'Figure 25 — Censoring Pattern by Migration Group\n'
+                      '(right-censored = alive as of 2026, treated as non-migrated)',
+                xlabel='Migration Group')
+    plt.tight_layout(rect=[0, 0.06, 1, 1])
+    add_source(fig25)
+    save(fig25, 'fig25_censoring_pattern.png')
+
+    try:
+        _fig_p25 = go.Figure()
+        _fig_p25.add_trace(go.Bar(
+            x=_grp_labels25, y=[e * 100 for e in _ev25],
+            name='Dead (confirmed death date)', marker_color='#d62728',
+            hovertemplate='<b>%{x}</b><br>Dead: %{y:.1f}%<extra></extra>',
+        ))
+        _fig_p25.add_trace(go.Bar(
+            x=_grp_labels25, y=[c * 100 for c in _cn25],
+            name='Alive (right-censored, 2026)', marker_color='#aec7e8',
+            hovertemplate='<b>%{x}</b><br>Right-censored: %{y:.1f}%<extra></extra>',
+        ))
+        _fig_p25.update_layout(
+            barmode='stack',
+            title=dict(text='Figure 25 — Censoring Pattern by Migration Group', font=dict(size=14)),
+            yaxis=dict(title='Proportion (%)', ticksuffix='%', range=[0, 100]),
+            xaxis_title='Migration Group',
+            plot_bgcolor='white', paper_bgcolor='white',
+            font=dict(family='Georgia, serif', size=12),
+            legend=dict(orientation='h', yanchor='top', y=-0.15, xanchor='center', x=0.5),
+            height=450,
+        )
+        _save_interactive(_fig_p25, 'fig25_interactive.html')
+        print("  fig25 interactive saved.")
+    except Exception as _e25:
+        print(f"  fig25 interactive skipped: {_e25}")
+
+    # ── Step 10: Figure 26 — KM Curves with Right-Censored Data ─────────────
+    print("  fig26_km_censored.png")
+    _km_colors26 = {
+        'migrated':          '#2ca02c',
+        'non_migrated':      '#1f77b4',
+        'internal_transfer': '#ff7f0e',
+        'deported':          '#d62728',
+    }
+    _km_labels26 = {
+        'migrated':          f'Migrated (n={int((_df_cens["migration"]=="migrated").sum())})',
+        'non_migrated':      f'Non-migrated incl. censored (n={int((_df_cens["migration"]=="non_migrated").sum())})',
+        'internal_transfer': f'Internal Transfer (n={int((_df_cens["migration"]=="internal_transfer").sum())})',
+        'deported':          f'Deported (n={int((_df_cens["migration"]=="deported").sum())})',
+    }
+
+    fig26, ax26 = plt.subplots(figsize=(11, 6))
+    for _ms in ['migrated', 'non_migrated', 'internal_transfer', 'deported']:
+        _mask26 = _df_cens['migration'] == _ms
+        _kmf26  = _KMF2()
+        _kmf26.fit(
+            durations=_df_cens.loc[_mask26, 'duration'],
+            event_observed=_df_cens.loc[_mask26, 'event_observed'],
+            label=_km_labels26[_ms]
+        )
+        _kmf26.plot_survival_function(ax=ax26, ci_show=True,
+                                       color=_km_colors26[_ms])
+    ax26.set_xlim(0, 110)
+    ax26.set_xlabel('Age (years)', fontsize=11)
+    ax26.set_ylabel('Proportion Surviving', fontsize=11)
+    apply_style(ax26,
+        'Figure 26 — Kaplan-Meier Survival Curves with Right-Censored Data\n'
+        '(tick marks on curves = living individuals right-censored at 2026 age)',
+        xlabel='Age (years)')
+    plt.tight_layout(rect=[0, 0.04, 1, 1])
+    add_source(fig26)
+    save(fig26, 'fig26_km_censored.png')
+
+    try:
+        _fig_p26 = go.Figure()
+        for _ms in ['migrated', 'non_migrated', 'internal_transfer', 'deported']:
+            _mask26 = _df_cens['migration'] == _ms
+            _kmf26  = _KMF2()
+            _kmf26.fit(
+                durations=_df_cens.loc[_mask26, 'duration'],
+                event_observed=_df_cens.loc[_mask26, 'event_observed'],
+                label=_km_labels26[_ms]
+            )
+            _sf26 = _kmf26.survival_function_
+            _ci26 = _kmf26.confidence_interval_
+            _ages26 = _sf26.index.tolist()
+            _sv26   = _sf26.iloc[:, 0].tolist()
+            _lo26   = _ci26.iloc[:, 0].tolist()
+            _hi26   = _ci26.iloc[:, 1].tolist()
+            _fig_p26.add_trace(go.Scatter(
+                x=_ages26 + _ages26[::-1], y=_hi26 + _lo26[::-1],
+                fill='toself', fillcolor=_km_colors26[_ms],
+                opacity=0.15, line=dict(width=0),
+                showlegend=False, hoverinfo='skip',
+            ))
+            _fig_p26.add_trace(go.Scatter(
+                x=_ages26, y=_sv26,
+                mode='lines', name=_km_labels26[_ms],
+                line=dict(color=_km_colors26[_ms], width=2.5),
+                hovertemplate='<b>Age %{x}</b><br>P(survive) = %{y:.3f}<extra></extra>',
+            ))
+        _fig_p26.update_layout(
+            title=dict(text='Figure 26 — KM Survival Curves with Right-Censored Data', font=dict(size=14)),
+            xaxis_title='Age (years)', yaxis_title='Proportion Surviving',
+            xaxis=dict(range=[0, 110]),
+            plot_bgcolor='white', paper_bgcolor='white',
+            font=dict(family='Georgia, serif', size=12),
+            legend=dict(orientation='h', yanchor='top', y=-0.15, xanchor='center', x=0.5),
+            height=500,
+        )
+        _save_interactive(_fig_p26, 'fig26_interactive.html')
+        print("  fig26 interactive saved.")
+    except Exception as _e26:
+        print(f"  fig26 interactive skipped: {_e26}")
+
+    print("  Censored Cox analysis complete.")
+
+except Exception as _e_cens:
+    print(f"  Censored Cox skipped: {_e_cens}")
+    import traceback; traceback.print_exc()
 
 # ===========================================================================
 # PROPENSITY SCORE MATCHING — ADDRESSES REVIEWER CRITIQUE #3 (§5.4)
