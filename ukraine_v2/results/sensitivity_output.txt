@@ -1,0 +1,66 @@
+============================================================
+STAGE 6 SENSITIVITY ANALYSES
+============================================================
+
+SCENARIO A — Implausibly Alive Duration Assumption (unadjusted)
+--------------------------------------------------
+  Duration=70:
+  mig_migrated: HR=1.100 (95%CI 1.039–1.163) p=0.0009
+  mig_internal_transfer: HR=1.545 (95%CI 1.454–1.640) p=0.0000
+  mig_deported: HR=5.005 (95%CI 4.302–5.821) p=0.0000
+  Duration=75:
+  mig_migrated: HR=1.095 (95%CI 1.035–1.158) p=0.0016
+  mig_internal_transfer: HR=1.543 (95%CI 1.453–1.639) p=0.0000
+  mig_deported: HR=4.988 (95%CI 4.288–5.802) p=0.0000
+  Duration=80:
+  mig_migrated: HR=1.088 (95%CI 1.028–1.151) p=0.0033
+  mig_internal_transfer: HR=1.541 (95%CI 1.451–1.637) p=0.0000
+  mig_deported: HR=4.964 (95%CI 4.267–5.773) p=0.0000
+  Duration=85:
+  mig_migrated: HR=1.080 (95%CI 1.021–1.142) p=0.0075
+  mig_internal_transfer: HR=1.538 (95%CI 1.448–1.634) p=0.0000
+  mig_deported: HR=4.922 (95%CI 4.232–5.724) p=0.0000
+  Duration=90:
+  mig_migrated: HR=1.067 (95%CI 1.009–1.129) p=0.0234
+  mig_internal_transfer: HR=1.533 (95%CI 1.444–1.628) p=0.0000
+  mig_deported: HR=4.889 (95%CI 4.204–5.686) p=0.0000
+
+SCENARIO B — Post-1991 Emigrant Inclusion/Exclusion (unadjusted)
+--------------------------------------------------
+  Include all (baseline):
+  mig_migrated: HR=1.088 (95%CI 1.028–1.151) p=0.0033
+  mig_internal_transfer: HR=1.541 (95%CI 1.451–1.637) p=0.0000
+  mig_deported: HR=4.964 (95%CI 4.267–5.773) p=0.0000
+  Exclude 62 post-Soviet emigrants:
+  mig_migrated: HR=1.094 (95%CI 1.034–1.157) p=0.0018
+  mig_internal_transfer: HR=1.541 (95%CI 1.451–1.637) p=0.0000
+  mig_deported: HR=4.961 (95%CI 4.265–5.770) p=0.0000
+  Reclassify 62 post-Soviet emigrants as non_migrated:
+  mig_migrated: HR=1.094 (95%CI 1.034–1.158) p=0.0017
+  mig_internal_transfer: HR=1.543 (95%CI 1.453–1.638) p=0.0000
+  mig_deported: HR=4.967 (95%CI 4.271–5.778) p=0.0000
+
+SCENARIO C — Bootstrap Misclassification Error
+--------------------------------------------------
+  Rate=5%:
+    mig_migrated: median HR=1.088 (2.5–97.5%: 1.064–1.109) n=50
+    mig_internal_transfer: median HR=1.474 (2.5–97.5%: 1.447–1.519) n=50
+    mig_deported: median HR=1.959 (2.5–97.5%: 1.808–2.176) n=50
+  Rate=10%:
+    mig_migrated: median HR=1.077 (2.5–97.5%: 1.048–1.110) n=50
+    mig_internal_transfer: median HR=1.425 (2.5–97.5%: 1.385–1.457) n=50
+    mig_deported: median HR=1.571 (2.5–97.5%: 1.451–1.739) n=50
+  Rate=15%:
+    mig_migrated: median HR=1.083 (2.5–97.5%: 1.050–1.111) n=50
+    mig_internal_transfer: median HR=1.379 (2.5–97.5%: 1.341–1.414) n=50
+    mig_deported: median HR=1.402 (2.5–97.5%: 1.288–1.512) n=50
+
+============================================================
+SUMMARY
+============================================================
+Migrated HR across all scenarios:
+  A (dur=70-90): ['1.100', '1.095', '1.088', '1.080', '1.067']
+  B1 (include): 1.088
+  B2 (exclude): 1.094
+  B3 (reclassify): 1.094
+  C 5%: 1.088  10%: 1.077  15%: 1.083
