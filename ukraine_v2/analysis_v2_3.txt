@@ -134,3 +134,43 @@ Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)
   - β = coefficient in years of age at death relative to non-migrated baseline
   - Birth decade, profession, region coefficients omitted for brevity;
     full model summary in regression_full_output.txt
+
+
+================================================================================
+8. COX PROPORTIONAL HAZARDS — HAZARD RATIOS
+--------------------------------------------------------------------------------
+  Reference: non_migrated. HR < 1 = lower hazard of death = longer survival.
+  Censoring note: living individuals excluded (not right-censored);
+  all n=8,643 rows have event_observed=1.
+
+  Model 1 (unadjusted)
+  Group                        HR               95% CI          p
+  ----------------------------------------------------------------
+  Migrated                 0.7234 [0.6811, 0.7684]      0.0000
+  Internal Transfer        1.0285 [0.9659, 1.0952]      0.3801
+  Deported                 5.0232 [4.3297, 5.8278]      0.0000
+
+  Model 2 (adjusted +cohort +profession +region)
+  Group                        HR               95% CI          p
+  ----------------------------------------------------------------
+  Migrated                 0.7597 [0.7131, 0.8093]      0.0000
+  Internal Transfer        1.0796 [1.0116, 1.1522]      0.0210
+  Deported                 5.3952 [4.6408, 6.2723]      0.0000
+
+
+
+================================================================================
+9. PROPENSITY SCORE MATCHING — MIGRATED vs NON-MIGRATED
+--------------------------------------------------------------------------------
+  Covariates: birth_decade, profession_code, birth_region_code
+  Method: nearest-neighbour matching on estimated propensity score
+  Matched n (treated = migrated): 1280
+
+  PSM gap (migrated − non-migrated): +3.35 yrs
+  Bootstrap 95% CI (2000 resamples): [2.26, 4.45]
+  Full-sample (unadjusted) gap:       +4.04 yrs
+
+  Gap attenuation after matching: 17.1%
+  Interpretation: PSM controls for birth cohort, profession, and
+  region. The residual gap after matching reflects effects not
+  captured by observable selection covariates.

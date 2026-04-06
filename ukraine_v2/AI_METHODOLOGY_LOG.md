@@ -249,7 +249,7 @@ Phase 5b clearance received → full analysis run executed on `esu_creative_work
 
 **Deported finding** (Cohen's d = 1.656 = "huge" effect) is the strongest single finding in the paper. 183 individuals is a solid group, and the effect size is so large that the 95% CI (46.3–50.4) does not overlap with the non-migrated CI (70.87–71.57) by more than 20 years.
 
-### Charts generated (26 total, after revisions)
+### Charts generated (28 total, after revisions)
 
 | File | Description |
 |------|-------------|
@@ -279,6 +279,7 @@ Phase 5b clearance received → full analysis run executed on `esu_creative_work
 | fig21 | Soviet republic LE comparison: Ukrainian SSR vs Russian SFSR, Baltic SSRs, Central Asian SSRs |
 | fig22 | Educated urban comparison: creative workers vs Ukrainian SSR + Shkolnikov +3–5 yr premium band |
 | fig23 | Regression coefficient plot — grouped bars: Model 1 (unadjusted) vs Model 2 (adjusted, +cohort +profession +region). Shows gap stability |
+| fig24 | Cox PH forest plot — hazard ratios for migrated (HR≈0.76), internal transfer (HR≈1.08), deported (HR≈5.40) vs non-migrated reference; both models shown with 95% CI error bars |
 
 ### Statistical methods used
 
@@ -287,6 +288,8 @@ Phase 5b clearance received → full analysis run executed on `esu_creative_work
 - **95% confidence intervals** via Student's t (valid at n>30; deported n=75 qualifies)
 - **Kaplan-Meier survival curves** via `lifelines` 0.30.3
 - **Sensitivity analysis** — LE gap tested at 0%–10% AI error rate; main finding holds throughout
+- **Cox Proportional Hazards** via `lifelines.CoxPHFitter` (penalizer=0.01); two models (unadjusted + adjusted); all n=8,643 complete cases (event_observed=1); output: hazard ratios with 95% CI
+- **Propensity Score Matching** via `sklearn.LogisticRegression`; nearest-neighbour on PS estimated from birth_decade + profession + region; n=1,280 matched pairs; PSM gap = +3.35 yrs (95% CI [2.26, 4.45]); bootstrap 2000 resamples
 
 ---
 
@@ -547,6 +550,19 @@ Used in: fig22
 | 11 | Tone audit — no further causal language found beyond Steps 2–3 |
 | + | Chart titles/axis labels updated: "Life Expectancy" → "Mean Age at Death" throughout all figures |
 | + | Figure 7b added: deported group death year histogram 1920–1960 |
+
+**Peer-review revision batch 2 (2026-04-06) — 7 major weaknesses addressed:**
+
+| Weakness | Fix |
+|----------|-----|
+| W1 | Abstract, intro, §4.1, conclusion restructured: deportee finding + internal transfer null lead; migrant gap repositioned as secondary with selection caveat |
+| W2 | Cox PH model implemented (§4.10): HR=0.76 migrated, HR=5.40 deported, HR=1.08 internal transfer (adjusted); Figure 24 forest plot added |
+| W3 | PSM implemented: matched gap = +3.35 yrs [2.26, 4.45] vs full-sample +4.04 yrs (17% attenuation); blockquote "wish list" replaced with actual results in §5.4 |
+| W4 | AI validation section expanded: Appendix A template retained; body text now explicitly flags small-n limitation and category-specific error rate gap |
+| W5 | Nationality circularity note added to §3.6.1: circularity affects deported group more than migrant/non-migrant comparison |
+| W6 | Post-1991 framing caveat added to §5.4: gap = cumulative lifetime effect, not clean Soviet signal |
+| W7 | Table 6 restricted to n ≥ 50 cities (Kyiv, Lviv only); small-n cities moved to Figure 12 with explicit "illustrative only" note |
+| + | All 24+ figures distributed into body text with in-text references; §7 converted from caption dump to navigation index |
 
 ---
 

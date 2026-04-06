@@ -5,7 +5,7 @@
 **Author:** Mark Symkin
 **Study completed:** 2026
 **Data source:** Encyclopedia of Modern Ukraine (esu.com.ua)
-**This document version:** 1.2 — revised 2026-04-06 following peer-review 11-step revision
+**This document version:** 1.3 — revised 2026-04-06 following peer-review batch 2 (7 major weaknesses)
 
 
 ## Version History
@@ -16,7 +16,8 @@
 | 2.0 | 2026 | V2 expanded dataset (4-group, n=8,643), full AI disclosure |
 | 2.1 | 2026-04-03 | Phase 5 human check; pre-1921 and Galicia filters added |
 | 2.2 | 2026-04 | Author corrected to Mark Symkin; sample sizes updated to V2.3; Cliff's delta and CI added |
-| 2.3 | 2026-04-06 | Peer-review 11-step revision: terminology (mean age at death), §3.4.1 missing data, §4.9 regression, Fig 23, selection bias §, Fig 7b |
+| 2.3 | 2026-04-06 | Peer-review batch 1 (11 steps): terminology, §3.4.1, §4.9 OLS regression, Fig 23, selection bias §, Fig 7b |
+| 2.4 | 2026-04-06 | Peer-review batch 2 (7 major weaknesses): Cox PH (§4.10, Fig 24), PSM (+3.35 yrs matched), argument restructure (deportee leads), figures distributed into narrative, nationality circularity note, post-1991 caveat, Table 6 small-n fix |
 
 ---
 > **V2.3 CURRENT.** Primary dataset: `esu_creative_workers_v2_3.csv`. Analysable: **n=8,643**. V2.2 reference dataset archived (unchanged). See AI_METHODOLOGY_LOG.md Phase V2.3 for full correction log.
@@ -728,6 +729,36 @@ Cohorts with fewer than 20 individuals in either the migrant or non-migrant grou
 ### 8.8 Profession-Level Analysis
 
 For each of the six profession categories, average life expectancy was calculated separately for migrants and non-migrants. The same statistical approach (means, medians, gap) was applied. Full Mann-Whitney U testing was not performed at the profession level due to smaller sample sizes in some categories (particularly Theatre/Film migrants, n=53), but direction of effect was consistent across all categories.
+
+### 8.9 Cox Proportional Hazards Model (Added V2.4)
+
+**Python library:** `lifelines` (already used for Kaplan-Meier). Class: `CoxPHFitter(penalizer=0.01)`.
+
+**Sample:** n = 8,643 (identical to OLS). All observations have `event_observed = 1` (confirmed deaths only; living individuals excluded, not right-censored — matches OLS sample).
+
+**Models:**
+- Model 1 (unadjusted): migration dummies only (reference = non_migrated)
+- Model 2 (adjusted): + birth_decade (standardised z-score) + profession dummies + birth_region dummies
+
+**Output:** Hazard ratios (HR), 95% CI, p-values. HR < 1 = lower mortality hazard = longer survival vs reference.
+
+**Key results:** Migrated HR = 0.76 (Model 2, 95% CI [0.71–0.81]); Deported HR = 5.40 (Model 2, 95% CI [4.64–6.27]); Internal Transfer HR = 1.08 (Model 2, 95% CI [1.01–1.15]). Full output saved to `cox_output.txt`.
+
+### 8.10 Propensity Score Matching (Added V2.4)
+
+**Python library:** `sklearn.linear_model.LogisticRegression` (max_iter=500, solver='lbfgs').
+
+**Purpose:** Partially address healthy-migrant selection effects on the migrated/non-migrated gap.
+
+**Sample:** migrated (n=1,280) + non_migrated (n=6,030); internal transfer and deported excluded.
+
+**Covariates:** birth_decade (continuous), profession_code (categorical integer), birth_region_code (categorical integer). Standardised before logistic regression.
+
+**Method:** Estimate propensity score (P(migrated) given covariates) for each individual. Greedy nearest-neighbour matching: each migrated worker matched to the closest non-migrated worker by propensity score distance (no replacement). Matched n = 1,280 pairs.
+
+**Uncertainty:** 95% CI estimated by bootstrap (2,000 resamples, random seed=42) of the matched-sample mean gap.
+
+**Result:** PSM gap = +3.35 yrs (bootstrap 95% CI: [2.26, 4.45]). Full-sample gap for reference: +4.04 yrs. Gap attenuation after matching: 17%. Residual gap after matching is not explained by observable birth-cohort, profession, or region differences.
 
 ---
 

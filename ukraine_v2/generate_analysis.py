@@ -3514,6 +3514,320 @@ except Exception as e:
 print("Regression analysis complete.")
 
 # ===========================================================================
+# COX PROPORTIONAL HAZARDS MODEL — SURVIVAL ANALYSIS COMPLEMENT TO OLS (§4.10)
+# ===========================================================================
+# Addresses reviewer critique: OLS on age-at-death is defensible but
+# CoxPH is the natural framework. lifelines already used for Kaplan-Meier.
+# Censoring caveat: living individuals were excluded (not right-censored),
+# so Cox model is fit on complete cases only (event_observed=1 for all).
+# This is identical to OLS in terms of sample, but CoxPH handles
+# the non-normal hazard structure properly and outputs hazard ratios.
+# ===========================================================================
+print("\nCox Proportional Hazards Models (§4.10)...")
+
+try:
+    from lifelines import CoxPHFitter as _CoxPH
+
+    df_cox = df_reg.copy()
+    df_cox['duration']       = df_cox['age_at_death'].astype(float)
+    df_cox['event_observed'] = 1  # all confirmed deaths in analysable dataset
+
+    # One-hot encode migration (reference: non_migrated)
+    _mig_d = pd.get_dummies(df_cox['migration'], prefix='mig')
+    for col in ['mig_non_migrated']:
+        if col in _mig_d.columns:
+            _mig_d = _mig_d.drop(columns=[col])
+
+    # One-hot encode profession and region (drop_first for each)
+    _prof_d = pd.get_dummies(df_cox['profession'], prefix='prof', drop_first=True)
+    _reg_d  = pd.get_dummies(df_cox['birth_region'], prefix='reg', drop_first=True)
+
+    # Standardise birth_decade so the coefficient is interpretable
+    _bd_mean = df_cox['birth_decade'].mean()
+    _bd_std  = df_cox['birth_decade'].std()
+    df_cox['birth_decade_z'] = (df_cox['birth_decade'] - _bd_mean) / _bd_std
+
+    # ── Cox Model 1: unadjusted ──────────────────────────────────────────
+    _df_c1 = pd.concat([df_cox[['duration', 'event_observed']], _mig_d], axis=1).dropna()
+    _cx1   = _CoxPH(penalizer=0.01)
+    _cx1.fit(_df_c1, duration_col='duration', event_col='event_observed', show_progress=False)
+
+    # ── Cox Model 2: adjusted ────────────────────────────────────────────
+    _df_c2 = pd.concat([
+        df_cox[['duration', 'event_observed', 'birth_decade_z']],
+        _mig_d, _prof_d, _reg_d
+    ], axis=1).dropna()
+    _cx2   = _CoxPH(penalizer=0.01)
+    _cx2.fit(_df_c2, duration_col='duration', event_col='event_observed', show_progress=False)
+
+    # ── Extract HR, CI, p for the three migration groups ────────────────
+    _mig_keys = {
+        'mig_migrated':         'Migrated',
+        'mig_internal_transfer':'Internal Transfer',
+        'mig_deported':         'Deported',
+    }
+
+    def _get_hr(cox_model, col):
+        """Return (HR, CI_lo, CI_hi, p) or None if col not in model."""
+        s = cox_model.summary
+        if col not in s.index:
+            return None
+        hr     = round(float(s.loc[col, 'exp(coef)']),    4)
+        ci_lo  = round(float(s.loc[col, 'exp(coef) lower 95%']), 4)
+        ci_hi  = round(float(s.loc[col, 'exp(coef) upper 95%']), 4)
+        p      = round(float(s.loc[col, 'p']), 4)
+        return hr, ci_lo, ci_hi, p
+
+    # ── Write Cox results to text report ────────────────────────────────
+    with open(OUT_TXT, 'a', encoding='utf-8') as _f:
+        _f.write('\n\n')
+        _f.write('=' * 80 + '\n')
+        _f.write('8. COX PROPORTIONAL HAZARDS — HAZARD RATIOS\n')
+        _f.write('-' * 80 + '\n')
+        _f.write('  Reference: non_migrated. HR < 1 = lower hazard of death = longer survival.\n')
+        _f.write('  Censoring note: living individuals excluded (not right-censored);\n')
+        _f.write('  all n=8,643 rows have event_observed=1.\n\n')
+
+        for label, (cx, model_name) in [
+            ('Model 1 (unadjusted)', (_cx1, 'Cox 1')),
+            ('Model 2 (adjusted +cohort +profession +region)', (_cx2, 'Cox 2')),
+        ]:
+            _f.write(f'  {label}\n')
+            _f.write(f'  {"Group":<22} {"HR":>8} {"95% CI":>20} {"p":>10}\n')
+            _f.write('  ' + '-' * 64 + '\n')
+            for col, grp in _mig_keys.items():
+                res = _get_hr(cx, col)
+                if res:
+                    hr, lo, hi, p = res
+                    _f.write(f'  {grp:<22} {hr:>8.4f} [{lo:.4f}, {hi:.4f}]  {p:>10.4f}\n')
+            _f.write('\n')
+
+    # ── Save full Cox summaries ──────────────────────────────────────────
+    _cox_out = os.path.join(PROJECT_ROOT, 'cox_output.txt')
+    with open(_cox_out, 'w', encoding='utf-8') as _f:
+        _f.write('COX MODEL 1 — Unadjusted\n' + '='*80 + '\n')
+        _f.write(_cx1.summary.to_string())
+        _f.write('\n\nCOX MODEL 2 — Adjusted\n' + '='*80 + '\n')
+        _f.write(_cx2.summary.to_string())
+    print(f"  Full Cox output → {_cox_out}")
+
+    # ── Figure 24: Forest plot — HRs for migration groups ───────────────
+    print("  fig24_cox_forest_plot.png")
+
+    _groups   = list(_mig_keys.keys())
+    _glabels  = list(_mig_keys.values())
+    _n_groups = len(_groups)
+
+    _hr1_vals = [_get_hr(_cx1, c) for c in _groups]
+    _hr2_vals = [_get_hr(_cx2, c) for c in _groups]
+
+    fig24, ax24 = plt.subplots(figsize=(10, 5))
+
+    _y = np.arange(_n_groups)
+    _offset = 0.18
+
+    _c1_col = '#2E86AB'
+    _c2_col = '#E84855'
+
+    for i, (res1, res2, label) in enumerate(zip(_hr1_vals, _hr2_vals, _glabels)):
+        if res1:
+            hr, lo, hi, p = res1
+            ax24.errorbar(_hr1_vals[i][0], _y[i] + _offset,
+                          xerr=[[hr - lo], [hi - hr]],
+                          fmt='o', color=_c1_col, capsize=4, markersize=7,
+                          label='Model 1 (unadjusted)' if i == 0 else '')
+        if res2:
+            hr, lo, hi, p = res2
+            ax24.errorbar(_hr2_vals[i][0], _y[i] - _offset,
+                          xerr=[[hr - lo], [hi - hr]],
+                          fmt='s', color=_c2_col, capsize=4, markersize=7,
+                          label='Model 2 (adjusted)' if i == 0 else '')
+
+    ax24.axvline(1.0, color='black', linestyle='--', linewidth=1.2, label='HR = 1 (null)')
+    ax24.set_yticks(_y)
+    ax24.set_yticklabels(_glabels, fontsize=11)
+    ax24.set_xlabel('Hazard Ratio (HR < 1 = lower mortality hazard = longer survival)', fontsize=10)
+    ax24.invert_yaxis()
+
+    # Annotate HR values
+    for i, (res1, res2) in enumerate(zip(_hr1_vals, _hr2_vals)):
+        if res1:
+            hr, lo, hi, p = res1
+            ax24.text(hi + 0.01, _y[i] + _offset, f'HR={hr:.3f}', va='center', fontsize=8, color=_c1_col)
+        if res2:
+            hr, lo, hi, p = res2
+            ax24.text(hi + 0.01, _y[i] - _offset, f'HR={hr:.3f}', va='center', fontsize=8, color=_c2_col)
+
+    apply_style(ax24, 'Figure 24 — Cox Proportional Hazards: Migration Status Hazard Ratios\n'
+                      '(reference = non-migrated; HR < 1 = lower hazard of death)',
+                xlabel='Hazard Ratio')
+    ax24.legend(fontsize=9, loc='lower right')
+    plt.tight_layout(rect=[0, 0.04, 1, 1])
+    add_source(fig24)
+    save(fig24, 'fig24_cox_forest_plot.png')
+
+    # ── Interactive Figure 24 ────────────────────────────────────────────
+    _go24 = go  # already imported at top of file
+
+    _fig_p24 = _go24.Figure()
+    _colours24 = {'Model 1 (unadjusted)': '#2E86AB', 'Model 2 (adjusted)': '#E84855'}
+    for (res_list, model_label, sym) in [
+        (_hr1_vals, 'Model 1 (unadjusted)', 'circle'),
+        (_hr2_vals, 'Model 2 (adjusted)',   'square'),
+    ]:
+        hrs, los, his, ps, labels = [], [], [], [], []
+        for col, grp in _mig_keys.items():
+            res = _get_hr(_cx1 if model_label.startswith('Model 1') else _cx2, col)
+            if res:
+                hr, lo, hi, p = res
+                hrs.append(hr); los.append(lo); his.append(hi); ps.append(p)
+                labels.append(grp)
+        _fig_p24.add_trace(_go24.Scatter(
+            x=hrs, y=labels,
+            mode='markers',
+            name=model_label,
+            marker=dict(symbol=sym, size=10, color=_colours24[model_label]),
+            error_x=dict(
+                type='data',
+                symmetric=False,
+                array=[hi - hr for hr, hi in zip(hrs, his)],
+                arrayminus=[hr - lo for hr, lo in zip(hrs, los)],
+            ),
+            customdata=list(zip(los, his, ps, labels)),
+            hovertemplate=(
+                '<b>%{customdata[3]}</b><br>'
+                f'Model: {model_label}<br>'
+                'HR: <b>%{x:.4f}</b><br>'
+                '95% CI: [%{customdata[0]:.4f}, %{customdata[1]:.4f}]<br>'
+                'p = %{customdata[2]:.4f}<extra></extra>'
+            ),
+        ))
+    _fig_p24.add_vline(x=1.0, line_dash='dash', line_color='black', line_width=1.5)
+    _fig_p24.update_layout(
+        title=dict(text='Figure 24 — Cox PH Hazard Ratios: Migration Status (reference = non-migrated)',
+                   font=dict(size=14)),
+        xaxis_title='Hazard Ratio (HR < 1 = lower hazard of death = longer survival)',
+        yaxis_title='Group',
+        plot_bgcolor='white', paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        xaxis=dict(gridcolor='#eee'),
+        legend=dict(orientation='h', yanchor='top', y=-0.18, xanchor='center', x=0.5),
+        margin=dict(t=70, b=120, l=160, r=40),
+        height=420,
+    )
+    _save_interactive(_fig_p24, 'fig24_interactive.html')
+    print("  fig24 interactive saved.")
+
+    print("Cox analysis complete.")
+
+except Exception as _e:
+    print(f"  Cox model skipped: {_e}")
+
+# ===========================================================================
+# PROPENSITY SCORE MATCHING — ADDRESSES REVIEWER CRITIQUE #3 (§5.4)
+# ===========================================================================
+# Estimates the migrant/non-migrant mean age at death gap on a matched sample
+# to partially control for healthy-migrant selection effects.
+# Covariates: birth_decade, profession_code, birth_region_code
+# Method: nearest-neighbour matching on estimated propensity score (logistic)
+# Reference group: non_migrated (the larger group — matched to)
+# ===========================================================================
+print("\nPropensity Score Matching (§5.4)...")
+
+try:
+    from sklearn.linear_model import LogisticRegression as _LR
+    from sklearn.preprocessing import StandardScaler as _Scaler
+
+    # Filter to migrated + non_migrated only (df_reg has all analysable rows)
+    _psm_mask = df_reg['migration'].isin(['migrated', 'non_migrated'])
+    _df_psm   = df_reg[_psm_mask].copy()
+    _df_psm['_treated'] = (_df_psm['migration'] == 'migrated').astype(int)
+
+    # Encode covariates
+    _prof_codes = pd.Categorical(_df_psm['profession']).codes
+    _reg_codes  = pd.Categorical(_df_psm['birth_region']).codes
+    _X_psm = pd.DataFrame({
+        'birth_decade': _df_psm['birth_decade'].values,
+        'profession':   _prof_codes,
+        'region':       _reg_codes,
+    })
+    _y_psm = _df_psm['_treated'].values
+
+    # Estimate propensity scores
+    _scaler = _Scaler()
+    _X_scaled = _scaler.fit_transform(_X_psm)
+    _lr = _LR(max_iter=500, solver='lbfgs')
+    _lr.fit(_X_scaled, _y_psm)
+    _df_psm = _df_psm.copy()
+    _df_psm['_ps'] = _lr.predict_proba(_X_scaled)[:, 1]
+
+    # Nearest-neighbour matching (greedy, without replacement)
+    _treated  = _df_psm[_df_psm['_treated'] == 1].copy()
+    _control  = _df_psm[_df_psm['_treated'] == 0].copy().reset_index(drop=True)
+
+    import numpy as _np_psm
+    _ctrl_ps = _control['_ps'].values
+    _matched_ctrl_idx = []
+    _used = set()
+    for _, row in _treated.iterrows():
+        _dists = _np_psm.abs(_ctrl_ps - row['_ps'])
+        _sorted_idx = _np_psm.argsort(_dists)
+        for _idx in _sorted_idx:
+            if _idx not in _used:
+                _matched_ctrl_idx.append(_idx)
+                _used.add(_idx)
+                break
+
+    _matched_ctrl = _control.iloc[_matched_ctrl_idx]
+    _psm_gap      = _treated['age_at_death'].mean() - _matched_ctrl['age_at_death'].mean()
+    _psm_n        = len(_treated)
+
+    # Bootstrap 95% CI for PSM gap
+    _rng = _np_psm.random.default_rng(42)
+    _boot_gaps = []
+    for _ in range(2000):
+        _bt_idx = _rng.integers(0, _psm_n, size=_psm_n)
+        _bc_idx = _rng.integers(0, len(_matched_ctrl), size=_psm_n)
+        _boot_gaps.append(
+            _treated.iloc[_bt_idx]['age_at_death'].values.mean() -
+            _matched_ctrl.iloc[_bc_idx]['age_at_death'].values.mean()
+        )
+    _psm_ci_lo = round(float(_np_psm.percentile(_boot_gaps, 2.5)),  2)
+    _psm_ci_hi = round(float(_np_psm.percentile(_boot_gaps, 97.5)), 2)
+    _psm_gap_r  = round(float(_psm_gap), 2)
+
+    print(f"  PSM matched n = {_psm_n} treated (migrated)")
+    print(f"  PSM gap (migrated − non-migrated): {_psm_gap_r:+.2f} yrs  "
+          f"95% CI [{_psm_ci_lo}, {_psm_ci_hi}]")
+    print(f"  Full-sample gap for reference:  +4.04 yrs")
+
+    # Write PSM results to text report
+    with open(OUT_TXT, 'a', encoding='utf-8') as _f:
+        _f.write('\n\n')
+        _f.write('=' * 80 + '\n')
+        _f.write('9. PROPENSITY SCORE MATCHING — MIGRATED vs NON-MIGRATED\n')
+        _f.write('-' * 80 + '\n')
+        _f.write(f'  Covariates: birth_decade, profession_code, birth_region_code\n')
+        _f.write(f'  Method: nearest-neighbour matching on estimated propensity score\n')
+        _f.write(f'  Matched n (treated = migrated): {_psm_n}\n\n')
+        _f.write(f'  PSM gap (migrated − non-migrated): {_psm_gap_r:+.2f} yrs\n')
+        _f.write(f'  Bootstrap 95% CI (2000 resamples): [{_psm_ci_lo}, {_psm_ci_hi}]\n')
+        _f.write(f'  Full-sample (unadjusted) gap:       +4.04 yrs\n\n')
+        _attenuation = round(((4.04 - _psm_gap_r) / 4.04) * 100, 1)
+        _f.write(f'  Gap attenuation after matching: {_attenuation:.1f}%\n')
+        _f.write(f'  Interpretation: PSM controls for birth cohort, profession, and\n')
+        _f.write(f'  region. The residual gap after matching reflects effects not\n')
+        _f.write(f'  captured by observable selection covariates.\n')
+
+    print("  PSM analysis complete.")
+
+except Exception as _e_psm:
+    print(f"  PSM skipped: {_e_psm}")
+    _psm_gap_r = None
+    _psm_ci_lo = None
+    _psm_ci_hi = None
+
+# ===========================================================================
 # DONE
 # ===========================================================================
 print(f"\nAll charts saved to: {CHARTS_DIR}")
