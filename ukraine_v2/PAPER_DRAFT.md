@@ -10,7 +10,7 @@
 
 This paper presents an expanded quantitative analysis of life expectancy among Ukrainian creative industry workers during the Soviet occupation of Ukraine, extending and refining the methodology of our original V1 study. Drawing on 16,215 confirmed Ukrainian creative workers extracted from the Encyclopedia of Modern Ukraine (Інститут енциклопедичних досліджень НАН України, esu.com.ua, accessed 2026), we identify 8,643 individuals with complete birth dates, death dates, and determinable migration status across four groups: migrated (n=1,280), non-migrated (n=6,030), internal transfer (n=1,150), and deported by the Soviet state (n=183). This represents a more than twenty-fold expansion over the V1 dataset of 415 workers, and a 42% increase over V2.1 following date recovery from previously corrupted ESU biographical text entries and V2.3 reclassification corrections.
 
-Non-migrants who remained within the USSR (n=6,030) achieved an average life expectancy of 71.22 years (median 73, SD 13.81), while migrants who left the Soviet sphere (n=1,280) achieved an average of 75.25 years (median 77, SD 13.89), yielding a **gap of 4.04 years** in favour of emigrants (Mann-Whitney U, p<0.001; Cohen's d=0.292). Workers deported by the Soviet state (n=183) died on average at 48.35 years — a 22.87-year deficit relative to non-migrants (Cohen's d=1.656, p<0.001). Workers who relocated within the Soviet system (internal transfer, n=1,150) showed no meaningful LE advantage over non-migrants (gap=+0.52 yrs, d=0.037), confirming that leaving the Soviet sphere specifically — not mere mobility — was the protective variable.
+Non-migrants who remained within the USSR (n=6,030) achieved an average life expectancy of 71.22 years (median 73, SD 13.79), while migrants who left the Soviet sphere (n=1,280) achieved an average of 75.25 years (median 77, SD 13.88), yielding a **gap of 4.04 years** in favour of emigrants (Mann-Whitney U, p<0.001; Cohen's d=0.292). Workers deported by the Soviet state (n=183) died on average at 48.35 years — a 22.87-year deficit relative to non-migrants (Cohen's d=1.656, p<0.001). Workers who relocated within the Soviet system (internal transfer, n=1,150) showed no meaningful LE advantage over non-migrants (gap=+0.52 yrs, d=0.038), confirming that leaving the Soviet sphere specifically — not mere mobility — was the protective variable.
 
 The primary gap of 4.04 years is markedly narrower than the 9-year gap reported in V1, reflecting the inclusion of long-lived post-Soviet non-migrants excluded by V1's pre-1991 death cutoff, not a retraction of the V1 finding. Profession-level, birth cohort, repression-period, and death cause analyses confirm systematic mortality differentials aligned with documented Soviet repression campaigns, particularly the Holodomor (1932–1933), the Great Terror (1937–1938), and the broader cultural liquidation of the Executed Renaissance (*Розстріляне Відродження*). These findings constitute quantitative corroboration of the mortality cost of Soviet cultural policy for Ukrainian creative communities.
 
@@ -18,11 +18,11 @@ The primary gap of 4.04 years is markedly narrower than the 9-year gap reported 
 
 ## 1. Introduction
 
-The Soviet occupation of Ukraine — conventionally dated from the consolidation of Bolshevik control in 1920 through Ukrainian independence in 1991 — was characterised by systematic state violence against Ukrainian cultural and intellectual life. Policies of Russification, enforced collectivisation, mass executions, forced labour, and ideological surveillance were not applied uniformly across Soviet society but were deployed with particular intensity against groups whose work produced and transmitted national identity: writers, poets, visual artists, composers, theatre directors, architects, and other creative workers.
+The Soviet occupation of Ukraine — conventionally dated from the consolidation of Bolshevik control in 1920 through Ukrainian independence in 1991[^2] — was characterised by systematic state violence against Ukrainian cultural and intellectual life. Policies of Russification, enforced collectivisation, mass executions, forced labour, and ideological surveillance were not applied uniformly across Soviet society but were deployed with particular intensity against groups whose work produced and transmitted national identity: writers, poets, visual artists, composers, theatre directors, architects, and other creative workers.
 
-The period known in Ukrainian historiography as the "Executed Renaissance" (Розстріляне відродження, Rozstriliane vidrodzhennia) — roughly 1917 to 1941 — saw the near-total physical destruction of an entire generation of Ukrainian cultural figures. Scholars including Mykola Zerov, Mykhailo Khvylovy, Les Kurbas, Valerian Pidmohylny, and hundreds of others were arrested, tortured, imprisoned in the Gulag system, or executed outright during the Stalinist terror campaigns of the 1930s. The Great Terror of 1937–1938 was particularly lethal: Ukrainian cultural workers were disproportionately targeted as potential vectors of "bourgeois nationalism." The scale and character of this liquidation is documented extensively in Ukrainian literary historiography (Lavrinenko, 1959; Škandrij, 2010; Myshanych & Semenko, 1991).
+The period known in Ukrainian historiography as the "Executed Renaissance" (Розстріляне відродження, Rozstriliane vidrodzhennia) — roughly 1917 to 1941 — saw the near-total physical destruction of an entire generation of Ukrainian cultural figures. Scholars including Mykola Zerov, Mykhailo Khvylovy, Les Kurbas, Valerian Pidmohylny, and hundreds of others were arrested, tortured, imprisoned in the Gulag system, or executed outright during the Stalinist terror campaigns of the 1930s. The Great Terror of 1937–1938 was particularly lethal: Ukrainian cultural workers were disproportionately targeted as potential vectors of "bourgeois nationalism." The scale and character of this liquidation is documented extensively in Ukrainian literary historiography.[^3]
 
-Quantitative study of this mortality toll has been limited. Historical demography of Soviet persecution has relied heavily on archival records — many still restricted or destroyed — and has focused more on aggregate victim counts than on comparative life expectancy across survivor groups. Our V1 study (Berdnyk & Symkin, 2025) provided a first quantitative examination of the life expectancy gap between Ukrainian creative workers who emigrated versus those who remained within the Soviet Union, finding a 9-year gap (63 years versus 72 years) in a dataset of 415 workers.
+Quantitative study of this mortality toll has been limited. Historical demography of Soviet persecution has relied heavily on archival records — many still restricted or destroyed — and has focused more on aggregate victim counts than on comparative life expectancy across survivor groups. Our V1 study[^4] provided a first quantitative examination of the life expectancy gap between Ukrainian creative workers who emigrated versus those who remained within the Soviet Union, finding a 9-year gap (63 years versus 72 years) in a dataset of 415 workers.
 
 The present paper — V2 — substantially expands that dataset to 8,643 analysable workers, refines the methodology to eliminate the pre-1991 death cutoff that we identified as a source of bias in V1, introduces a profession-level disaggregation, and provides detailed analysis of repression-period mortality, birth cohort effects, and geographic migration patterns. Our central research question remains unchanged: did Ukrainian creative workers who emigrated from the Soviet Union live significantly longer than those who remained, and if so, by how much and under what conditions?
 
@@ -70,7 +70,7 @@ The narrowing of the gap from 9 years to 4.04 years is not a finding of lesser m
 
 ### 3.1 Data Source
 
-All data were extracted from the Encyclopedia of Modern Ukraine (Енциклопедія сучасної України, ESU), maintained by the Institute of Encyclopedic Research of the National Academy of Sciences of Ukraine (Інститут енциклопедичних досліджень НАН України) and available at esu.com.ua. The ESU is the authoritative scholarly encyclopedia of Ukrainian cultural and intellectual life, with entries written and reviewed by subject-matter experts. As of our access date (2026), it contained entries for approximately 70,000 individuals.
+All data were extracted from the Encyclopedia of Modern Ukraine (Енциклопедія сучасної України, ESU), maintained by the Institute of Encyclopedic Research of the National Academy of Sciences of Ukraine (Інститут енциклопедичних досліджень НАН України) and available at esu.com.ua.[^1] The ESU is the authoritative scholarly encyclopedia of Ukrainian cultural and intellectual life, with entries written and reviewed by subject-matter experts. As of our access date (2026), it contained entries for approximately 70,000 individuals.
 
 The ESU was selected as the primary source for three reasons: (1) it is the most comprehensive Ukrainian-language biographical reference work covering the relevant time period; (2) its entries consistently include birth and death dates, biographical summaries, and sufficient information to determine migration status; and (3) it focuses specifically on individuals of cultural, intellectual, and creative significance, making it a natural population of interest for this study.
 
@@ -168,7 +168,7 @@ The ESU biographical texts consistently contain sufficient information to make t
 
 **Statistical significance testing.** We used the Mann-Whitney U test (also known as the Wilcoxon rank-sum test) rather than a two-sample t-test for the primary significance test. This choice reflects the non-normal distribution of ages at death in the non-migrant group — the distribution is left-skewed due to the substantial number of premature deaths from execution and political violence, and this skew violates the normality assumption of the t-test. The Mann-Whitney U test makes no parametric distributional assumptions and is therefore more appropriate for this data structure. The resulting p-value is approximately 0.0 (less than any conventional significance threshold).
 
-**Effect size.** Cohen's d was calculated as the difference in group means divided by the pooled standard deviation. Our primary result of d=0.292 falls in the small-to-medium range (Cohen, 1988), indicating that the life expectancy difference is not merely statistically detectable but practically meaningful: it is large enough to observe at the individual level, not merely at the population aggregate level.
+**Effect size.** Cohen's d was calculated as the difference in group means divided by the pooled standard deviation. Our primary result of d=0.292 falls in the small-to-medium range,[^5] indicating that the life expectancy difference is not merely statistically detectable but practically meaningful: it is large enough to observe at the individual level, not merely at the population aggregate level.
 
 **Period analysis.** Deaths among non-migrants were grouped by historical period using established historiographic periodisation of Soviet Ukrainian history. Average age at death within each period was calculated to identify periods of anomalously young mortality.
 
@@ -186,18 +186,18 @@ The primary finding of V2 is a statistically robust 4.04-year life expectancy ga
 
 | Group | n | Mean LE | Median LE | SD | 95% CI |
 |-------|---|---------|-----------|-----|--------|
-| Migrated (left USSR) | 1,280 | 75.25 | 77 | 13.89 | [74.49, 76.01] |
-| Non-migrated (stayed) | 6,030 | 71.22 | 73 | 13.81 | [70.86, 71.57] |
-| Internal transfer (USSR) | 1,150 | 70.70 | 72 | 13.62 | [69.91, 71.49] |
-| Deported by Soviet state | 183 | 48.35 | 45 | 14.49 | [46.26, 50.44] |
+| Migrated (left USSR) | 1,280 | 75.25 | 77 | 13.88 | [74.49, 76.01] |
+| Non-migrated (stayed) | 6,030 | 71.22 | 73 | 13.79 | [70.87, 71.57] |
+| Internal transfer (USSR) | 1,150 | 70.70 | 72 | 13.61 | [69.91, 71.49] |
+| Deported by Soviet state | 183 | 48.35 | 45 | 14.36 | [46.26, 50.44] |
 | **Primary gap (Migrated vs Non-migrated)** | — | **+4.04** | **+4** | — | — |
 | **Deportation gap (Non-migrated vs Deported)** | — | **+22.87** | — | — | — |
 
-The non-migrated group (n=6,030) achieved a mean life expectancy of 71.22 years and a median of 73 years. The wide standard deviation (13.81) reflects the heterogeneous mortality experience of this group: it spans both very young deaths from political violence and long-lived individuals who survived the Soviet period and died in old age in independent Ukraine.
+The non-migrated group (n=6,030) achieved a mean life expectancy of 71.22 years and a median of 73 years. The wide standard deviation (13.79) reflects the heterogeneous mortality experience of this group: it spans both very young deaths from political violence and long-lived individuals who survived the Soviet period and died in old age in independent Ukraine.
 
-The migrated group (n=1,280) achieved a mean life expectancy of 75.25 years and a median of 77 years (SD=13.89). Migrants were largely spared the systematic political violence that produced the left tail of the non-migrated distribution, though they faced other mortality risks including wartime conditions, poverty in exile, and the psychological consequences of displacement.
+The migrated group (n=1,280) achieved a mean life expectancy of 75.25 years and a median of 77 years (SD=13.88). Migrants were largely spared the systematic political violence that produced the left tail of the non-migrated distribution, though they faced other mortality risks including wartime conditions, poverty in exile, and the psychological consequences of displacement.
 
-The internal transfer group (n=1,150) — workers who relocated within the Soviet Union under voluntary or professional pressure — shows a mean LE of 70.70 years, statistically indistinguishable from non-migrated (gap = +0.52 yrs, p=0.096, d=0.037). This near-null finding is itself significant: moving within the Soviet system conferred no meaningful survival advantage.
+The internal transfer group (n=1,150) — workers who relocated within the Soviet Union under voluntary or professional pressure — shows a mean LE of 70.70 years, statistically indistinguishable from non-migrated (gap = +0.52 yrs, p=0.094, d=0.038). This near-null finding is itself significant: moving within the Soviet system conferred no meaningful survival advantage.
 
 The most extreme finding is the deported group (n=183): mean LE of 48.35 years, median 45 years — a 22.87-year deficit relative to non-migrants and a 26.90-year deficit relative to migrants. This group, comprising workers forcibly expelled to Central Asia, Siberia, or the Gulag, experienced mortality conditions equivalent to those observed in wartime populations.
 
@@ -210,7 +210,7 @@ All pairwise comparisons between migrated and non-migrated groups, and between e
 | Migrated vs Non-migrated | +4.04 yrs | 0.292 | < 0.001 |
 | Migrated vs Deported | +26.90 yrs | 1.930 | < 0.001 |
 | Non-migrated vs Deported | +22.87 yrs | 1.656 | < 0.001 |
-| Non-migrated vs Internal transfer | +0.52 yrs | 0.037 | 0.096 (n.s.) |
+| Non-migrated vs Internal transfer | +0.52 yrs | 0.038 | 0.094 (n.s.) |
 
 For the primary comparison (migrated vs non-migrated), Cohen's d = 0.292 indicates a small-to-medium effect size. The deported group shows a massive effect (d = 1.930), one of the largest effect sizes observable in population mortality data outside of direct famine or epidemic conditions.
 
@@ -246,10 +246,10 @@ The non-migrated dataset (n=6,030) provides sufficient power to examine mortalit
 | 1921–1929 | Early Soviet/NEP | 93 | 58.5 | 1.5% |
 | 1930–1933 | Holodomor/Purges | 53 | 59.6 | 0.9% |
 | 1934–1938 | Great Terror | 95 | 55.5 | 1.6% |
-| 1939–1945 | World War II | 202 | 55.0 | 3.3% |
+| 1939–1945 | World War II | 202 | 55.2 | 3.3% |
 | 1946–1953 | Late Stalinist period | 121 | 62.6 | 2.0% |
 | 1954–1964 | Khrushchev Thaw | 234 | 66.6 | 3.9% |
-| 1965–1991 | Stagnation/Late USSR | 1,427 | 69.2 | 23.6% |
+| 1965–1991 | Stagnation/Late USSR | 1,427 | 69.2 | 23.7% |
 | Post-1991 | Independent Ukraine | 3,710 | 74.7 | 61.5% |
 
 The most striking figure is the Great Terror period (1934–1938): 95 deaths with an average age of 55.5 years — well below the Late Soviet-period average of 69.2. This is compounded by the deported group's Terror-period data: 95 deported workers died in 1934–1938, with an average age of just 43.4 years. Combined, 190 creative workers died in the Terror years with an average age in the low-to-mid forties — a quantitative signal of mass non-natural mortality.
@@ -258,9 +258,9 @@ The post-1991 period dominates numerically (3,710 deaths, 61.5% of all non-migra
 
 ### 4.5 The 1937 Spotlight
 
-The year 1937 — the peak of the Stalinist Great Terror — warrants dedicated analysis. The combined non-migrated and deported datasets record 24 + 65 = **89 creative worker deaths in 1937 alone**, with a blended mean age at death of approximately 43 years. This is the single most lethal year for Ukrainian creative workers in our dataset.
+The year 1937 — the peak of the Stalinist Great Terror — warrants dedicated analysis. The combined non-migrated and deported datasets record 24 + 65 = **89 creative worker deaths in 1937 alone**, with a blended mean age at death of approximately 44 years. This is the single most lethal year for Ukrainian creative workers in our dataset.
 
-Among non-migrants alone, 24 deaths in 1937 at average age 48. Among deportees, 65 deaths in 1937 at average age 42.4. The deported group's 1937 figure is particularly revealing: 65 of the 183 total deported workers in our dataset (35.5%) died in a single year, at an average age of 42.
+Among non-migrants alone, 24 deaths in 1937 at average age 48. Among deportees, 65 deaths in 1937 at average age 42.4. The deported group's 1937 figure is particularly revealing: 65 of the 183 total deported workers in our dataset (35.5%) died in a single year, at an average age of 42.4.
 
 **Table 4: 1937 Deaths by Group**
 
@@ -270,7 +270,7 @@ Among non-migrants alone, 24 deaths in 1937 at average age 48. Among deportees, 
 | Deported | 65 | 42.4 |
 | Internal transfer | — | — |
 | Migrated | — | — |
-| **Total** | **89** | **~43.8** |
+| **Total** | **89** | **~43.9** |
 
 The deported group's concentration of deaths in 1937 corresponds directly to the Sandarmokh massacres, the Solovki transit camp executions, and the general liquidation of Ukrainian cultural intelligentsia ordered by NKVD Order No. 00447. Named figures recovered in V2.2 who now correctly appear in this dataset include Лесь Курбас (shot 1937, age 50), Микола Зеров (shot 1937, age 47), Валер'ян Підмогильний (shot 1937, age 36), and Валер'ян Поліщук (shot 1937, age 40).
 
@@ -291,7 +291,7 @@ The life expectancy gap between migrants and non-migrants is strongly concentrat
 
 The 1890s cohort shows the most extreme deported mortality: mean LE of 44.6 years among those 60 deported individuals, nearly all of whom died in the Terror years. This cohort — those born 1890–1899, who were in their thirties and forties during the peak repression — formed the core of the Executed Renaissance and bears the full weight of state-organised liquidation.
 
-The pattern across cohorts reinforces the causal interpretation: the gap persists across all birth decades but is most severe where the cohort's prime years overlapped with peak repression. The 1930s cohort shows the smallest gap (+1.5 years) — those workers were children during the Terror and came of age in post-war Soviet Ukraine, facing bureaucratic repression rather than physical elimination.
+The pattern across cohorts reinforces the causal interpretation: the gap persists across all birth decades but is most severe where the cohort's prime years overlapped with peak repression. The 1930s cohort shows the smallest gap (+1.6 years) — those workers were children during the Terror and came of age in post-war Soviet Ukraine, facing bureaucratic repression rather than physical elimination.
 
 ### 4.7 Geographic Patterns
 
@@ -317,15 +317,15 @@ Donetsk (historically called Stalino during the Soviet period) shows a 0% migrat
 
 The distribution of ages at death further illuminates the mortality differential between the two groups.
 
-**Premature death (before age 50):** 9.2% of non-migrants died before age 50, compared to 5.8% of migrants — a relative excess of 59% more premature deaths among non-migrants.
+**Premature death (before age 50):** 7.1% of non-migrants died before age 50, compared to 5.4% of migrants — a relative excess of 31% more premature deaths among non-migrants.
 
-**Very young death (before age 30):** 77 non-migrants versus 6 migrants died before age 30. Expressed as a proportion of their respective group sizes: 1.46% of non-migrants versus 0.58% of migrants died before age 30 — a ratio of approximately 2.5:1.
+**Very young death (before age 30):** 49 non-migrants versus 3 migrants died before age 30. Expressed as a proportion of their respective group sizes: 0.81% of non-migrants versus 0.23% of migrants died before age 30 — a ratio of approximately 3.5:1.
 
-**Age 30–39 deaths:** 130 non-migrants versus 22 migrants.
+**Age 30–39 deaths:** 123 non-migrants versus 25 migrants.
 
-**Age 40–49 deaths:** 276 non-migrants versus 32 migrants.
+**Age 40–49 deaths:** 255 non-migrants versus 41 migrants.
 
-**Long life (age 90+):** 294 non-migrants and 141 migrants reached age 90 or older. As a proportion: 5.6% of non-migrants versus 13.6% of migrants achieved this milestone. This finding is counterintuitive at first glance — if non-migrants faced greater mortality risk, why do more of them in absolute terms reach age 90? The answer lies in sample sizes: non-migrants outnumber migrants five to one in this dataset, so even at a lower rate, they produce more individuals in the 90+ bracket in absolute terms.
+**Long life (age 90+):** 375 non-migrants and 189 migrants reached age 90 or older. As a proportion: 6.2% of non-migrants versus 14.8% of migrants achieved this milestone. This finding is counterintuitive at first glance — if non-migrants faced greater mortality risk, why do more of them in absolute terms reach age 90? The answer lies in sample sizes: non-migrants outnumber migrants five to one in this dataset, so even at a lower rate, they produce more individuals in the 90+ bracket in absolute terms.
 
 The age distribution analysis confirms the interpretation of the life expectancy gap: non-migrants show a pronounced left tail (excess premature deaths from political violence) combined with a roughly normal long-life distribution, while migrants show a more symmetric distribution with a lighter left tail and a modestly heavier right tail (more long-lived individuals proportionally).
 
@@ -375,9 +375,9 @@ Eastern and southern Ukrainian creative workers, by contrast, were longer-embedd
 
 ### 5.5 Comparisons to Related Research
 
-Our findings are broadly consistent with existing historical scholarship on Soviet repression and with the limited quantitative literature on mortality in Soviet-era professional populations. Studies of Gulag mortality (Barnes, 2011; Applebaum, 2003) document life expectancy at arrest of approximately 35–45 years among those who died in the Gulag, consistent with our finding that the most lethal periods in our data (1934–1938 and 1939–1945) show average ages at death of approximately 51 years — higher than the Gulag average because our dataset includes both those who died in the Gulag and those who died of natural causes during those periods.
+Our findings are broadly consistent with existing historical scholarship on Soviet repression and with the limited quantitative literature on mortality in Soviet-era populations. Studies of Gulag mortality[^6] document catastrophic death rates in Soviet labor camps, reaching 20–25% annually during 1942–1943, and systematic mass executions during 1937–1938. These documented mortality patterns are broadly consistent with our deported group's average age at death of 43.4 years during 1934–1938 and 44.4 years during 1939–1945.
 
-Comparative demography of Soviet versus Western European professional populations in the mid-twentieth century (Andreev et al., 1998; Meslé et al., 2002) documents a general Soviet mortality penalty of approximately 3–7 years relative to Western European equivalents by the 1970s and 1980s. Our finding of a 4.04-year gap is consistent with this range, though our dataset's specific focus on a targeted professional group subject to particular repression means our estimate captures both the general Soviet mortality penalty and the profession-specific repression penalty.
+Comparative demography of Soviet versus Western European general populations[^7] documents a Soviet mortality penalty that grew from approximately 3 years in the mid-1960s to over 10 years by the early 1990s, depending on country and sex. Andreev et al. additionally reconstruct Soviet demographic conditions for the 1927–1959 period, directly covering our Great Terror and Holodomor years. Our finding of a 4.04-year gap is consistent with the lower end of the East-West divergence range, though our dataset's specific focus on a group subject to targeted repression means our estimate captures both the general Soviet mortality penalty and the profession-specific repression effect.
 
 ---
 
@@ -385,7 +385,7 @@ Comparative demography of Soviet versus Western European professional population
 
 This paper presents the most comprehensive quantitative analysis to date of life expectancy among Ukrainian creative workers under Soviet occupation. Across a dataset of 8,643 individuals with confirmed birth dates, death dates, and migration status — more than twenty times larger than our V1 dataset — we find a statistically robust 4.04-year life expectancy gap in favour of those who emigrated, with a Mann-Whitney U p-value of approximately 0.0 and a Cohen's d of 0.292 (small-to-medium effect size).
 
-The gap is not uniform: it is largest for the 1880s and 1890s birth cohorts (the Executed Renaissance generation, with identical gaps of 5.1 years for both cohorts), for Architects (+6.1 years) and Other Creative workers (+5.1 years), and for workers born in western Ukrainian cities (who emigrated at rates of 15–17% compared to near-zero rates in eastern Ukraine). It narrows substantially for the post-Terror cohorts, providing strong evidence that the gap is driven primarily by cohort-specific political violence rather than by stable baseline differences between migrants and non-migrants.
+The gap is not uniform: it is largest for the 1880s and 1890s birth cohorts (the Executed Renaissance generation, with identical gaps of 5.1 years for both cohorts), for Architects (+6.1 years) and Other Creative workers (+4.9 years), and for workers born in western Ukrainian cities (who emigrated at rates of 15–17% compared to near-zero rates in eastern Ukraine). It narrows substantially for the post-Terror cohorts, providing strong evidence that the gap is driven primarily by cohort-specific political violence rather than by stable baseline differences between migrants and non-migrants.
 
 The 1937 spotlight analysis reveals that 89 Ukrainian creative workers in our dataset died in that single year (24 non-migrated + 65 deported) at a blended average age of approximately 44 — predominantly Writers and Poets — in a pattern consistent with mass political execution rather than natural mortality. The repression period analysis shows average ages at death of 55.5 years (non-migrated) and 43.4 years (deported) during the Great Terror (1934–1938), the lowest of any period in our data, contrasting with 74.7 years for those who died in the post-independence period.
 
@@ -397,29 +397,29 @@ The Executed Renaissance was not a metaphor. It was a demographic event — one 
 
 ---
 
-## 7. References
+## 7. Bibliography
 
-Andreev, E. M., Darsky, L. E., & Kharkova, T. L. (1998). *Demographic history of Russia: 1927–1959*. Informatika Publishers.
+Andreev, E. M., L. E. Darsky, and T. L. Kharkova. *Demographic History of Russia: 1927–1959*. Moscow: Informatika Publishers, 1998.
 
-Applebaum, A. (2003). *Gulag: A history*. Doubleday.
+Applebaum, Anne. *Gulag: A History*. New York: Doubleday, 2003.
 
-Barnes, S. A. (2011). *Death and redemption: The Gulag and the shaping of Soviet society*. Princeton University Press.
+Barnes, Steven A. *Death and Redemption: The Gulag and the Shaping of Soviet Society*. Princeton: Princeton University Press, 2011.
 
-Berdnyk, E., & Symkin, M. (2025). Life expectancy of Ukrainian creative industry workers during the Soviet occupation: A preliminary study (V1). [Unpublished manuscript].
+Berdnyk, Elza, and Mark Symkin. "Life Expectancy of Ukrainian Creative Industry Workers during the Soviet Occupation: A Preliminary Study (V1)." Unpublished manuscript, 2025.
 
-Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum Associates.
+Cohen, Jacob. *Statistical Power Analysis for the Behavioral Sciences*. 2nd ed. Hillsdale, NJ: Lawrence Erlbaum Associates, 1988.
 
-Інститут енциклопедичних досліджень НАН України (Institute of Encyclopedic Research of the National Academy of Sciences of Ukraine). (2026). *Енциклопедія сучасної України* [Encyclopedia of Modern Ukraine]. esu.com.ua.
+Institute of Encyclopedic Research of the National Academy of Sciences of Ukraine [Інститут енциклопедичних досліджень НАН України]. *Encyclopedia of Modern Ukraine* [Енциклопедія сучасної України]. Accessed 2026. https://esu.com.ua.
 
-Lavrinenko, Y. (1959). *Rozstriliane vidrodzhennia: Antolohiia 1917–1933* [The Executed Renaissance: Anthology 1917–1933]. Instytut Literacki.
+Lavrinenko, Yuriy. *Rozstriliane vidrodzhennia: Antolohiia 1917–1933* [The Executed Renaissance: An Anthology, 1917–1933]. Paris: Instytut Literacki, 1959.
 
-Meslé, F., Vallin, J., & Hertrich, V. (2002). *Causes of death in Russia: Assessing trends since the 1950s*. Institut National d'Études Démographiques.
+Meslé, France, and Jacques Vallin. "Mortality in Europe: The Divergence Between East and West." *Population* (English edition) 57, no. 1 (2002): 157–197.
 
-Myshanych, O., & Semenko, M. (1991). *Ukrainska literatura XX stolittia* [Ukrainian literature of the 20th century]. Naukova Dumka.
+Myshanych, O., and M. Semenko (given name unverified). *Ukrainska literatura XX stolittia* [Ukrainian Literature of the Twentieth Century]. Kyiv: Naukova Dumka, 1991.
 
-Škandrij, M. (2010). *Ukrainian nationalism: Politics, ideology, and literature, 1929–1956*. Yale University Press.
+Škandrij, Myroslav. *Ukrainian Nationalism: Politics, Ideology, and Literature, 1929–1956*. New Haven: Yale University Press, 2015.
 
-Subtelny, O. (2000). *Ukraine: A history* (3rd ed.). University of Toronto Press.
+Subtelny, Orest. *Ukraine: A History*. 3rd ed. Toronto: University of Toronto Press, 2000.
 
 ---
 
@@ -433,9 +433,9 @@ The following figures accompany this paper. Each figure was generated computatio
 
 **Figure 3 (`fig09_nonmigrant_deaths_by_period.png`):** Grouped bar chart of mean age at death by Soviet historical period (NEP, Holodomor, Great Terror, WWII, Late Stalin, Thaw, Stagnation, Post-1991) for each migration group. Red-outlined bars mark repression periods. The deported group shows catastrophically low mean ages in the Terror period (1934–1938: avg 43.4 yrs). The post-1991 bar for non-migrants (avg 74.7 yrs) is the tallest, illustrating why including post-Soviet deaths is essential for an unbiased estimate.
 
-**Figure 4 (`fig11_profession_grouped_bar.png`):** Grouped bar chart showing group sizes and life expectancy by creative profession (Writers/Poets, Visual Artists, Musicians/Composers, Theatre/Film, Architects, Other Creative). The migrant/non-migrant LE gap is present in every profession. Writers/Poets have the largest deported sub-group (n=114), reflecting the targeted Soviet liquidation of Ukrainian-language literary production.
+**Figure 4 (`fig11_profession_grouped_bar.png`):** Grouped bar chart showing group sizes and life expectancy by creative profession (Writers/Poets, Visual Artists, Musicians/Composers, Theatre/Film, Architects, Other Creative). The migrant/non-migrant LE gap is present in every profession. Writers/Poets have the largest deported sub-group (n=117), reflecting the targeted Soviet liquidation of Ukrainian-language literary production.
 
-**Figure 5 (`fig10_birth_cohort_le.png`):** Line chart showing mean age at death by birth decade for migrants, non-migrants, internal transfers, and deported workers (minimum n=10 per data point). The 1890s deported cohort (mean LE 44.9 yrs, n=60) represents the peak of Executed Renaissance destruction. The migrated line remains consistently above non-migrated across all birth decades.
+**Figure 5 (`fig10_birth_cohort_le.png`):** Line chart showing mean age at death by birth decade for migrants, non-migrants, internal transfers, and deported workers (minimum n=10 per data point). The 1890s deported cohort (mean LE 44.6 yrs, n=60) represents the peak of Executed Renaissance destruction. The migrated line remains consistently above non-migrated across all birth decades.
 
 **Figure 6 (`fig08_deported_deaths_by_year.png`):** Year-by-year bar chart of deaths in the deported group only (n=183). The 1937 spike — 65 deaths, 35.5% of the entire group in a single year — is the visual centrepiece of the repression analysis. A secondary cluster appears in 1941–1945 (WWII). After 1950, deaths drop to near-zero; the cohort is effectively gone.
 
@@ -466,3 +466,19 @@ We believe that transparent disclosure of AI tool use is essential for the integ
 *Manuscript prepared 2026. Authors: Elza Berdnyk, Mark Symkin.*
 *Data source: Encyclopedia of Modern Ukraine (esu.com.ua), accessed 2026.*
 *Correspondence: [author contact details to be added before submission]*
+
+---
+
+[^1]: Інститут енциклопедичних досліджень НАН України [Institute of Encyclopedic Research of the National Academy of Sciences of Ukraine], *Енциклопедія сучасної України* [Encyclopedia of Modern Ukraine], accessed 2026, https://esu.com.ua.
+
+[^2]: Orest Subtelny, *Ukraine: A History*, 3rd ed. (Toronto: University of Toronto Press, 2000).
+
+[^3]: Yuriy Lavrinenko, *Rozstriliane vidrodzhennia: Antolohiia 1917–1933* [The Executed Renaissance: An Anthology, 1917–1933] (Paris: Instytut Literacki, 1959); Myroslav Škandrij, *Ukrainian Nationalism: Politics, Ideology, and Literature, 1929–1956* (New Haven: Yale University Press, 2015); O. Myshanych and M. Semenko (given name unverified), *Ukrainska literatura XX stolittia* [Ukrainian Literature of the Twentieth Century] (Kyiv: Naukova Dumka, 1991).
+
+[^4]: Elza Berdnyk and Mark Symkin, "Life Expectancy of Ukrainian Creative Industry Workers during the Soviet Occupation: A Preliminary Study (V1)," unpublished manuscript, 2025.
+
+[^5]: Jacob Cohen, *Statistical Power Analysis for the Behavioral Sciences*, 2nd ed. (Hillsdale, NJ: Lawrence Erlbaum Associates, 1988).
+
+[^6]: Steven A. Barnes, *Death and Redemption: The Gulag and the Shaping of Soviet Society* (Princeton: Princeton University Press, 2011); Anne Applebaum, *Gulag: A History* (New York: Doubleday, 2003).
+
+[^7]: E. M. Andreev, L. E. Darsky, and T. L. Kharkova, *Demographic History of Russia: 1927–1959* (Moscow: Informatika Publishers, 1998) [covers 1927–1959; documents Soviet-era demographic conditions]; France Meslé and Jacques Vallin, "Mortality in Europe: The Divergence Between East and West," *Population* (English edition) 57, no. 1 (2002): 157–197 [documents the East-West LE divergence from 1950s through 1990s, including 1970s–80s gap of approximately 3–10 years depending on country and sex].
