@@ -1,15 +1,15 @@
-# Fig 11 — Life Expectancy by Creative Profession and Migration Group
+# Fig 11 — Mean Age at Death by Creative Profession and Migration Group
 
 **File:** `charts/fig11_profession_grouped_bar.png`
 
 ## What this chart shows
-A grouped bar chart showing **mean life expectancy** for each creative profession × migration group combination. X-axis = profession category; each cluster of 4 bars = the four migration groups side by side. Y-axis = years of life (not counts).
+A grouped bar chart showing **mean age at death** for each creative profession × migration group combination. X-axis = profession category; each cluster of 4 bars = the four migration groups side by side. Y-axis = years of life (not counts).
 
 ## Key finding (V2.3)
-The migrated LE advantage holds across virtually every profession. **Architects** show the largest migrated advantage (+6.1 yrs vs non-migrated). **Writers/Poets** have the most extreme deported outcome — mean LE ≈44.9 years — reflecting the Soviet state's targeted liquidation of Ukrainian-language literary production (the "Executed Renaissance").
+The migrated mean age at death advantage holds across virtually every profession. **Architects** show the largest migrated advantage (+6.1 yrs vs non-migrated). **Writers/Poets** have the most extreme deported outcome — mean age at death ≈44.9 years — reflecting the Soviet state's targeted liquidation of Ukrainian-language literary production (the "Executed Renaissance").
 
-**V2.3 profession breakdown (mean LE):**
-| Profession | Migrated LE | Non-migrated LE | Deported LE | Gap (M vs NM) |
+**V2.3 profession breakdown (mean age at death):**
+| Profession | Migrated mean age at death | Non-migrated mean age at death | Deported mean age at death | Gap (M vs NM) |
 |------------|------------|-----------------|-------------|--------------|
 | Writers/Poets | ~75.6 | ~71.3 | ~44.9 | +4.3 yrs |
 | Visual Artists | ~75.2 | ~72.3 | ~52.1 | +2.9 yrs |
@@ -25,4 +25,4 @@ The migrated LE advantage holds across virtually every profession. **Architects*
 - Writers/Poets have the largest absolute deported group (n≈114) — making that bar the most statistically reliable of the deported profession estimates
 
 ## Update history
-- **V2.3 (2026-04-06):** Description corrected — previous version incorrectly described this as a migration count chart. It shows mean LE per profession per group. Interactive Plotly version added (hover shows mean LE + n per cell).
+- **V2.3 (2026-04-06):** Description corrected — previous version incorrectly described this as a migration count chart. It shows mean age at death per profession per group. Interactive Plotly version added (hover shows mean age at death + n per cell).

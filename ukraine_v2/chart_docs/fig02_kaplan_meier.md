@@ -20,7 +20,7 @@ The migrated group's curve stays higher for longer — they have a higher probab
 - **Where curves diverge:** They start to separate around age 40-50. Below that, all groups had similar survival — the difference is in middle and old age.
 - **Deported curve:** Drops steeply and early. Large portions of the deported group never reached their 60s. Median survival is 45 — half the group was dead before age 45.
 - **Shaded bands:** The shaded region around each curve is the confidence interval. Wide band = less certainty (smaller group).
-- **Median survival:** The age where each curve crosses 0.5 (50% probability) gives the median life expectancy.
+- **Median survival:** The age where each curve crosses 0.5 (50% probability) gives the median age at death.
 
 ## Reference lines (V2.3)
 - **Non-migrated median (73 yrs)** — red dotted vertical line

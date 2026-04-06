@@ -3,7 +3,7 @@
 **File:** `charts/fig14_sensitivity_analysis.png`
 
 ## What this chart shows
-How the main LE gap (migrated vs non-migrated) would change if our AI classification had varying error rates — from 0% (perfect) to 10% (very bad). The x-axis is the hypothetical AI error rate; the y-axis is the resulting LE gap in years. The green shaded zone (0–5%) marks the methodologically acceptable range for AI-assisted classification.
+How the main mean age at death gap (migrated vs non-migrated) would change if our AI classification had varying error rates — from 0% (perfect) to 10% (very bad). The x-axis is the hypothetical AI error rate; the y-axis is the resulting mean age at death gap in years. The green shaded zone (0–5%) marks the methodologically acceptable range for AI-assisted classification.
 
 ## Key finding (V2.3)
 The finding remains positive across the entire tested range. Our actual measured error rate is **3.2%** (Phase 5 human accuracy check, n=63). The gap under various error scenarios (V2.3 worst-case model — most long-lived migrants removed first):

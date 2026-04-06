@@ -22,7 +22,7 @@ All groups are **male-dominated**, which is expected for this era and domain. Pu
 - Unknown/unclassified gender is minimal (<1% in most groups)
 
 ## Why gender matters for the study
-Men and women have different life expectancies in every population. If one migration group was predominantly female, that could partially explain LE differences. The gender breakdown shows groups are similarly male-dominated, so this confound is minimal. Fig18 controls for it explicitly.
+Men and women have different mean ages at death in every population. If one migration group was predominantly female, that could partially explain mean age at death differences. The gender breakdown shows groups are similarly male-dominated, so this confound is minimal. Fig18 controls for it explicitly.
 
 ## ⚠️ Readability issue
 The non-migrated group (n=6,030) is so much larger than the others that the smaller groups' bars are barely visible at the same Y-axis scale.

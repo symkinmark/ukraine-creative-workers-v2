@@ -3,18 +3,18 @@
 **File:** `charts/fig20_two_group_conservative.png`
 
 ## What this chart shows
-A two-bar chart with a large explanatory text panel on the right. Collapses the four migration groups into two: "Migrated (left USSR)" vs "Stayed in Soviet Sphere" (non-migrated + internal transfer + deported combined). Includes Ukrainian SSR population LE as a reference dashed line.
+A two-bar chart with a large explanatory text panel on the right. Collapses the four migration groups into two: "Migrated (left USSR)" vs "Stayed in Soviet Sphere" (non-migrated + internal transfer + deported combined). Includes Ukrainian SSR population life expectancy (e₀) as a reference dashed line.
 
 ## Key finding (V2.3)
 **+4.68 year gap. Cohen's d = 0.330. p < 0.001.**
 
-- Migrated: n=1,280, mean LE = 75.25 yrs
-- Stayed (all others): n=7,363, mean LE = 70.58 yrs
+- Migrated: n=1,280, mean age at death = 75.25 yrs
+- Stayed (all others): n=7,363, mean age at death = 70.58 yrs
 
-Even when you lump deportees (mean LE 48.35) into the "stayed" group — which *raises* the stayed average — the gap still clearly holds. This is the most conservative possible framing of the finding.
+Even when you lump deportees (mean age at death 48.35) into the "stayed" group — which *raises* the stayed average — the gap still clearly holds. This is the most conservative possible framing of the finding.
 
 ## What to look for
-- The Ukrainian SSR population reference line (~55.71 yrs) — our non-migrated group outperforms the general population, consistent with being educated urban elites
+- The Ukrainian SSR population reference line (~55.71 yrs, e₀) — our non-migrated group outperforms the general population, consistent with being educated urban elites
 - The gap between bars: +4.68 yrs in this conservative framing vs +4.04 yrs in the four-group version
 - Counterintuitive: lumping in deportees (who died at ~48) pulls the stayed average *down*, yet the conservative framing still shows a clear gap. This is because deportees are a small fraction (183/8,643 = 2.1%) of the combined stayed group.
 - The explanatory text panel on the right — designed for self-contained reading

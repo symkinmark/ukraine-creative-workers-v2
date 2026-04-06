@@ -1,12 +1,12 @@
-# Fig 01 — Primary Life Expectancy Comparison
+# Fig 01 — Primary Mean Age at Death Comparison
 
 **File:** `charts/fig01_primary_le_comparison.png`
 
 ## What this chart shows
-The headline result of the entire study. Four bars showing mean age at death (life expectancy proxy) for each migration group, with **±1 SE error bars** (standard error, not 95% CI). The 95% CI for each group is shown in the hover tooltip on the interactive version and in the table below.
+The headline result of the entire study. Four bars showing mean age at death for each migration group, with **±1 SE error bars** (standard error, not 95% CI). The 95% CI for each group is shown in the hover tooltip on the interactive version and in the table below.
 
 ## The four groups (V2.3)
-| Group | N | Mean LE | 95% CI | What they are |
+| Group | N | Mean age at death | 95% CI | What they are |
 |---|---|---|---|---|
 | Migrated (left USSR) | 1,280 | 75.25 yrs | [74.49, 76.01] | Left Soviet sphere voluntarily |
 | Non-migrated (stayed) | 6,030 | 71.22 yrs | [70.86, 71.57] | Stayed in Soviet Ukraine |

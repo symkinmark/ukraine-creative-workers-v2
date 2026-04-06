@@ -1,4 +1,4 @@
-# Fig 10 — Mean Age at Death by Birth Decade (Cohort Data)
+# Fig 10 — Birth Cohort Mean Age at Death by Birth Decade (Cohort Data)
 
 **File:** `charts/fig10_birth_cohort_le.png`
 
@@ -8,10 +8,10 @@ Each data point = "people born in this decade, how long did they live?" This is 
 Minimum 10 people per data point (n≥10) — sparser points are suppressed.
 
 ## Key finding (V2.3)
-People born in the **1890s–1910s** (who came of age during the Terror) show the starkest mortality differences. The deported line for 1890s births shows mean LE of **44.6 years** (n=60) — the cohort most destroyed by the Executed Renaissance liquidations. The migrated line stays high across all birth decades.
+People born in the **1890s–1910s** (who came of age during the Terror) show the starkest mortality differences. The deported line for 1890s births shows mean age at death of **44.6 years** (n=60) — the cohort most destroyed by the Executed Renaissance liquidations. The migrated line stays high across all birth decades.
 
 **V2.3 key cohort values:**
-| Birth decade | Migrated LE (n) | Non-migrated LE (n) | Deported LE (n) |
+| Birth decade | Migrated mean age at death (n) | Non-migrated mean age at death (n) | Deported mean age at death (n) |
 |-------------|----------------|---------------------|----------------|
 | 1880s | 73.8 (168) | 68.7 (260) | 56.7 (27) |
 | 1890s | 75.2 (223) | 70.3 (326) | **44.6 (60)** |
