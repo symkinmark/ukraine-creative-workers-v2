@@ -357,8 +357,6 @@ To assess whether the observed age-at-death gap between migrants and non-migrant
 
 **Model 2 (adjusted)** adds birth decade, profession, and birth region as controls. The migration advantage reduces modestly to **+3.31 years** (95% CI [2.44, 4.19], p < 0.001), indicating that the gap is not explained by cohort composition, professional distribution, or geographic origin. Notably, internal transfer becomes statistically significant in the adjusted model (−1.43 years, p = 0.002), suggesting a suppressed effect partially confounded by birth-cohort composition. The deportation penalty remains severe at **−23.44 years** (95% CI [−25.49, −21.39], p < 0.001). The adjusted model explains 7.7% of variance in age at death (R² = 0.077), consistent with the expected explanatory power of migration status as one factor among many shaping individual longevity.
 
-**Figure 23** displays the coefficients and 95% confidence intervals from both models side by side, illustrating the stability of the migration advantage under covariate adjustment.
-
 **Figure 23:** OLS regression coefficients for migration status categories (vs. non-migrated baseline) from two models: unadjusted (Model 1) and adjusted for birth decade, creative profession, and birth region (Model 2). Points show point estimates; horizontal lines show 95% confidence intervals. The migrated group advantage is stable across both specifications. The deportation penalty is large and robust. The internal transfer coefficient is small in Model 1 (non-significant) but becomes significant in the adjusted model, suggesting partial cohort confounding.
 
 ---
