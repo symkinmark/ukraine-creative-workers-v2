@@ -1024,7 +1024,7 @@ def clean_pseudonym_prefix(text: str) -> str:
 8. Generates birth cohort analysis.
 9. Generates geographic (city-level) migration rate analysis.
 10. Generates age-at-death distribution statistics (premature death rates, age 90+ rates).
-11. Calls matplotlib/seaborn to generate all seven figures and saves them to the `charts/` subdirectory.
+11. Calls matplotlib/seaborn to generate all 24 figures and saves them to the `charts/` subdirectory. Notable visualisation decisions: fig06 uses split violins by gender (seaborn `split=True`, `hue='gender'`) so the male and female LE distributions are visible within each migration group; fig10 uses per-group fixed label directions to prevent numeric annotations overlapping at shared x-positions.
 12. Writes summary statistics to `esu_analysis_results.txt` and `analysis_extended.txt`.
 
 **Dependencies:** `pandas`, `numpy`, `scipy`, `matplotlib`, `seaborn`

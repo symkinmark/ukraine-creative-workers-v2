@@ -256,7 +256,7 @@ Phase 5b clearance received → full analysis run executed on `esu_creative_work
 | fig03 | V1 vs V2.1 comparison (migrated/non-migrated only, apples-to-apples) |
 | fig04 | Box plots with notches, all four groups |
 | fig05 | Deported group: age-at-death histogram |
-| fig06 | Violin plots (full distribution shape) |
+| fig06 | Split violin plots by gender (Male=blue left, Female=red right) — full distribution shape per group × gender |
 | fig07 | Death year histogram 1900–2024 (migrated vs non-migrated, annotated) |
 | fig08 | Deported deaths by year 1921–1965 (1937 peak highlighted) |
 | fig09 | Non-migrant deaths by Soviet period — count and avg age, dual panel |
