@@ -1,4 +1,4 @@
-# Mortality Differentials Among Ukrainian Creative Industry Workers During the Soviet Occupation: An Expanded Study (V2)
+# Observed Age at Death Among Ukrainian Creative Workers Under Soviet Occupation: A Quantitative Study
 
 **Author:** Mark Symkin
 
