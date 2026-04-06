@@ -72,6 +72,8 @@ Upon reflection, we identified three significant limitations in the prior study'
 
 Figure 3 visualises this comparison directly: it places the prior study's two-group bar chart alongside the present study's recalculated results under the same grouping logic, making the source of the gap narrowing visually explicit.
 
+**Figure 3.** Grouped bar chart directly comparing the prior study's two-group results (Berdnyk et al. 2025: migrated mean=72 yrs, non-migrated mean=63 yrs, gap=9 yrs, n=415) against the present study's recalculated two-group results (migrated mean=75.25 yrs, stayed-in-Soviet-sphere mean=70.58 yrs, gap=4.68 yrs, n=8,643). The gap narrows because V2 includes the long-lived post-Soviet non-migrants excluded by the prior study's 1991 cutoff.
+
 The narrowing of the gap from 9 years to 4.04 years is not a finding of lesser mortality disparity — it is a correction of an artificial inflation. When long-lived post-Soviet non-migrants are included in the analysis, the non-migrant average rises substantially. The 4.04-year gap in the present study represents a cleaner estimate of the actual mortality differential associated with remaining within the Soviet system.
 
 ---
@@ -119,6 +121,8 @@ Of the 16,215 entries initially collected, 8,643 met all five criteria and form 
 ### 3.4.1 Sample Construction and Missing Data
 
 Of the 16,215 entries initially extracted from the ESU, 8,643 (53.3%) met all inclusion criteria and form the primary analytical dataset. The remaining 7,572 entries (46.7%) were excluded. Table B presents the exclusion flow; Figure 16 shows the same process as a CONSORT-style flowchart.
+
+**Figure 16.** CONSORT-style flowchart documenting the exclusion cascade from 16,215 raw ESU entries to the 8,643 analysable dataset. Each exclusion step is labelled with its criterion and the resulting n. The final box shows the four-way group split (migrated n=1,280, non-migrated n=6,030, internal transfer n=1,150, deported n=183).
 
 **Table B — Sample Construction: Exclusion Flow**
 
@@ -229,6 +233,16 @@ V2 analyses four groups, and the most causally interpretable findings come from 
 
 Figure 1 shows mean age at death with 95% confidence intervals for all four groups. Figures 4, 15, and 15b present box plots, the internal transfer null comparison, and all-group distribution overlays respectively. Figure 20 shows the most conservative possible framing, collapsing non-migrated, internal transfer, and deported into a single "remained in Soviet sphere" group.
 
+**Figure 1.** Mean age at death with 95% CI by migration group. Migrated (n=1,280): 75.25 yrs [74.49–76.01]. Non-migrated (n=6,030): 71.22 yrs [70.87–71.57]. Internal transfer (n=1,150): 70.70 yrs [69.91–71.49]. Deported (n=183): 48.35 yrs [46.26–50.44].
+
+**Figure 4.** Notched box plots of age at death for all four migration groups. Central line = median; notches = 95% CI on median; boxes = IQR; whiskers = 1.5×IQR. The deported group's box sits far below the others, median=45, reflecting mass non-natural mortality.
+
+**Figure 15.** Direct comparison of mean age at death for the internal transfer group (n=1,150, mean=70.70 yrs) versus non-migrated (n=6,030, mean=71.22 yrs) with Mann-Whitney U p-value displayed. The near-zero gap (+0.52 yrs, p=0.094) is the null result anchoring the paper's interpretation: moving within the Soviet system conferred no survival benefit.
+
+**Figure 15b.** Box plots for all four groups with written statistical conclusions text overlay. Shows which between-group comparisons are significant and which are null.
+
+**Figure 20.** Conservative two-group comparison: migrated (n=1,280, mean=75.25 yrs) vs all three Soviet-sphere groups combined (n=7,363, mean=70.58 yrs). Gap = +4.68 yrs (Cohen's d=0.330, p<0.001). The most conservative possible framing — the gap persists even when deported and internal transfer groups are combined with non-migrants.
+
 **Table 1: Observed Age at Death by Migration Group (n=8,643)**
 
 | Group | n | Mean age at death | Median age at death | SD | 95% CI |
@@ -254,6 +268,10 @@ The most extreme finding is the deported group (n=183): mean age at death of 48.
 
 All pairwise comparisons between migrated and non-migrated groups, and between either group and the deported group, yield p ≈ 0.0 — vanishingly small probabilities that these gaps arose by chance. Figure 2 shows Kaplan-Meier survival curves for all four groups, providing a non-parametric visual of the survival differences independent of distributional assumptions. Figure 14 is the sensitivity analysis demonstrating robustness to AI classification errors.
 
+**Figure 2.** Kaplan-Meier survival curves for all four migration groups. Y-axis = probability of surviving to a given age. Shaded bands = 95% CI. The migrated group's curve remains highest throughout; the deported group's curve falls sharply in the 1930s–1940s. Median survival: migrated=77, non-migrated=73, internal transfer=72, deported=45.
+
+**Figure 14.** Sensitivity analysis: primary mean age at death gap under hypothetical AI classification error rates 0–10%, assuming worst-case directional bias (all errors misclassify the longest-lived migrants as non-migrants). Gap remains positive at every tested rate. At measured 3.2% error: adjusted gap = +3.30 yrs. At 10% error: +1.87 yrs.
+
 | Comparison | Gap | Cohen's d | Cliff's δ | p-value |
 |-----------|-----|-----------|-----------|---------|
 | Migrated vs Non-migrated | +4.04 yrs | 0.292 | 0.18 | < 0.001 |
@@ -270,6 +288,8 @@ For the primary comparison (migrated vs non-migrated), Cohen's d = 0.292 indicat
 ### 4.3 Profession-Level Breakdown
 
 The mean age at death gap between migrants and non-migrants is consistent across all creative professions. Table 2 and Figure 11 report mean age at death by group for each profession category.
+
+**Figure 11.** Mean age at death by creative profession for all four groups. The migrated/non-migrated gap is present in every profession without exception. Writers/Poets contribute the largest deported sub-cohort (n=117, mean age at death=45.2). Architects show the largest between-group gap (+6.1 yrs).
 
 **Table 2: Mean Age at Death by Profession**
 
@@ -289,6 +309,10 @@ Architects show the largest migrant/non-migrant gap (+6.1 years) with relatively
 ### 4.4 Repression Period Analysis
 
 The non-migrated dataset (n=6,030) provides sufficient power to examine mortality patterns by historical period. Table 3 and Figure 9 classify deaths by Soviet-era periodisation and report average age at death within each period. Figure 8 shows the deported group's year-by-year death distribution, making the 1937 spike visually explicit.
+
+**Figure 9.** Mean age at death by Soviet historical period for each migration group. The deported group's Great Terror bar (mean 43.4 yrs) is the lowest of any group in any period. The post-independence non-migrant bar (74.7 yrs) is the highest, illustrating why the V1 pre-1991 cutoff deflated the non-migrant average.
+
+**Figure 8.** Year-by-year bar chart of deported deaths (n=183), 1920–2000. The 1937 spike — 65 deaths, 35.5% of the entire cohort in a single year — is the study's strongest single-year mortality signal. A secondary cluster in 1941–1945 reflects wartime Gulag conditions.
 
 **Table 3: Non-Migrant Deaths by Historical Period**[^11]
 
@@ -315,7 +339,9 @@ V2 removes the cutoff entirely and includes all confirmed death dates. The 4.04-
 
 ### 4.5 The 1937 Spotlight
 
-The year 1937 — the peak of the Stalinist Great Terror — warrants dedicated analysis. Figure 7b shows the deported group's death year histogram restricted to 1920–1960, where the 1937 spike (65 deaths, 35.5% of the entire deported cohort in a single year) is the most concentrated mortality event in the dataset. Across all four groups, **100 creative workers in our dataset died in 1937**, with a blended mean age at death of approximately 46.2 years. This is the single most lethal year for Ukrainian creative workers in our dataset.
+The year 1937 — the peak of the Stalinist Great Terror — warrants dedicated analysis. Figure 7b shows the deported group's death year histogram restricted to 1920–1960
+
+**Figure 7b.** Death year histogram for the deported group only (n=183), 1920–1960. The 1937 peak — 65 deaths (35.5% of all deported deaths) in a single year — is the most concentrated mortality event in the dataset, consistent with mass execution during the Great Terror. The 1934–1938 period accounts for 95 of 183 deported deaths (51.9%)., where the 1937 spike (65 deaths, 35.5% of the entire deported cohort in a single year) is the most concentrated mortality event in the dataset. Across all four groups, **100 creative workers in our dataset died in 1937**, with a blended mean age at death of approximately 46.2 years. This is the single most lethal year for Ukrainian creative workers in our dataset.
 
 The deaths are not evenly distributed. Among those who remained under Soviet rule, 24 non-migrated workers died at an average age of 48.0, and 65 deported workers died at an average age of 42.4 — a combined repression cluster of 89 deaths concentrated in a single year. The deported group's figure is particularly stark: 65 of the 183 total deported workers in our dataset (35.5%) died in a single calendar year, at an average age of 42.4. Among the internal transfer group, 1 death is recorded in 1937 at age 25.
 
@@ -339,6 +365,10 @@ The deported group's concentration of deaths in 1937 corresponds directly to the
 
 The mean age at death gap between migrants and non-migrants is strongly concentrated in specific birth cohorts. Table 5 and Figure 10 present mean age at death by decade of birth for all groups; Figure 13 shows the overlaid birth year distributions confirming substantial cohort overlap between groups (a methodological check that between-group comparisons are not conflating era effects with migration status).
 
+**Figure 10.** Mean age at death by birth decade for all four groups (min n=10 per data point). The 1880s and 1890s cohorts — the Executed Renaissance generation — show the largest gaps (5.1 yrs each). The deported 1890s cohort (mean 44.6 yrs, n=60) is the most concentrated single mortality event. Gaps narrow for post-1920 cohorts.
+
+**Figure 13.** Overlaid birth year histograms (5-year bins) for all four groups. Methodological check: the distributions overlap substantially, confirming between-group comparisons are not confounded by groups being born in systematically different eras.
+
 **Table 5: Mean Age at Death by Birth Cohort**
 
 | Birth cohort | Migrant mean age | n | Non-migrant mean age | n | Deported mean age | n | Gap (M vs NM) |
@@ -358,6 +388,8 @@ The pattern across cohorts is consistent with a differential impact of Soviet re
 
 Migration rates varied substantially by city of birth. Table 6 presents migration rates for cities with n ≥ 50 in the dataset; cities below this threshold are shown in Figure 12 for visual context but not in the table due to insufficient statistical reliability. Figure 12 ranks the top 20 birth cities by total workers and shows migration rate within each.
 
+**Figure 12.** Horizontal bar chart ranking top 20 birth cities by total workers, with bars subdivided by migration rate. Western Ukrainian cities (Lviv, Ternopil, Chernivtsi) show dramatically higher emigration rates than eastern cities. Note: small-n cities are shown here for visual context only and should not be interpreted as statistically precise estimates.
+
 **Table 6: Migration Rates by Birth City (n ≥ 50 only)**
 
 | City | Total in dataset | % Migrated |
@@ -376,6 +408,12 @@ Donetsk (historically called Stalino during the Soviet period) shows a 0% migrat
 ### 4.8 Death Age Distribution
 
 The distribution of ages at death further illuminates the mortality differential between the two groups. Figure 5 shows the deported group's age-at-death histogram (sharply left-skewed, mass concentrated below 60). Figure 6 shows split violin plots by gender within each group. Figure 7 shows the overlapping death year histogram for migrated and non-migrated groups, with vertical markers at the Holodomor (1933), Great Terror (1937), and WWII (1941) repression years.
+
+**Figure 5.** Histogram of age at death for the deported group only (n=183), 5-year bins. Dashed line = group mean (48.35 yrs). Sharply left-skewed with mass below 60; spike in 35–50 range consistent with mass execution and Gulag death in mid-career individuals. Small right tail = survivors released post-Stalin.
+
+**Figure 6.** Split violin plots for all four groups by gender (left = Male, right = Female). The migrated group's long upper tail and the deported group's sharp left-skewed truncation are visible in both sexes.
+
+**Figure 7.** Overlapping death year histogram (2-year bins, 1900–2024) for migrated and non-migrated groups. Vertical markers at 1933 (Holodomor), 1937 (Great Terror), 1941 (WWII). Peaks in the 1930s–40s for non-migrants versus the more gradual post-war distribution for migrants.
 
 **Premature death (before age 50):** 7.1% of non-migrants died before age 50, compared to 5.4% of migrants — a relative excess of 31% more premature deaths among non-migrants.
 
@@ -427,7 +465,9 @@ To complement the OLS regression, two Cox proportional hazards models were estim
 
 Results are consistent with OLS: migrated workers show approximately 24% lower mortality hazard after covariate adjustment (HR = 0.76); deported workers show more than five-fold higher hazard (HR = 5.40); the internal transfer group shows a small but now statistically significant elevated hazard in the adjusted model (HR = 1.08, p = 0.021), consistent with the OLS Model 2 finding of a −1.43 year adjusted coefficient. The deportation signal is, if anything, stronger under the Cox model's non-parametric hazard structure than under OLS.
 
-**Figure 24** shows the forest plot of hazard ratios for both models with 95% CI error bars. The migrated HR < 1 and the deported HR >> 1 are both clearly visible; the internal transfer HR ≈ 1 (null) is similarly clear.
+The forest plot of hazard ratios for both models is shown below, with 95% CI error bars. The migrated HR < 1 and the deported HR >> 1 are both clearly visible; the internal transfer HR ≈ 1 (null) is similarly clear.
+
+**Figure 24.** Cox PH forest plot — hazard ratios for all migration groups relative to non-migrated reference (HR=1.0, dashed line), for both Model 1 (unadjusted) and Model 2 (adjusted for birth decade, profession, and region). Error bars = 95% CI. Non-migrated is shown as the reference row at HR=1.000 (grey diamond). Migrated: HR=0.76 (Model 2); Internal Transfer: HR=1.08; Deported: HR=5.40. n=8,643.
 
 *Censoring caveat: This Cox model fits complete cases only (all event_observed = 1). A Cox model including right-censored living individuals would require ESU follow-up data not currently available. The complete-case restriction is identical to the OLS analysis and does not affect interpretation.*
 
@@ -483,6 +523,10 @@ Readers should interpret all comparative statistics in this paper as descriptive
 
 **Gender breakdown.** Figures 17 and 18 document gender composition and mean age at death by gender within each group. Male workers predominate in all four groups (consistent with the ESU's historical composition), but the migrated/non-migrated gap holds for both sexes, confirming the primary finding is not an artefact of differential gender composition across groups.
 
+**Figure 17.** Gender composition (% male / % female) within each of the four migration groups. All groups are male-dominated, consistent with the ESU's historical coverage of the creative sector; the migrated group is approximately 72% male, non-migrated 74% male, internal transfer 71% male, deported 81% male.
+
+**Figure 18.** Mean age at death disaggregated by gender within each migration group. The migrated/non-migrated gap is present for both male workers (~3.8 yrs) and female workers (~4.5 yrs), confirming the primary finding is not driven by differential gender composition across groups.
+
 **Missing data.** Of the 16,215 entries in our initial dataset, 8,643 (53.3%) met our inclusion criteria for the primary age-at-death analysis. The remaining 46.7% were excluded primarily because they lacked death dates (living individuals or individuals whose death date was not recorded in the ESU), because migration status could not be determined, or because they died before the Soviet period began. Date recovery from the ESU's biographical text using automated parsing of biographical notes increased the initial analysable pool from 6,106 entries (37.7%) to the current 8,643 (53.3%); full details are documented in SCIENTIFIC_METHODOLOGY.md (§4). If the remaining excluded population differs systematically from the included population in ways correlated with age at death, our estimates may be biased.
 
 **Incomplete ESU source coverage.** Several prominent Ukrainian creative workers documented in other historical sources — including Pavlo Tychyna [Павло Тичина], Maksym Rylʹsʹkyĭ [Максим Рильський], Vasylʹ Symonenko [Василь Симоненко], Mykola Khvylʹovyĭ [Микола Хвильовий], and Vasylʹ Stus [Василь Стус] — are absent from our dataset. A systematic audit of the ESU, conducted using an exhaustive crawler that traversed all letter-index pages, confirmed that these individuals have no published articles in the ESU as of the 2026 access date. This reflects the ongoing, incomplete nature of the ESU as an encyclopedic project, not a failure of our data collection. Chornovil Viacheslav [Чорновіл В'ячеслав] is present in the ESU but is categorised there as a political figure rather than a creative worker, and was correctly excluded by our profession filter. We cannot precisely quantify the effect of these absences on our age-at-death estimates. However, given that several of these figures (particularly Стус, who died in the Perm-36 Soviet corrective labor colony in 1985 — a post-Gulag penal institution that historians treat as functionally continuous with the Gulag system — and Хвильовий, who died by suicide under political pressure in 1933) are repressed non-migrants who died young, their inclusion would likely increase the measured mortality signal for the non-migrated group — that is, their absence if anything causes us to underestimate the effect, not overestimate it. We flag this as a limitation for future iterations of this study pending ESU coverage expansion.
@@ -496,6 +540,14 @@ Our findings are broadly consistent with existing historical scholarship on Sovi
 Comparative demography of Soviet versus Western European general populations[^7] documents a Soviet mortality penalty that grew from approximately 3 years in the mid-1960s to over 10 years by the early 1990s, depending on country and sex. Andreev et al. additionally reconstruct Soviet demographic conditions for the 1927–1959 period, directly covering our Great Terror and Holodomor years. Our finding of a 4.04-year gap is consistent with the lower end of the East-West divergence range, though our dataset's specific focus on a group subject to targeted repression means our estimate captures both the general Soviet mortality penalty and the profession-specific repression effect.
 
 Figures 19 and 19b show normalised annual death rates (deaths per year as a percentage of each group's size) across the Soviet period, making the 1937 spike in the deported group visually prominent relative to all other groups. Figure 21 contextualises creative workers' mean age at death against published estimates for comparable Soviet-era republic populations. Figure 22 compares non-migrant creative workers against an estimated educated urban Ukrainian baseline, showing that non-migrants in repression periods fall below even the general population estimate — suggesting excess mortality over and above what socioeconomic composition alone would predict.
+
+**Figure 19.** Normalised annual death rate (deaths per year as % of group size) for all four migration groups, 1921–1992. The 1937 spike in the deported group — reaching approximately 35% of the group's total size in a single year — dwarfs all other groups in all other years, making the concentration of state violence in a single calendar year visually unmistakable.
+
+**Figure 19b.** Simplified version of Figure 19 showing three lines: migrated, non-migrated (stayed in USSR), and a combined "stayed in Soviet sphere" composite. Reduces visual complexity while preserving the key 1937 signal and the divergence between emigrant and non-emigrant trajectories.
+
+**Figure 21.** Mean age at death for Ukrainian creative workers (non-migrated group) compared against published estimates for general populations of comparable Soviet-era republics (Russia, Ukraine, Belarus). Non-migrants in repression periods fall substantially below general-population baselines, consistent with targeted political mortality over and above the general Soviet mortality penalty.
+
+**Figure 22.** Mean age at death for the non-migrated creative worker group compared against an estimated educated urban Ukrainian baseline derived from demographic studies of comparable cohorts. Non-migrants in the Great Terror and wartime periods fall below the educated-urban baseline, suggesting excess mortality that is not fully explained by socioeconomic composition.
 
 ---
 

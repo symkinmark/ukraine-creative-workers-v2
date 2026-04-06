@@ -3612,6 +3612,7 @@ try:
     print(f"  Full Cox output → {_cox_out}")
 
     # ── Figure 24: Forest plot — HRs for migration groups ───────────────
+    # Include Non-migrated as explicit reference row (HR=1.0, no CI)
     print("  fig24_cox_forest_plot.png")
 
     _groups   = list(_mig_keys.keys())
@@ -3621,60 +3622,81 @@ try:
     _hr1_vals = [_get_hr(_cx1, c) for c in _groups]
     _hr2_vals = [_get_hr(_cx2, c) for c in _groups]
 
-    fig24, ax24 = plt.subplots(figsize=(10, 5))
+    # All rows including reference: reference goes first (top)
+    _all_labels = ['Non-migrated\n(reference, HR=1.0)'] + _glabels
+    _n_all = len(_all_labels)
 
-    _y = np.arange(_n_groups)
+    fig24, ax24 = plt.subplots(figsize=(11, 5.5))
+
+    _y = np.arange(_n_all)
     _offset = 0.18
 
     _c1_col = '#2E86AB'
     _c2_col = '#E84855'
 
+    # Reference row: single diamond at HR=1.0, no error bars, grey
+    ax24.plot(1.0, _y[0] + _offset,  marker='D', color='grey', markersize=7,
+              label='Model 1 (unadjusted)', zorder=5)
+    ax24.plot(1.0, _y[0] - _offset,  marker='D', color='grey', markersize=7,
+              label='Model 2 (adjusted)', zorder=5)
+    ax24.text(1.02, _y[0], 'HR=1.000 (reference)', va='center', fontsize=8, color='grey')
+
     for i, (res1, res2, label) in enumerate(zip(_hr1_vals, _hr2_vals, _glabels)):
+        row = i + 1  # offset by 1 because row 0 is reference
         if res1:
             hr, lo, hi, p = res1
-            ax24.errorbar(_hr1_vals[i][0], _y[i] + _offset,
+            ax24.errorbar(hr, _y[row] + _offset,
                           xerr=[[hr - lo], [hi - hr]],
                           fmt='o', color=_c1_col, capsize=4, markersize=7,
                           label='Model 1 (unadjusted)' if i == 0 else '')
+            ax24.text(hi + 0.02, _y[row] + _offset, f'HR={hr:.3f}', va='center', fontsize=8, color=_c1_col)
         if res2:
             hr, lo, hi, p = res2
-            ax24.errorbar(_hr2_vals[i][0], _y[i] - _offset,
+            ax24.errorbar(hr, _y[row] - _offset,
                           xerr=[[hr - lo], [hi - hr]],
                           fmt='s', color=_c2_col, capsize=4, markersize=7,
                           label='Model 2 (adjusted)' if i == 0 else '')
+            ax24.text(hi + 0.02, _y[row] - _offset, f'HR={hr:.3f}', va='center', fontsize=8, color=_c2_col)
 
     ax24.axvline(1.0, color='black', linestyle='--', linewidth=1.2, label='HR = 1 (null)')
     ax24.set_yticks(_y)
-    ax24.set_yticklabels(_glabels, fontsize=11)
+    ax24.set_yticklabels(_all_labels, fontsize=10)
     ax24.set_xlabel('Hazard Ratio (HR < 1 = lower mortality hazard = longer survival)', fontsize=10)
     ax24.invert_yaxis()
 
-    # Annotate HR values
-    for i, (res1, res2) in enumerate(zip(_hr1_vals, _hr2_vals)):
-        if res1:
-            hr, lo, hi, p = res1
-            ax24.text(hi + 0.01, _y[i] + _offset, f'HR={hr:.3f}', va='center', fontsize=8, color=_c1_col)
-        if res2:
-            hr, lo, hi, p = res2
-            ax24.text(hi + 0.01, _y[i] - _offset, f'HR={hr:.3f}', va='center', fontsize=8, color=_c2_col)
+    # Deduplicate legend
+    _handles, _lbls = ax24.get_legend_handles_labels()
+    _seen = {}
+    for h, l in zip(_handles, _lbls):
+        if l not in _seen:
+            _seen[l] = h
+    ax24.legend(_seen.values(), _seen.keys(), fontsize=9, loc='lower right')
 
     apply_style(ax24, 'Figure 24 — Cox Proportional Hazards: Migration Status Hazard Ratios\n'
                       '(reference = non-migrated; HR < 1 = lower hazard of death)',
                 xlabel='Hazard Ratio')
-    ax24.legend(fontsize=9, loc='lower right')
     plt.tight_layout(rect=[0, 0.04, 1, 1])
     add_source(fig24)
     save(fig24, 'fig24_cox_forest_plot.png')
 
-    # ── Interactive Figure 24 ────────────────────────────────────────────
+    # ── Interactive Figure 24 (includes reference row) ───────────────────
     _go24 = go  # already imported at top of file
 
     _fig_p24 = _go24.Figure()
     _colours24 = {'Model 1 (unadjusted)': '#2E86AB', 'Model 2 (adjusted)': '#E84855'}
-    for (res_list, model_label, sym) in [
-        (_hr1_vals, 'Model 1 (unadjusted)', 'circle'),
-        (_hr2_vals, 'Model 2 (adjusted)',   'square'),
-    ]:
+
+    # Reference row first — shown as diamond at HR=1, no error bar
+    for _ml, _sym in [('Model 1 (unadjusted)', 'diamond'), ('Model 2 (adjusted)', 'diamond')]:
+        _fig_p24.add_trace(_go24.Scatter(
+            x=[1.0], y=['Non-migrated (reference)'],
+            mode='markers',
+            name=_ml + ' ref',
+            marker=dict(symbol=_sym, size=9, color='grey'),
+            showlegend=False,
+            hovertemplate='<b>Non-migrated</b><br>Reference group<br>HR = 1.000 (fixed)<extra></extra>',
+        ))
+
+    for (model_label, sym) in [('Model 1 (unadjusted)', 'circle'), ('Model 2 (adjusted)', 'square')]:
         hrs, los, his, ps, labels = [], [], [], [], []
         for col, grp in _mig_keys.items():
             res = _get_hr(_cx1 if model_label.startswith('Model 1') else _cx2, col)
@@ -3702,18 +3724,26 @@ try:
                 'p = %{customdata[2]:.4f}<extra></extra>'
             ),
         ))
+
     _fig_p24.add_vline(x=1.0, line_dash='dash', line_color='black', line_width=1.5)
+
+    # Ensure reference row appears at top (index 0 = top in inverted y)
+    _yorder = ['Non-migrated (reference)'] + list(_mig_keys.values())
     _fig_p24.update_layout(
         title=dict(text='Figure 24 — Cox PH Hazard Ratios: Migration Status (reference = non-migrated)',
                    font=dict(size=14)),
         xaxis_title='Hazard Ratio (HR < 1 = lower hazard of death = longer survival)',
-        yaxis_title='Group',
+        yaxis=dict(
+            title='Group',
+            categoryorder='array',
+            categoryarray=list(reversed(_yorder)),
+        ),
         plot_bgcolor='white', paper_bgcolor='white',
         font=dict(family='Georgia, serif', size=12),
         xaxis=dict(gridcolor='#eee'),
         legend=dict(orientation='h', yanchor='top', y=-0.18, xanchor='center', x=0.5),
-        margin=dict(t=70, b=120, l=160, r=40),
-        height=420,
+        margin=dict(t=70, b=120, l=200, r=40),
+        height=460,
     )
     _save_interactive(_fig_p24, 'fig24_interactive.html')
     print("  fig24 interactive saved.")
