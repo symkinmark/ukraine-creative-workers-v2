@@ -885,14 +885,18 @@ for dec in decades_ch:
         cohort_ns[ms].append(len(v))
     valid_decs.append(dec)
 
-fig, ax = plt.subplots(figsize=(13, 7))
+fig, ax = plt.subplots(figsize=(15, 7))
 MARKERS10 = {'migrated': 'o', 'non_migrated': 's', 'internal_transfer': '^', 'deported': 'D'}
 
-# Fixed per-group label direction + x-nudge so labels at the same decade never collide
-_LBL_DY = {'migrated': +14, 'non_migrated': -14,
-            'internal_transfer': +7, 'deported': -7}   # points
-_LBL_DX = {'migrated': -3,  'non_migrated': +3,
-            'internal_transfer': -1, 'deported': +1}   # points
+# Label strategy:
+#   - Deported: label every point (it's the key story, sits far below the others)
+#   - Migrated / Non-migrated: label every other decade only (reduces clutter on the
+#     tightly-packed upper cluster without losing the data story)
+#   - Internal transfer: no inline labels (it tracks non-migrated closely; the line
+#     shape tells the story; labelling would only add noise)
+_LABEL_EVERY = {'migrated': 2, 'non_migrated': 2, 'internal_transfer': None, 'deported': 1}
+_LBL_DY      = {'migrated': +18, 'non_migrated': -18, 'deported': -14}   # offset points
+_LBL_DX      = {'migrated':  -4, 'non_migrated':  +4,  'deported':   0}
 
 for ms in ALL_GROUPS:
     vals = cohort_means[ms]
@@ -903,10 +907,15 @@ for ms in ALL_GROUPS:
         continue
     ax.plot(xs, ys, marker=MARKERS10[ms], linestyle='-', color=COLOUR[ms],
             label=GROUP_LABELS[ms], linewidth=2, markersize=7, zorder=5)
-    for x_pt, y_pt, n_pt in zip(xs, ys, ns):
+    step = _LABEL_EVERY[ms]
+    if step is None:
+        continue
+    for j, (x_pt, y_pt, n_pt) in enumerate(zip(xs, ys, ns)):
+        if j % step != 0:
+            continue
         ax.annotate(f"{y_pt:.0f}", xy=(x_pt, y_pt),
                     xytext=(_LBL_DX[ms], _LBL_DY[ms]), textcoords='offset points',
-                    ha='center', fontsize=6.5, color=COLOUR[ms], fontweight='bold')
+                    ha='center', fontsize=7, color=COLOUR[ms], fontweight='bold')
 
 # Shade the Terror/Holodomor birth cohorts
 ax.axvspan(1890, 1910, alpha=0.06, color='#8B0000', zorder=0)
@@ -922,7 +931,7 @@ first_x = min(dec for dec in valid_decs
 ax.set_xlim(first_x - 5, 1985)
 ax.set_ylim(25, 90)
 fig.text(0.5, 0.01,
-    "Source: ESU V2.1 dataset, Berdnyk & Symkin 2026. Each point = mean age at death of creative workers "
+    "Source: ESU V2.3 dataset, Symkin 2026. Each point = mean age at death of creative workers "
     "born in that decade (cohort estimate, n≥10). Period LE comparison: see fig21/fig22.",
     ha='center', fontsize=7, color='grey', style='italic')
 plt.tight_layout(rect=[0, 0.05, 1, 1])
