@@ -278,7 +278,7 @@ Architects show the largest migrant/non-migrant gap (+6.1 years) with relatively
 
 The non-migrated dataset (n=6,030) provides sufficient power to examine mortality patterns by historical period. Table 3 classifies deaths by Soviet-era periodisation and reports average age at death within each period.
 
-**Table 3: Non-Migrant Deaths by Historical Period**
+**Table 3: Non-Migrant Deaths by Historical Period**[^11]
 
 | Period | Historical context | Deaths | Avg age at death | % of total |
 |--------|--------------------|--------|-----------------|-----------|
@@ -583,6 +583,8 @@ Berdnyk, Elza, Mark Symkin, and Alona Motiashova. "Life Expectancy of Ukrainian 
 [^6]: Steven A. Barnes, *Death and Redemption: The Gulag and the Shaping of Soviet Society* (Princeton: Princeton University Press, 2011); Anne Applebaum, *Gulag: A History* (New York: Doubleday, 2003).
 
 [^7]: E. M. Andreev, L. E. Darsky, and T. L. Kharkova, *Demographic History of Russia: 1927–1959* (Moscow: Informatika Publishers, 1998) [covers 1927–1959; documents Soviet-era demographic conditions]; France Meslé and Jacques Vallin, "Mortality in Europe: The Divergence Between East and West," *Population* (English edition) 57, no. 1 (2002): 157–197 [documents the East-West LE divergence from 1950s through 1990s, including 1970s–80s gap of approximately 3–10 years depending on country and sex].
+
+[^11]: Table 3 is computed from the primary dataset (`esu_creative_workers_v2_3.csv`, V2.3) using the non-migrated group only (n=6,030). Deaths are classified by the year of death falling within each historical period. Average age at death is the arithmetic mean of (death year − birth year) for all non-migrants dying within that period. Periodisation follows standard Soviet historiography; see Robert Conquest, *The Great Terror: A Reassessment* (Oxford: Oxford University Press, 1990) for the 1934–1938 period, and Orest Subtelny, *Ukraine: A History*, 4th ed. (Toronto: University of Toronto Press, 2009) for the broader periodisation framework.
 
 [^10]: In cohort studies of mortality, right-censoring is only methodologically valid when it is *non-informative* — that is, when who is censored is independent of how long they would have lived had they not been censored. See David Collett, *Modelling Survival Data in Medical Research*, 3rd ed. (Boca Raton: CRC Press, 2015), 1–9; Samuel H. Preston, Patrick Heuveline, and Michel Guillot, *Demography: Measuring and Modeling Population Processes* (Oxford: Blackwell, 2001), 47–53. When censoring is informative — as in V1's 1991 cutoff, where the longest-lived non-migrants are systematically excluded — the resulting estimates are biased in a predictable direction.
 
