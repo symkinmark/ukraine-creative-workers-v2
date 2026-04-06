@@ -1730,6 +1730,231 @@ save(fig, 'fig22_educated_urban_comparison.png')
 
 
 # ===========================================================================
+# INTERACTIVE PLOTLY CHARTS — for GitHub Pages (docs/index.html)
+# Generates self-contained HTML files alongside PNGs.
+# Figures: fig01, fig09, fig10, fig14 (bar, period, cohort, sensitivity)
+# ===========================================================================
+print("\nGenerating interactive Plotly charts …")
+
+try:
+    import plotly.graph_objects as go
+    import plotly.io as pio
+    _PLOTLY_AVAIL = True
+except ImportError:
+    print("  plotly not installed — skipping interactive charts (pip3 install plotly)")
+    _PLOTLY_AVAIL = False
+
+if _PLOTLY_AVAIL:
+
+    _PCOLOUR = {
+        'migrated':          '#2980B9',
+        'non_migrated':      '#C0392B',
+        'internal_transfer': '#27AE60',
+        'deported':          '#8E44AD',
+    }
+
+    def _save_interactive(fig_plotly, filename):
+        out = os.path.join(CHARTS_DIR, filename)
+        fig_plotly.write_html(out, include_plotlyjs='cdn', full_html=False)
+        print(f"  {filename}")
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 01 — Primary LE bar chart
+    # -----------------------------------------------------------------------
+    means_i, ses_i, ns_i = group_means_errors()
+    descs_i = {ms: describe(groups[ms], GROUP_LABELS[ms]) for ms in ALL_GROUPS}
+
+    bars_i = []
+    for ms, mean_val, se_val, n_val in zip(ALL_GROUPS, means_i, ses_i, ns_i):
+        d = descs_i[ms]
+        ci_lo = d['ci95_lo'] if d['ci95_lo'] else round(mean_val - 1.96 * se_val, 2)
+        ci_hi = d['ci95_hi'] if d['ci95_hi'] else round(mean_val + 1.96 * se_val, 2)
+        bars_i.append(go.Bar(
+            name=GROUP_LABELS[ms],
+            x=[GROUP_LABELS[ms]],
+            y=[round(mean_val, 2)],
+            error_y=dict(type='data', array=[round(se_val, 2)], visible=True,
+                         color='#333', thickness=2, width=8),
+            marker_color=_PCOLOUR[ms],
+            customdata=[[n_val, ci_lo, ci_hi, d['median']]],
+            hovertemplate=(
+                '<b>%{x}</b><br>'
+                'Mean LE: <b>%{y:.2f} years</b><br>'
+                '95% CI: [%{customdata[1]:.2f} – %{customdata[2]:.2f}]<br>'
+                'Median LE: %{customdata[3]:.1f} years<br>'
+                'n = %{customdata[0]:,}<extra></extra>'
+            ),
+        ))
+
+    overall_mean_i = round(statistics.mean(le_values(analysable)), 2)
+    fig_p01 = go.Figure(data=bars_i)
+    fig_p01.add_hline(y=overall_mean_i, line_dash='dash', line_color='grey',
+                      annotation_text=f'Dataset overall mean ({overall_mean_i} yrs)',
+                      annotation_position='bottom right')
+    fig_p01.add_hline(y=UKR_SSR_SOVIET_MEAN, line_dash='dot', line_color='#27AE60',
+                      annotation_text=f'Ukrainian SSR general pop. avg ≈{UKR_SSR_SOVIET_MEAN} yrs',
+                      annotation_position='top right')
+    fig_p01.update_layout(
+        title='Figure 1 — Mean Life Expectancy by Migration Group (hover for full stats)',
+        yaxis_title='Mean Life Expectancy (years)',
+        xaxis_title='Migration Group',
+        showlegend=False,
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=13),
+        yaxis=dict(gridcolor='#eee', range=[0, max(means_i) * 1.3 + 5]),
+        margin=dict(t=60, b=40),
+        height=480,
+    )
+    _save_interactive(fig_p01, 'fig01_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 09 — Death period grouped bar
+    # -----------------------------------------------------------------------
+    period_labels_clean = [p[0].replace('\n', ' ') for p in CHART_PERIODS]
+    _REPRESSION_SET = {'Holodomor 1930–33', 'Terror 1934–38', 'Late Stalin 1946–53'}
+
+    bars_p09 = []
+    for ms in ALL_GROUPS:
+        x_vals, y_vals, n_vals, per_labels = [], [], [], []
+        for j, (period_lbl, _) in enumerate(CHART_PERIODS):
+            mean_val, n_val = period_data[ms][j]
+            if mean_val is None:
+                continue
+            x_vals.append(period_labels_clean[j])
+            y_vals.append(mean_val)
+            n_vals.append(n_val)
+            per_labels.append(period_lbl.replace('\n', ' '))
+        bars_p09.append(go.Bar(
+            name=GROUP_LABELS[ms],
+            x=x_vals,
+            y=y_vals,
+            marker_color=_PCOLOUR[ms],
+            customdata=list(zip(n_vals, per_labels)),
+            hovertemplate=(
+                '<b>%{customdata[1]}</b><br>'
+                f'{GROUP_LABELS[ms]}<br>'
+                'Mean age at death: <b>%{y:.1f} years</b><br>'
+                'n = %{customdata[0]}<extra></extra>'
+            ),
+        ))
+
+    fig_p09 = go.Figure(data=bars_p09)
+    # Shade repression periods with background rectangles
+    repression_x = [lbl for lbl in period_labels_clean
+                    if lbl.replace('\n', ' ') in _REPRESSION_SET or lbl in _REPRESSION_SET]
+    fig_p09.update_layout(
+        title='Figure 9 — Mean Age at Death by Soviet Period and Migration Group<br>'
+              '<sub>Hover for exact values · Click legend to show/hide groups · '
+              'Red-outline bars = repression periods (n≥5 shown)</sub>',
+        yaxis_title='Mean Age at Death (years)',
+        xaxis_title='Soviet Historical Period',
+        barmode='group',
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee', range=[0, 95]),
+        legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
+        margin=dict(t=80, b=40),
+        height=500,
+    )
+    _save_interactive(fig_p09, 'fig09_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 10 — Birth cohort line chart
+    # -----------------------------------------------------------------------
+    lines_p10 = []
+    for ms in ALL_GROUPS:
+        vals = cohort_means[ms]
+        xs10 = [dec for dec, v in zip(valid_decs, vals) if v is not None]
+        ys10 = [v for v in vals if v is not None]
+        ns10 = [cohort_ns[ms][i] for i, v in enumerate(vals) if v is not None]
+        if not xs10:
+            continue
+        lines_p10.append(go.Scatter(
+            name=GROUP_LABELS[ms],
+            x=xs10,
+            y=ys10,
+            mode='lines+markers',
+            line=dict(color=_PCOLOUR[ms], width=2.5),
+            marker=dict(size=8),
+            customdata=list(zip(ns10, [f'{d}s' for d in xs10])),
+            hovertemplate=(
+                '<b>Born in the %{customdata[1]}</b><br>'
+                f'{GROUP_LABELS[ms]}<br>'
+                'Mean age at death: <b>%{y:.1f} years</b><br>'
+                'n = %{customdata[0]}<extra></extra>'
+            ),
+        ))
+
+    fig_p10 = go.Figure(data=lines_p10)
+    # Shade 1890–1910 repression victim cohort
+    fig_p10.add_vrect(x0=1890, x1=1910, fillcolor='#8B0000', opacity=0.06,
+                      layer='below', line_width=0,
+                      annotation_text='Born 1890–1910<br>(peak repression<br>victim cohort)',
+                      annotation_position='bottom left',
+                      annotation_font_size=10, annotation_font_color='#8B0000')
+    fig_p10.update_layout(
+        title='Figure 10 — Mean Age at Death by Birth Decade (cohort data)<br>'
+              '<sub>Hover for exact values and n · Click legend to show/hide groups · '
+              'Zoom/pan with mouse · n≥10 per point shown</sub>',
+        xaxis_title='Birth Decade',
+        yaxis_title='Mean Age at Death (years)',
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee', range=[25, 90]),
+        xaxis=dict(gridcolor='#eee'),
+        legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
+        margin=dict(t=80, b=40),
+        height=500,
+    )
+    _save_interactive(fig_p10, 'fig10_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 14 — Sensitivity analysis (LE gap vs error rate)
+    # -----------------------------------------------------------------------
+    fig_p14 = go.Figure()
+    fig_p14.add_trace(go.Scatter(
+        name='LE gap (migrated − non-migrated)',
+        x=error_rates,
+        y=gaps,
+        mode='lines+markers',
+        line=dict(color=_PCOLOUR['migrated'], width=2.5),
+        marker=dict(size=9),
+        fill='tozeroy',
+        fillcolor='rgba(41,128,185,0.08)',
+        customdata=[[round(g, 2), er] for g, er in zip(gaps, error_rates)],
+        hovertemplate=(
+            'Error rate: <b>%{x}%</b><br>'
+            'LE gap: <b>%{y:.2f} years</b><br>'
+            '<i>Gap above 0 = migrated lived longer</i><extra></extra>'
+        ),
+    ))
+    fig_p14.add_hline(y=0, line_dash='dash', line_color='grey',
+                      annotation_text='Zero (no difference)')
+    fig_p14.add_vline(x=3.2, line_dash='dot', line_color=_PCOLOUR['non_migrated'],
+                      annotation_text='Actual AI error rate (3.2%)',
+                      annotation_position='top right')
+    fig_p14.update_layout(
+        title='Figure 14 — Sensitivity Analysis: LE Gap vs AI Classification Error Rate<br>'
+              '<sub>Hover for exact gap at each error rate · '
+              'Gap = years migrated lived longer than non-migrated</sub>',
+        xaxis_title='Assumed AI Classification Error Rate (%)',
+        yaxis_title='LE Gap: Migrated − Non-migrated (years)',
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee'),
+        xaxis=dict(gridcolor='#eee'),
+        margin=dict(t=80, b=40),
+        height=450,
+    )
+    _save_interactive(fig_p14, 'fig14_interactive.html')
+
+    print("Interactive charts complete.")
+
+# ===========================================================================
 # DONE
 # ===========================================================================
 print(f"\nAll charts saved to: {CHARTS_DIR}")

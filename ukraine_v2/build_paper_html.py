@@ -1,9 +1,10 @@
 """
 build_paper_html.py
-Converts PAPER_DRAFT.md → paper_preview.html
+Converts PAPER_DRAFT.md → paper_preview.html + docs/index.html (GitHub Pages)
 - Full markdown rendering (tables, bold, footnotes)
-- Embeds all 9 paper figures as base64 inline images, placed directly after captions
-- Self-contained single HTML file, no external dependencies
+- Key figures (1, 9, 10, 14) rendered as interactive Plotly charts with hover tooltips
+- Remaining figures embedded as base64 inline images
+- Plotly loaded via CDN (requires internet); falls back to PNG if interactive HTML missing
 """
 
 import re
@@ -14,6 +15,9 @@ PROJECT = os.path.dirname(os.path.abspath(__file__))
 MD_PATH  = os.path.join(PROJECT, 'PAPER_DRAFT.md')
 OUT_PATH = os.path.join(PROJECT, 'paper_preview.html')
 CHARTS   = os.path.join(PROJECT, 'charts')
+
+# Figures that have interactive Plotly versions (figXX_interactive.html)
+INTERACTIVE_FIGS = {'1', '9', '10', '14'}
 
 # Map each Figure N to its PNG filename (file number = paper figure number)
 FIGURE_MAP = {
@@ -45,12 +49,26 @@ FIGURE_MAP = {
 
 def img_b64(filename):
     path = os.path.join(CHARTS, filename)
+    if not os.path.exists(path):
+        return None
     with open(path, 'rb') as f:
         data = base64.b64encode(f.read()).decode('ascii')
     return f'data:image/png;base64,{data}'
 
-# Pre-encode all images
-IMAGES = {k: img_b64(fn) for k, fn in FIGURE_MAP.items()}
+def load_interactive(fig_num):
+    """Load the Plotly HTML div for a figure number, or None if not available."""
+    path = os.path.join(CHARTS, f'fig{int(fig_num):02d}_interactive.html')
+    if os.path.exists(path):
+        with open(path, encoding='utf-8') as f:
+            return f.read()
+    return None
+
+# Pre-encode all images (skip missing files gracefully)
+IMAGES = {k: img_b64(fn) for k, fn in FIGURE_MAP.items() if img_b64(fn)}
+
+# Load interactive HTML for key figures
+INTERACTIVE = {k: load_interactive(k) for k in INTERACTIVE_FIGS}
+INTERACTIVE = {k: v for k, v in INTERACTIVE.items() if v is not None}
 
 # ---------------------------------------------------------------------------
 # Minimal markdown → HTML converter (covers everything in this paper)
@@ -169,7 +187,14 @@ def md_to_html(md_text):
         fig_m = re.search(r'\*\*Figure\s+(\d+[ab]?)', para)
         if fig_m:
             fig_num = fig_m.group(1)
-            if fig_num in IMAGES:
+            if fig_num in INTERACTIVE:
+                # Interactive Plotly chart — embed div directly
+                html_parts.append(
+                    f'<figure class="interactive-fig">'
+                    f'{INTERACTIVE[fig_num]}'
+                    f'</figure>'
+                )
+            elif fig_num in IMAGES:
                 html_parts.append(
                     f'<figure>'
                     f'<img src="{IMAGES[fig_num]}" alt="Figure {fig_num}">'
@@ -203,7 +228,8 @@ HTML = f"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Life Expectancy of Ukrainian Creative Workers — V2 Pre-Final</title>
+<title>Life Expectancy of Ukrainian Creative Workers — V2.3</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
 <style>
   body {{
     font-family: 'Georgia', serif;
@@ -260,6 +286,13 @@ HTML = f"""<!DOCTYPE html>
     height: auto;
     border-radius: 4px;
   }}
+  figure.interactive-fig {{
+    padding: 8px;
+    text-align: left;
+  }}
+  figure.interactive-fig .plotly-graph-div {{
+    width: 100% !important;
+  }}
   hr {{ border: none; border-top: 1px solid #ddd; margin: 2em 0; }}
   sup a {{ color: #a00; text-decoration: none; font-size: 0.8em; }}
   sup a:hover {{ text-decoration: underline; }}
@@ -293,4 +326,4 @@ with open(DOCS_PATH, 'w', encoding='utf-8') as f:
 
 print(f"Done → {OUT_PATH}")
 print(f"Done → {DOCS_PATH}")
-print(f"Figures embedded: {len(IMAGES)}")
+print(f"Figures embedded: {len(IMAGES)} static PNGs + {len(INTERACTIVE)} interactive Plotly")
