@@ -1881,9 +1881,10 @@ if _PLOTLY_AVAIL:
     repression_x = [lbl for lbl in period_labels_clean
                     if lbl.replace('\n', ' ') in _REPRESSION_SET or lbl in _REPRESSION_SET]
     fig_p09.update_layout(
-        title='Figure 9 — Mean Age at Death by Soviet Period and Migration Group<br>'
-              '<sub>Hover for exact values · Click legend to show/hide groups · '
-              'Red-outline bars = repression periods (n≥5 shown)</sub>',
+        title=dict(
+            text='Figure 9 — Mean Age at Death by Soviet Period and Migration Group',
+            font=dict(size=15),
+        ),
         yaxis_title='Mean Age at Death (years)',
         xaxis_title='Soviet Historical Period',
         barmode='group',
@@ -1891,9 +1892,21 @@ if _PLOTLY_AVAIL:
         paper_bgcolor='white',
         font=dict(family='Georgia, serif', size=12),
         yaxis=dict(gridcolor='#eee', range=[0, 95]),
-        legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
-        margin=dict(t=80, b=40),
-        height=500,
+        legend=dict(
+            orientation='v',
+            yanchor='top', y=0.98,
+            xanchor='left', x=0.01,
+            bgcolor='rgba(255,255,255,0.85)',
+            bordercolor='#ccc', borderwidth=1,
+        ),
+        margin=dict(t=60, b=70, l=60, r=20),
+        height=520,
+        annotations=[dict(
+            text='Hover for exact values · Click legend to show/hide · Red-outline bars = repression periods (n≥5 shown)',
+            xref='paper', yref='paper', x=0.5, y=-0.12,
+            showarrow=False, font=dict(size=10, color='#888'),
+            xanchor='center',
+        )],
     )
     _save_interactive(fig_p09, 'fig09_interactive.html')
 
