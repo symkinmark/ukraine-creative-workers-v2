@@ -285,5 +285,12 @@ HTML = f"""<!DOCTYPE html>
 with open(OUT_PATH, 'w', encoding='utf-8') as f:
     f.write(HTML)
 
+# Also write to docs/index.html for GitHub Pages
+DOCS_PATH = os.path.join(os.path.dirname(PROJECT), 'docs', 'index.html')
+os.makedirs(os.path.dirname(DOCS_PATH), exist_ok=True)
+with open(DOCS_PATH, 'w', encoding='utf-8') as f:
+    f.write(HTML)
+
 print(f"Done → {OUT_PATH}")
+print(f"Done → {DOCS_PATH}")
 print(f"Figures embedded: {len(IMAGES)}")
