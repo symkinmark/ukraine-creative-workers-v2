@@ -532,8 +532,10 @@ ax.set_ylim(0, 1.05)
 apply_style(ax, 'Figure 2 — Kaplan-Meier Survival Curves by Migration Group',
             xlabel='Age (years)', ylabel='Proportion Surviving')
 ax.legend(fontsize=10)
-ax.axvline(63, color='grey', linestyle=':', linewidth=1, alpha=0.6)
-ax.text(63.5, 0.85, 'V1 avg\n(63)', fontsize=7, color='grey')
+ax.axvline(73, color=COLOUR['non_migrated'], linestyle=':', linewidth=1, alpha=0.7)
+ax.text(73.5, 0.88, 'Non-migrated\nmedian (73)', fontsize=7, color=COLOUR['non_migrated'])
+ax.axvline(45, color=COLOUR['deported'], linestyle=':', linewidth=1, alpha=0.7)
+ax.text(45.5, 0.60, 'Deported\nmedian (45)', fontsize=7, color=COLOUR['deported'])
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 add_source(fig)
 save(fig, 'fig02_kaplan_meier.png')
@@ -1877,7 +1879,18 @@ if _PLOTLY_AVAIL:
         ))
 
     fig_p09 = go.Figure(data=bars_p09)
-    # Shade repression periods with background rectangles
+    # Shade repression periods — use numeric index positions on categorical axis
+    for j, lbl in enumerate(period_labels_clean):
+        if lbl in _REPRESSION_SET:
+            fig_p09.add_shape(
+                type='rect',
+                x0=j - 0.5, x1=j + 0.5,
+                y0=0, y1=1,
+                xref='x', yref='paper',
+                fillcolor='rgba(139,0,0,0.07)',
+                line_width=0,
+                layer='below',
+            )
     repression_x = [lbl for lbl in period_labels_clean
                     if lbl.replace('\n', ' ') in _REPRESSION_SET or lbl in _REPRESSION_SET]
     fig_p09.update_layout(

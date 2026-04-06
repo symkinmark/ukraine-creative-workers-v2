@@ -3,7 +3,7 @@
 **File:** `charts/fig01_primary_le_comparison.png`
 
 ## What this chart shows
-The headline result of the entire study. Four bars showing mean age at death (life expectancy proxy) for each migration group, with 95% confidence intervals as error bars.
+The headline result of the entire study. Four bars showing mean age at death (life expectancy proxy) for each migration group, with **±1 SE error bars** (standard error, not 95% CI). The 95% CI for each group is shown in the hover tooltip on the interactive version and in the table below.
 
 ## The four groups (V2.3)
 | Group | N | Mean LE | 95% CI | What they are |

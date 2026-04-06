@@ -22,9 +22,10 @@ The migrated group's curve stays higher for longer — they have a higher probab
 - **Shaded bands:** The shaded region around each curve is the confidence interval. Wide band = less certainty (smaller group).
 - **Median survival:** The age where each curve crosses 0.5 (50% probability) gives the median life expectancy.
 
-## Known issues / improvements
-- ~~"V1 avg (63)" annotation is outdated.~~ Update to V2.3 overall non-migrated median = 73 yrs, migrated median = 77 yrs.
-- Consider adding a table of median survival ages per group below the chart.
+## Reference lines (V2.3)
+- **Non-migrated median (73 yrs)** — red dotted vertical line
+- **Deported median (45 yrs)** — purple dotted vertical line
+- V1 avg (63 yr) reference line removed in V2.3 — was outdated, replaced with V2.3 group-specific medians
 
 ## Technical note
 Computed using the `lifelines` library (v0.30.3). Log-rank test was used to confirm statistical significance of differences between curves.
