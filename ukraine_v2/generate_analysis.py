@@ -29,6 +29,7 @@ import pandas as pd
 import numpy as np
 from scipy import stats
 from lifelines import KaplanMeierFitter
+import statsmodels.formula.api as smf
 
 def cliffs_delta(x, y):
     """Non-parametric effect size consistent with Mann-Whitney U.
@@ -3084,6 +3085,249 @@ if _PLOTLY_AVAIL:
     _save_interactive(fig_p22, 'fig22_interactive.html')
 
     print("Interactive charts complete.")
+
+# ===========================================================================
+# MULTIVARIABLE REGRESSION  (Step 7 — methods-aware robustness)
+# ===========================================================================
+print("\nRunning multivariable regression …")
+
+# ── Build regression DataFrame ──────────────────────────────────────────────
+WESTERN_LOCS = {
+    'Львів', 'Тернопіль', 'Чернівці', 'Івано-Франківськ', 'Станіслав',
+    'Дрогобич', 'Бережани', 'Броди', 'Борщів', 'Збараж', 'Стрий',
+    'Самбір', 'Золочів', 'Перемишль', 'Ярослав', 'Холм',
+}
+EASTERN_LOCS = {
+    'Харків', 'Донецьк', 'Луганськ', 'Маріуполь', 'Запоріжжя',
+    'Дніпропетровськ', 'Дніпро', 'Кривий Ріг', 'Катеринослав',
+}
+SOUTHERN_LOCS = {
+    'Одеса', 'Херсон', 'Миколаїв', 'Сімферополь', 'Севастополь',
+}
+CENTRAL_LOCS = {
+    'Київ', 'Полтава', 'Черкаси', 'Чернігів', 'Суми', 'Житомир',
+    'Вінниця', 'Умань', 'Кременчук', 'Ніжин', 'Переяслав',
+}
+
+def map_region(loc_str):
+    loc = (loc_str or '').strip()
+    for city in WESTERN_LOCS:
+        if city in loc:
+            return 'Western'
+    for city in EASTERN_LOCS:
+        if city in loc:
+            return 'Eastern'
+    for city in SOUTHERN_LOCS:
+        if city in loc:
+            return 'Southern'
+    for city in CENTRAL_LOCS:
+        if city in loc:
+            return 'Central'
+    return 'Other/Unknown'
+
+reg_rows = []
+for r in analysable:
+    reg_rows.append({
+        'age_at_death':   r['_le'],
+        'migration':      r['_ms'],
+        'birth_decade':   (r['_by'] // 10) * 10,
+        'profession':     r['_prof'],
+        'birth_region':   map_region(r.get('birth_location', '')),
+    })
+
+df_reg = pd.DataFrame(reg_rows)
+
+# Reference categories: non_migrated, 1880s cohort, Writers/Poets, Other/Unknown region
+df_reg['migration']    = pd.Categorical(df_reg['migration'],
+                             categories=['non_migrated','migrated','internal_transfer','deported'])
+df_reg['profession']   = pd.Categorical(df_reg['profession'])
+df_reg['birth_region'] = pd.Categorical(df_reg['birth_region'])
+
+# ── Model 1: unadjusted (migration only) ────────────────────────────────────
+m1 = smf.ols('age_at_death ~ C(migration, Treatment("non_migrated"))', data=df_reg).fit()
+
+# ── Model 2: adjusted (migration + cohort + profession + region) ─────────────
+m2 = smf.ols(
+    'age_at_death ~ C(migration, Treatment("non_migrated"))'
+    ' + birth_decade'
+    ' + C(profession, Treatment("Writers/Poets"))'
+    ' + C(birth_region, Treatment("Other/Unknown"))',
+    data=df_reg
+).fit()
+
+# ── Extract key coefficients for report ────────────────────────────────────
+def extract_coef(model, term):
+    """Return (coef, se, t, p, ci_lo, ci_hi) for a term, or Nones if not found."""
+    ci = model.conf_int()
+    for k in model.params.index:
+        if term in k:
+            return (round(model.params[k], 3),
+                    round(model.bse[k], 3),
+                    round(model.tvalues[k], 3),
+                    round(model.pvalues[k], 4),
+                    round(ci.loc[k, 0], 3),
+                    round(ci.loc[k, 1], 3))
+    return (None,) * 6
+
+mig_terms = ['migrated', 'internal_transfer', 'deported']
+
+# ── Write regression results to text report ────────────────────────────────
+with open(OUT_TXT, 'a', encoding='utf-8') as f:
+    f.write('\n\n')
+    f.write('=' * 80 + '\n')
+    f.write('7. MULTIVARIABLE REGRESSION — OBSERVED AGE AT DEATH\n')
+    f.write('-' * 80 + '\n')
+    f.write('  Dependent variable : age_at_death (years)\n')
+    f.write('  Reference category : non_migrated\n')
+    f.write('  Model 1            : unadjusted (migration status only)\n')
+    f.write('  Model 2            : adjusted (+ birth decade + profession + region)\n\n')
+    f.write('  MODEL 1 — Unadjusted\n')
+    f.write(f'  N={int(m1.nobs)}, R²={round(m1.rsquared, 4)}, adj-R²={round(m1.rsquared_adj, 4)}, '
+            f'F={round(m1.fvalue, 2)}, p={round(m1.f_pvalue, 6)}\n\n')
+    f.write(f'  {"Variable":<30} {"β":>8} {"SE":>7} {"t":>7} {"p":>9} {"95% CI":>20}\n')
+    f.write('  ' + '-' * 80 + '\n')
+    f.write(f'  {"Intercept (non-migrated)":<30} '
+            f'{round(m1.params["Intercept"], 3):>8} '
+            f'{round(m1.bse["Intercept"], 3):>7} '
+            f'{round(m1.tvalues["Intercept"], 3):>7} '
+            f'{round(m1.pvalues["Intercept"], 4):>9} '
+            f'[{round(m1.conf_int().loc["Intercept", 0], 3)}, {round(m1.conf_int().loc["Intercept", 1], 3)}]\n')
+    for term in mig_terms:
+        c, se, t, p, lo, hi = extract_coef(m1, term)
+        if c is not None:
+            f.write(f'  {term:<30} {c:>8} {se:>7} {t:>7} {p:>9} [{lo}, {hi}]\n')
+    f.write('\n  MODEL 2 — Adjusted\n')
+    f.write(f'  N={int(m2.nobs)}, R²={round(m2.rsquared, 4)}, adj-R²={round(m2.rsquared_adj, 4)}, '
+            f'F={round(m2.fvalue, 2)}, p={round(m2.f_pvalue, 6)}\n\n')
+    f.write(f'  {"Variable":<30} {"β":>8} {"SE":>7} {"t":>7} {"p":>9} {"95% CI":>20}\n')
+    f.write('  ' + '-' * 80 + '\n')
+    for term in mig_terms:
+        c, se, t, p, lo, hi = extract_coef(m2, term)
+        if c is not None:
+            f.write(f'  {term:<30} {c:>8} {se:>7} {t:>7} {p:>9} [{lo}, {hi}]\n')
+    f.write('\n  Notes:\n')
+    f.write('  - β = coefficient in years of age at death relative to non-migrated baseline\n')
+    f.write('  - Birth decade, profession, region coefficients omitted for brevity;\n')
+    f.write('    full model summary in regression_full_output.txt\n')
+
+# ── Save full statsmodels summary to separate file ──────────────────────────
+reg_out_path = os.path.join(PROJECT_ROOT, 'regression_full_output.txt')
+with open(reg_out_path, 'w', encoding='utf-8') as f:
+    f.write('MODEL 1 — Unadjusted\n')
+    f.write('=' * 80 + '\n')
+    f.write(str(m1.summary()))
+    f.write('\n\nMODEL 2 — Adjusted\n')
+    f.write('=' * 80 + '\n')
+    f.write(str(m2.summary()))
+print(f"  Full regression output → {reg_out_path}")
+
+# ── Figure 23: Coefficient plot ─────────────────────────────────────────────
+labels_map = {
+    'migrated':          'Migrated\n(vs. Non-migrated)',
+    'internal_transfer': 'Internal Transfer\n(vs. Non-migrated)',
+    'deported':          'Deported\n(vs. Non-migrated)',
+}
+
+fig23, ax23 = plt.subplots(figsize=(9, 5))
+ax23.set_facecolor('#fafafa')
+fig23.patch.set_facecolor('white')
+
+y_positions = [3, 2, 1]  # one per migration term
+offsets = [-0.18, 0.18]   # model 1 below, model 2 above
+colours = ['#2980B9', '#E67E22']
+model_labels = ['Model 1 (unadjusted)', 'Model 2 (adjusted)']
+
+for mi, model in enumerate([m1, m2]):
+    for yi, term in zip(y_positions, mig_terms):
+        c, se, t, p, lo, hi = extract_coef(model, term)
+        if c is None:
+            continue
+        ypos = yi + offsets[mi]
+        ax23.plot([lo, hi], [ypos, ypos], color=colours[mi], linewidth=2.0, alpha=0.8,
+                  solid_capstyle='round')
+        ax23.plot(c, ypos, 'o', color=colours[mi], markersize=8, zorder=5,
+                  label=model_labels[mi] if yi == y_positions[0] else '')
+
+ax23.axvline(0, color='#333', linewidth=1.2, linestyle='--', alpha=0.6, zorder=3)
+ax23.set_yticks(y_positions)
+ax23.set_yticklabels([labels_map[t] for t in mig_terms], fontsize=11)
+ax23.set_xlabel('β (years of observed age at death vs. non-migrated baseline)', fontsize=11)
+ax23.set_title('Figure 23 — Migration Status Coefficients: Unadjusted vs. Adjusted OLS',
+               fontsize=12, fontweight='bold', pad=12)
+ax23.legend(loc='lower right', fontsize=10)
+ax23.grid(axis='x', alpha=0.4)
+for spine in ['top', 'right']:
+    ax23.spines[spine].set_visible(False)
+ax23.text(0.99, -0.13,
+          SOURCE_NOTE,
+          transform=ax23.transAxes, ha='right', va='bottom',
+          fontsize=7, color='#888', style='italic')
+plt.tight_layout()
+fig23_path = os.path.join(CHARTS_DIR, 'fig23_regression_coef_plot.png')
+fig23.savefig(fig23_path, dpi=150, bbox_inches='tight')
+plt.close(fig23)
+print(f"  fig23 saved → {fig23_path}")
+
+# ── Interactive Plotly version ───────────────────────────────────────────────
+try:
+    import plotly.graph_objects as go
+
+    fig_p23 = go.Figure()
+    for mi, model in enumerate([m1, m2]):
+        xs, ys, texts, errors_lo, errors_hi = [], [], [], [], []
+        for yi, term in zip(y_positions, mig_terms):
+            c, se, t, p, lo, hi = extract_coef(model, term)
+            if c is None:
+                continue
+            xs.append(c)
+            ys.append(labels_map[term])
+            texts.append(
+                f'<b>{labels_map[term].replace(chr(10), " ")}</b><br>'
+                f'β = {c:+.2f} years<br>'
+                f'95% CI [{lo:.2f}, {hi:.2f}]<br>'
+                f'p = {p:.4f}<br>'
+                f'Model: {model_labels[mi]}'
+            )
+            errors_lo.append(c - lo)
+            errors_hi.append(hi - c)
+        fig_p23.add_trace(go.Scatter(
+            x=xs, y=ys, mode='markers',
+            name=model_labels[mi],
+            marker=dict(color=colours[mi], size=12),
+            error_x=dict(
+                type='data',
+                symmetric=False,
+                array=errors_hi,
+                arrayminus=errors_lo,
+                color=colours[mi],
+                thickness=2.5,
+                width=6,
+            ),
+            hovertemplate='%{text}<extra></extra>',
+            text=texts,
+        ))
+    fig_p23.add_vline(x=0, line_dash='dash', line_color='#555', line_width=1.5)
+    fig_p23.update_layout(
+        title=dict(
+            text='Figure 23 — Migration Status Coefficients: Unadjusted vs. Adjusted OLS',
+            font=dict(size=15)),
+        xaxis_title='β (years of observed age at death vs. non-migrated baseline)',
+        yaxis_title='',
+        plot_bgcolor='white', paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        xaxis=dict(gridcolor='#eee', zeroline=False),
+        yaxis=dict(gridcolor='#eee'),
+        legend=dict(orientation='h', yanchor='top', y=-0.2,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=70, b=100, l=220, r=40),
+        height=420,
+    )
+    _save_interactive(fig_p23, 'fig23_interactive.html')
+    print("  fig23 interactive saved.")
+except Exception as e:
+    print(f"  fig23 interactive skipped: {e}")
+
+print("Regression analysis complete.")
 
 # ===========================================================================
 # DONE

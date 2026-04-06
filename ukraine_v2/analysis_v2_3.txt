@@ -101,3 +101,36 @@ Berdnyk & Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)
   Adjusted gap (worst-case error scenario):   -1.47 years
   Sensitivity shift                       :   -5.51 years
   Conclusion: Main finding holds even under worst-case error assumption.
+
+
+================================================================================
+7. MULTIVARIABLE REGRESSION — OBSERVED AGE AT DEATH
+--------------------------------------------------------------------------------
+  Dependent variable : age_at_death (years)
+  Reference category : non_migrated
+  Model 1            : unadjusted (migration status only)
+  Model 2            : adjusted (+ birth decade + profession + region)
+
+  MODEL 1 — Unadjusted
+  N=8643, R²=0.0664, adj-R²=0.066, F=204.7, p=0.0
+
+  Variable                              β      SE       t         p               95% CI
+  --------------------------------------------------------------------------------
+  Intercept (non-migrated)         71.217   0.178 400.936       0.0 [70.869, 71.565]
+  migrated                          4.036   0.424   9.508       0.0 [3.204, 4.868]
+  internal_transfer                -0.518   0.444  -1.167    0.2434 [-1.388, 0.352]
+  deported                        -22.867   1.035 -22.094       0.0 [-24.896, -20.838]
+
+  MODEL 2 — Adjusted
+  N=8643, R²=0.0767, adj-R²=0.0753, F=55.12, p=0.0
+
+  Variable                              β      SE       t         p               95% CI
+  --------------------------------------------------------------------------------
+  migrated                          3.311   0.446   7.416       0.0 [2.436, 4.186]
+  internal_transfer                -1.432   0.461  -3.107    0.0019 [-2.335, -0.529]
+  deported                         -23.44   1.048 -22.371       0.0 [-25.494, -21.386]
+
+  Notes:
+  - β = coefficient in years of age at death relative to non-migrated baseline
+  - Birth decade, profession, region coefficients omitted for brevity;
+    full model summary in regression_full_output.txt
