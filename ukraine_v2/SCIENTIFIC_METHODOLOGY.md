@@ -820,7 +820,7 @@ The birth cohort analysis provides some evidence against a pure selection explan
 ### 11.1 Primary Data File (V2.3)
 
 **Filename:** `esu_creative_workers_v2_3.csv`
-**Location:** `/Users/symkinmark_/projects/Ai agent basic/ukraine_v2/esu_creative_workers_v2_3.csv`
+**Location:** `ukraine_v2/esu_creative_workers_v2_3.csv` (project git repository)
 **Format:** CSV, UTF-8 encoded, comma-separated
 **Rows:** 16,215 — one row per individual in the initial dataset
 **Analysable rows:** 8,643 (migration_status in: migrated, non_migrated, internal_transfer, deported, AND valid birth/death years with age 10–110)
@@ -859,10 +859,12 @@ The birth cohort analysis provides some evidence against a pure selection explan
 ### 11.3 Raw Data File
 
 **Filename:** `esu_creative_workers_raw.csv`
-**Location:** `/Users/symkinmark_/projects/Ai agent basic/ukraine_v2/esu_creative_workers_raw.csv`
+**Location:** `ukraine_v2/esu_creative_workers_raw.csv` (project git repository)
 **Description:** The raw output from the scraper before any nationality or migration classification. Contains all entries that matched the creative profession keywords. This file is the starting point for any replication; all subsequent processing steps are applied to this file programmatically.
 
 ### 11.4 Reproducing the Dataset (V2.3 full pipeline)
+
+> **Note on file locations:** All scripts and data files referenced below are available in the project git repository. Local paths used during development should be replaced with paths relative to the repository root when replicating.
 
 To reproduce the V2.3 primary analysis dataset from scratch:
 
