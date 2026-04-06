@@ -357,7 +357,17 @@ To assess whether the observed age-at-death gap between migrants and non-migrant
 
 **Model 2 (adjusted)** adds birth decade, profession, and birth region as controls. The migration advantage reduces modestly to **+3.31 years** (95% CI [2.44, 4.19], p < 0.001), indicating that the gap is not explained by cohort composition, professional distribution, or geographic origin. Notably, internal transfer becomes statistically significant in the adjusted model (−1.43 years, p = 0.002), suggesting a suppressed effect partially confounded by birth-cohort composition. The deportation penalty remains severe at **−23.44 years** (95% CI [−25.49, −21.39], p < 0.001). The adjusted model explains 7.7% of variance in age at death (R² = 0.077), consistent with the expected explanatory power of migration status as one factor among many shaping individual longevity.
 
-**Figure 23:** OLS regression coefficients for migration status categories (vs. non-migrated baseline) from two models: unadjusted (Model 1) and adjusted for birth decade, creative profession, and birth region (Model 2). Points show point estimates; horizontal lines show 95% confidence intervals. The migrated group advantage is stable across both specifications. The deportation penalty is large and robust. The internal transfer coefficient is small in Model 1 (non-significant) but becomes significant in the adjusted model, suggesting partial cohort confounding.
+**Table A — OLS Regression Results: Observed Age at Death by Migration Status**
+
+| Group (vs. Non-migrated) | Model 1 β | 95% CI | p | Model 2 β | 95% CI | p |
+|---|---|---|---|---|---|---|
+| Migrated | +4.04 | [+3.20, +4.87] | <0.001 | +3.31 | [+2.44, +4.19] | <0.001 |
+| Internal Transfer | −0.52 | [−1.39, +0.35] | 0.243 | −1.43 | [−2.34, −0.53] | 0.002 |
+| Deported | −22.87 | [−24.90, −20.84] | <0.001 | −23.44 | [−25.49, −21.39] | <0.001 |
+
+*Model 1: migration status only (n = 8,643). Model 2: + birth decade, profession, birth region. β = years of observed age at death relative to non-migrated baseline. Non-migrated mean age at death = 71.22 years.*
+
+**Figure 23:** Gap stability chart — the same migration status gaps shown as grouped bars, comparing the unadjusted estimate (Model 1) against the adjusted estimate (Model 2, controlling for birth cohort, profession, and region). Bar length = β in years. Error bars = 95% confidence intervals. The near-identical bar lengths confirm that the migration advantage and deportation penalty are not artefacts of compositional differences.
 
 ---
 

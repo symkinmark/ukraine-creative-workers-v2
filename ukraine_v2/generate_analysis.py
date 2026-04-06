@@ -3221,82 +3221,80 @@ with open(reg_out_path, 'w', encoding='utf-8') as f:
     f.write(str(m2.summary()))
 print(f"  Full regression output → {reg_out_path}")
 
-# ── Figure 23: Two-panel coefficient plot ───────────────────────────────────
-# Panel A: Migrated & Internal Transfer (zoomed scale −3 to +6)
-# Panel B: Deported (−28 to −18) — separate panel so scale is readable
+# ── Figure 23: Grouped bar chart — gap stability ─────────────────────────────
+# Shows each group's gap vs non-migrated as paired bars (raw vs adjusted).
+# The key message: bars are nearly identical → controls don't explain the gap.
 
-labels_display = {
-    'migrated':          'Migrated',
-    'internal_transfer': 'Internal Transfer',
-    'deported':          'Deported',
-}
-colours_model = ['#2980B9', '#E67E22']
-model_labels  = ['Model 1\n(unadjusted)', 'Model 2\n(adjusted)']
+bar_groups   = ['migrated', 'internal_transfer', 'deported']
+bar_labels   = ['Migrated', 'Internal\nTransfer', 'Deported']
+bar_colours  = [COLOUR['migrated'], COLOUR['internal_transfer'], COLOUR['deported']]
+model_labels = ['Unadjusted\n(Model 1)', 'Adjusted\n(Model 2)']
+adj_colours  = ['#5DADE2', '#F0A500', '#A569BD']  # lighter versions for Model 2
 
-fig23, (axA, axB) = plt.subplots(1, 2, figsize=(12, 4),
-                                  gridspec_kw={'width_ratios': [2, 1]})
+# Collect coefficients
+coef_data = {}
+for term in bar_groups:
+    c1, se1, t1, p1, lo1, hi1 = extract_coef(m1, term)
+    c2, se2, t2, p2, lo2, hi2 = extract_coef(m2, term)
+    coef_data[term] = {
+        'm1': (c1, lo1, hi1, p1),
+        'm2': (c2, lo2, hi2, p2),
+    }
+
+x      = np.arange(len(bar_groups))
+width  = 0.35
+
+fig23, ax23 = plt.subplots(figsize=(10, 6))
+ax23.set_facecolor('#fafafa')
 fig23.patch.set_facecolor('white')
 
-for ax in (axA, axB):
-    ax.set_facecolor('#fafafa')
-    for spine in ['top', 'right']:
-        ax.spines[spine].set_visible(False)
-    ax.grid(axis='x', alpha=0.35, linewidth=0.8)
+bars1 = ax23.bar(x - width/2,
+                 [coef_data[t]['m1'][0] for t in bar_groups],
+                 width, label='Unadjusted (Model 1)',
+                 color=bar_colours, alpha=0.9, edgecolor='white', linewidth=1.2)
+bars2 = ax23.bar(x + width/2,
+                 [coef_data[t]['m2'][0] for t in bar_groups],
+                 width, label='Adjusted: cohort + profession + region (Model 2)',
+                 color=adj_colours, alpha=0.9, edgecolor='white', linewidth=1.2,
+                 hatch='//')
 
-# Panel A — Migrated + Internal Transfer
-panelA_terms = ['migrated', 'internal_transfer']
-y_A = [2, 1]
-offsets = [-0.2, 0.2]
+# Error bars
+for i, term in enumerate(bar_groups):
+    c1, lo1, hi1, _ = coef_data[term]['m1']
+    c2, lo2, hi2, _ = coef_data[term]['m2']
+    ax23.errorbar(i - width/2, c1, yerr=[[c1-lo1],[hi1-c1]],
+                  fmt='none', color='#333', capsize=4, linewidth=1.5)
+    ax23.errorbar(i + width/2, c2, yerr=[[c2-lo2],[hi2-c2]],
+                  fmt='none', color='#333', capsize=4, linewidth=1.5)
 
-for mi, model in enumerate([m1, m2]):
-    for yi, term in zip(y_A, panelA_terms):
-        c, se, t, p, lo, hi = extract_coef(model, term)
-        if c is None:
-            continue
-        ypos = yi + offsets[mi]
-        axA.plot([lo, hi], [ypos, ypos], color=colours_model[mi],
-                 linewidth=2.5, alpha=0.85, solid_capstyle='round')
-        axA.plot(c, ypos, 'o', color=colours_model[mi], markersize=9, zorder=5,
-                 label=model_labels[mi] if yi == y_A[0] else '')
-        axA.text(hi + 0.1, ypos, f'{c:+.1f}y', va='center', fontsize=9,
-                 color=colours_model[mi], fontweight='bold')
+# Value labels on bars
+for i, term in enumerate(bar_groups):
+    c1, _, _, p1 = coef_data[term]['m1']
+    c2, _, _, p2 = coef_data[term]['m2']
+    sig1 = '***' if p1 < 0.001 else ('**' if p1 < 0.01 else ('*' if p1 < 0.05 else 'n.s.'))
+    sig2 = '***' if p2 < 0.001 else ('**' if p2 < 0.01 else ('*' if p2 < 0.05 else 'n.s.'))
+    offset1 = 0.4 if c1 >= 0 else -1.5
+    offset2 = 0.4 if c2 >= 0 else -1.5
+    ax23.text(i - width/2, c1 + offset1, f'{c1:+.1f}y\n{sig1}',
+              ha='center', va='bottom', fontsize=8.5, fontweight='bold',
+              color='#222')
+    ax23.text(i + width/2, c2 + offset2, f'{c2:+.1f}y\n{sig2}',
+              ha='center', va='bottom', fontsize=8.5, fontweight='bold',
+              color='#222')
 
-axA.axvline(0, color='#444', linewidth=1.2, linestyle='--', alpha=0.7)
-axA.set_yticks(y_A)
-axA.set_yticklabels([labels_display[t] for t in panelA_terms], fontsize=11)
-axA.set_xlabel('β (years vs. non-migrated)', fontsize=10)
-axA.set_xlim(-3.5, 7.5)
-axA.set_title('Panel A — Migrated & Internal Transfer', fontsize=11,
-              fontweight='bold', pad=8, color='#222')
-axA.legend(loc='lower right', fontsize=9, framealpha=0.7)
-
-# Panel B — Deported only
-for mi, model in enumerate([m1, m2]):
-    c, se, t, p, lo, hi = extract_coef(model, 'deported')
-    if c is None:
-        continue
-    ypos = 1 + offsets[mi]
-    axB.plot([lo, hi], [ypos, ypos], color=colours_model[mi],
-             linewidth=2.5, alpha=0.85, solid_capstyle='round')
-    axB.plot(c, ypos, 'o', color=colours_model[mi], markersize=9, zorder=5,
-             label=model_labels[mi])
-    axB.text(hi + 0.3, ypos, f'{c:+.1f}y', va='center', fontsize=9,
-             color=colours_model[mi], fontweight='bold')
-
-axB.axvline(0, color='#444', linewidth=1.2, linestyle='--', alpha=0.7)
-axB.set_yticks([1])
-axB.set_yticklabels(['Deported'], fontsize=11)
-axB.set_xlabel('β (years vs. non-migrated)', fontsize=10)
-axB.set_xlim(-28, -16)
-axB.set_title('Panel B — Deported', fontsize=11,
-              fontweight='bold', pad=8, color='#222')
-axB.legend(loc='lower right', fontsize=9, framealpha=0.7)
-
-fig23.suptitle('Figure 23 — OLS Regression Coefficients: Migration Status vs. Non-Migrated Baseline',
-               fontsize=12, fontweight='bold', y=1.02)
-fig23.text(0.99, -0.06, SOURCE_NOTE, ha='right', va='bottom',
-           fontsize=7, color='#888', style='italic',
-           transform=fig23.transFigure)
+ax23.axhline(0, color='#333', linewidth=1.2, linestyle='--', alpha=0.7)
+ax23.set_xticks(x)
+ax23.set_xticklabels(bar_labels, fontsize=12)
+ax23.set_ylabel('Years of observed age at death\nvs. non-migrated baseline (β)', fontsize=10)
+ax23.set_title('Regression Analysis: Does Controlling for Cohort, Profession & Region\n'
+               'Change the Migration Gap? (Non-migrated = 0 reference)',
+               fontsize=11, fontweight='bold', pad=10)
+ax23.legend(fontsize=9, loc='upper right', framealpha=0.85)
+for spine in ['top', 'right']:
+    ax23.spines[spine].set_visible(False)
+ax23.grid(axis='y', alpha=0.35, linewidth=0.8)
+ax23.text(0.99, -0.12, SOURCE_NOTE, transform=ax23.transAxes,
+          ha='right', va='bottom', fontsize=7, color='#888', style='italic')
 
 plt.tight_layout()
 fig23_path = os.path.join(CHARTS_DIR, 'fig23_regression_coef_plot.png')
@@ -3304,93 +3302,67 @@ fig23.savefig(fig23_path, dpi=150, bbox_inches='tight')
 plt.close(fig23)
 print(f"  fig23 saved → {fig23_path}")
 
-# ── Interactive Plotly version (two subplots) ────────────────────────────────
+# ── Interactive Plotly version ────────────────────────────────────────────────
 try:
-    from plotly.subplots import make_subplots
     import plotly.graph_objects as go
 
-    fig_p23 = make_subplots(
-        rows=1, cols=2,
-        column_widths=[0.65, 0.35],
-        subplot_titles=['Panel A — Migrated & Internal Transfer',
-                        'Panel B — Deported'],
-        horizontal_spacing=0.12,
-    )
+    plotly_bar_colours  = [COLOUR['migrated'], COLOUR['internal_transfer'], COLOUR['deported']]
+    plotly_adj_colours  = ['#5DADE2', '#F0A500', '#A569BD']
 
-    for mi, model in enumerate([m1, m2]):
-        # Panel A
-        xs_a, ys_a, texts_a, err_lo_a, err_hi_a = [], [], [], [], []
-        for term in ['migrated', 'internal_transfer']:
+    fig_p23 = go.Figure()
+
+    for mi, (model, mlabel, mcols) in enumerate(
+            zip([m1, m2],
+                ['Unadjusted (Model 1)', 'Adjusted: cohort + profession + region (Model 2)'],
+                [plotly_bar_colours, plotly_adj_colours])):
+        ys, errs_lo, errs_hi, texts, bcolours = [], [], [], [], []
+        for term, blabel, bc in zip(bar_groups,
+                                     ['Migrated', 'Internal Transfer', 'Deported'],
+                                     mcols):
             c, se, t, p, lo, hi = extract_coef(model, term)
             if c is None:
                 continue
-            xs_a.append(c)
-            ys_a.append(labels_display[term])
-            texts_a.append(
-                f'<b>{labels_display[term]}</b><br>'
-                f'β = {c:+.2f} years<br>'
+            sig = '***' if p < 0.001 else ('**' if p < 0.01 else ('*' if p < 0.05 else 'n.s.'))
+            ys.append(c)
+            errs_lo.append(c - lo)
+            errs_hi.append(hi - c)
+            bcolours.append(bc)
+            texts.append(
+                f'<b>{blabel}</b><br>'
+                f'Gap vs. non-migrated: {c:+.2f} years<br>'
                 f'95% CI [{lo:.2f}, {hi:.2f}]<br>'
-                f'p = {p:.4f}<br>'
-                f'{"Unadjusted" if mi == 0 else "Adjusted (cohort + profession + region)"}'
+                f'Significance: {sig}<br>'
+                f'{"Raw gap, no controls" if mi == 0 else "After controlling for birth cohort, profession & region"}'
             )
-            err_lo_a.append(c - lo)
-            err_hi_a.append(hi - c)
-        fig_p23.add_trace(go.Scatter(
-            x=xs_a, y=ys_a, mode='markers',
-            name=f'Model {mi+1} ({"unadjusted" if mi==0 else "adjusted"})',
-            marker=dict(color=colours_model[mi], size=13),
-            error_x=dict(type='data', symmetric=False,
-                         array=err_hi_a, arrayminus=err_lo_a,
-                         color=colours_model[mi], thickness=3, width=8),
+        fig_p23.add_trace(go.Bar(
+            name=mlabel,
+            x=['Migrated', 'Internal Transfer', 'Deported'],
+            y=ys,
+            marker_color=bcolours,
+            opacity=0.9 if mi == 0 else 0.7,
+            error_y=dict(type='data', symmetric=False,
+                         array=errs_hi, arrayminus=errs_lo,
+                         color='#444', thickness=2, width=6),
             hovertemplate='%{text}<extra></extra>',
-            text=texts_a,
-            legendgroup=f'model{mi}',
-            showlegend=True,
-        ), row=1, col=1)
+            text=texts,
+        ))
 
-        # Panel B — deported
-        c, se, t, p, lo, hi = extract_coef(model, 'deported')
-        if c is not None:
-            fig_p23.add_trace(go.Scatter(
-                x=[c], y=['Deported'], mode='markers',
-                name=f'Model {mi+1}',
-                marker=dict(color=colours_model[mi], size=13),
-                error_x=dict(type='data', symmetric=False,
-                             array=[hi - c], arrayminus=[c - lo],
-                             color=colours_model[mi], thickness=3, width=8),
-                hovertemplate=(
-                    f'<b>Deported</b><br>'
-                    f'β = {c:+.2f} years<br>'
-                    f'95% CI [{lo:.2f}, {hi:.2f}]<br>'
-                    f'p = {p:.4f}<br>'
-                    f'{"Unadjusted" if mi == 0 else "Adjusted"}'
-                    '<extra></extra>'
-                ),
-                legendgroup=f'model{mi}',
-                showlegend=False,
-            ), row=1, col=2)
-
-    fig_p23.add_vline(x=0, line_dash='dash', line_color='#555',
-                      line_width=1.5, row=1, col=1)
-    fig_p23.add_vline(x=0, line_dash='dash', line_color='#555',
-                      line_width=1.5, row=1, col=2)
-
-    fig_p23.update_xaxes(gridcolor='#eee', zeroline=False,
-                         range=[-3.5, 7.5], row=1, col=1)
-    fig_p23.update_xaxes(gridcolor='#eee', zeroline=False,
-                         range=[-28, -16], row=1, col=2)
-    fig_p23.update_yaxes(gridcolor='#eee')
-
+    fig_p23.add_hline(y=0, line_dash='dash', line_color='#444', line_width=1.5)
     fig_p23.update_layout(
+        barmode='group',
         title=dict(
-            text='Figure 23 — OLS Regression Coefficients vs. Non-Migrated Baseline',
+            text='Regression Analysis: Gap vs. Non-Migrated — Raw vs. Adjusted for Controls',
             font=dict(size=14)),
+        yaxis_title='Years of observed age at death vs. non-migrated (β)',
+        xaxis_title='',
         plot_bgcolor='white', paper_bgcolor='white',
         font=dict(family='Georgia, serif', size=12),
-        legend=dict(orientation='h', yanchor='top', y=-0.25,
+        yaxis=dict(gridcolor='#eee', zeroline=False),
+        xaxis=dict(gridcolor='#eee'),
+        legend=dict(orientation='h', yanchor='top', y=-0.2,
                     xanchor='center', x=0.5, borderwidth=0),
-        margin=dict(t=80, b=100, l=40, r=40),
-        height=420,
+        margin=dict(t=70, b=130, l=60, r=40),
+        height=480,
     )
     _save_interactive(fig_p23, 'fig23_interactive.html')
     print("  fig23 interactive saved.")
