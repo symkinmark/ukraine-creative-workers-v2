@@ -2332,6 +2332,723 @@ if _PLOTLY_AVAIL:
     )
     _save_interactive(fig_p12, 'fig12_interactive.html')
 
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 03 — Version comparison (V1 vs V2.3)
+    # -----------------------------------------------------------------------
+    v1_gap   = round(V1_mig  - V1_nm,  1)
+    v23_gap  = round(V23_mig - V23_nm, 1)
+
+    fig_p03 = go.Figure()
+    fig_p03.add_trace(go.Bar(
+        name='Left USSR (migrated)',
+        x=[f'V1<br>(n={V1_n})', f'V2.3<br>(n={V23_mig_n + V23_nm_n})'],
+        y=mig_vals,
+        marker_color=_PCOLOUR['migrated'],
+        text=[f'{v:.1f} yrs' for v in mig_vals],
+        textposition='outside',
+        customdata=[[V1_n, v1_gap], [V23_mig_n, v23_gap]],
+        hovertemplate=(
+            '<b>Left USSR / Migrated</b><br>'
+            'Mean LE: <b>%{y:.1f} years</b><br>'
+            'Gap vs stayed: <b>+%{customdata[1]:.1f} yrs</b><br>'
+            'n = %{customdata[0]:,}<extra></extra>'
+        ),
+    ))
+    fig_p03.add_trace(go.Bar(
+        name='Stayed in Soviet sphere',
+        x=[f'V1<br>(n={V1_n})', f'V2.3<br>(n={V23_mig_n + V23_nm_n})'],
+        y=nm_vals,
+        marker_color=_PCOLOUR['non_migrated'],
+        text=[f'{v:.1f} yrs' for v in nm_vals],
+        textposition='outside',
+        customdata=[[V1_n, v1_gap], [V23_nm_n, v23_gap]],
+        hovertemplate=(
+            '<b>Stayed in Soviet sphere</b><br>'
+            'Mean LE: <b>%{y:.1f} years</b><br>'
+            'n = %{customdata[0]:,}<extra></extra>'
+        ),
+    ))
+    fig_p03.update_layout(
+        title=dict(text='Figure 3 — Mean Life Expectancy: V1 vs V2.3 (Two-Group Framing)',
+                   font=dict(size=15)),
+        yaxis_title='Mean Life Expectancy (years)',
+        barmode='group',
+        plot_bgcolor='white', paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee', range=[0, max(mig_vals + nm_vals) * 1.25]),
+        legend=dict(orientation='h', yanchor='top', y=-0.18,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=60, b=110, l=60, r=20),
+        height=480,
+    )
+    _save_interactive(fig_p03, 'fig03_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 05 — Deported age-at-death histogram
+    # -----------------------------------------------------------------------
+    dep_les_p05 = le_values(deported)
+    dep_mean_p05 = round(statistics.mean(dep_les_p05), 2) if dep_les_p05 else 0
+    dep_med_p05  = round(statistics.median(dep_les_p05), 1) if dep_les_p05 else 0
+
+    # Build histogram counts manually so hover can show exact bin data
+    bin_edges = list(range(0, 106, 5))
+    bin_counts_05 = [sum(1 for v in dep_les_p05 if lo <= v < hi)
+                     for lo, hi in zip(bin_edges[:-1], bin_edges[1:])]
+    bin_labels_05 = [f'{lo}–{lo+4}' for lo in bin_edges[:-1]]
+
+    fig_p05 = go.Figure()
+    fig_p05.add_trace(go.Bar(
+        name='Deaths (n per age bin)',
+        x=bin_labels_05,
+        y=bin_counts_05,
+        marker_color=_hex_rgba(_PCOLOUR['deported'], 0.75),
+        marker_line_color=_PCOLOUR['deported'],
+        marker_line_width=0.8,
+        customdata=[[round(100 * c / len(dep_les_p05), 1) if dep_les_p05 else 0,
+                     lo, lo + 4]
+                    for c, lo in zip(bin_counts_05, bin_edges[:-1])],
+        hovertemplate=(
+            'Age range: <b>%{customdata[1]}–%{customdata[2]} yrs</b><br>'
+            'Deaths: <b>%{y}</b><br>'
+            '% of deported group: %{customdata[0]:.1f}%<extra></extra>'
+        ),
+    ))
+    fig_p05.add_vline(x=bin_labels_05[int(dep_mean_p05 // 5)] if dep_mean_p05 < 100 else bin_labels_05[-1],
+                      line_dash='dash', line_color='#C0392B', line_width=2)
+    # Add mean annotation as a shape since vline on categorical x is tricky
+    # Use annotation instead
+    fig_p05.add_annotation(
+        x=f'{int(dep_mean_p05 // 5 * 5)}–{int(dep_mean_p05 // 5 * 5) + 4}',
+        y=max(bin_counts_05) * 0.9 if bin_counts_05 else 1,
+        text=f'Mean: {dep_mean_p05} yrs<br>Median: {dep_med_p05} yrs<br>n = {len(dep_les_p05)}',
+        showarrow=True, arrowhead=2, ax=50, ay=-30,
+        font=dict(color='#C0392B', size=11),
+        bgcolor='rgba(255,240,255,0.9)', bordercolor=_PCOLOUR['deported'], borderwidth=1, borderpad=5,
+    )
+    fig_p05.update_layout(
+        title=dict(text='Figure 5 — Deported Creative Workers: Age at Death Distribution',
+                   font=dict(size=15)),
+        xaxis_title='Age at Death (5-year bins)',
+        yaxis_title='Number of Deaths',
+        plot_bgcolor='white', paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee'),
+        xaxis=dict(tickangle=-45),
+        showlegend=False,
+        margin=dict(t=60, b=110, l=60, r=20),
+        height=480,
+    )
+    _save_interactive(fig_p05, 'fig05_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 06 — Split violin by gender
+    # -----------------------------------------------------------------------
+    _gpal = {'male': '#2980B9', 'female': '#E74C3C'}
+    fig_p06 = go.Figure()
+    for gender, side in [('male', 'negative'), ('female', 'positive')]:
+        for ms in ALL_GROUPS:
+            v_g = [r['_le'] for r in groups[ms]
+                   if r['_le'] is not None and r.get('gender', '').lower() == gender]
+            if not v_g:
+                continue
+            fig_p06.add_trace(go.Violin(
+                name=gender.capitalize(),
+                x=[GROUP_LABELS[ms]] * len(v_g),
+                y=v_g,
+                side=side,
+                line_color=_gpal[gender],
+                fillcolor=_hex_rgba(_gpal[gender], 0.35),
+                meanline_visible=True,
+                box_visible=True,
+                points=False,
+                legendgroup=gender,
+                showlegend=(ms == 'migrated'),  # show legend once per gender
+                hovertemplate=(
+                    f'<b>{gender.capitalize()}</b> — {GROUP_LABELS[ms]}<br>'
+                    'n = ' + str(len(v_g)) + '<br>'
+                    'Value: %{y:.1f} yrs<extra></extra>'
+                ),
+            ))
+    fig_p06.update_layout(
+        title=dict(text='Figure 6 — Life Expectancy Distribution by Group and Gender (Violin)',
+                   font=dict(size=15)),
+        yaxis_title='Age at Death (years)',
+        violinmode='overlay',
+        plot_bgcolor='white', paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee', range=[0, 115]),
+        legend=dict(orientation='h', yanchor='top', y=-0.18,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=60, b=110, l=60, r=20),
+        height=520,
+    )
+    _save_interactive(fig_p06, 'fig06_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 07 — Death year histogram (migrated vs non-migrated)
+    # -----------------------------------------------------------------------
+    _dy_grps = {ms: [r['_dy'] for r in groups[ms] if r['_dy'] and 1900 <= r['_dy'] <= 2024]
+                for ms in ['non_migrated', 'migrated']}
+    bins07 = list(range(1900, 2027, 2))
+
+    fig_p07 = go.Figure()
+    for ms in ['non_migrated', 'migrated']:
+        fig_p07.add_trace(go.Histogram(
+            name=GROUP_LABELS[ms],
+            x=_dy_grps[ms],
+            xbins=dict(start=1900, end=2026, size=2),
+            marker_color=_hex_rgba(_PCOLOUR[ms], 0.65 if ms == 'non_migrated' else 0.55),
+            marker_line_color=_PCOLOUR[ms],
+            marker_line_width=0.5,
+            opacity=0.9,
+            hovertemplate='Year range: <b>%{x}</b><br>Deaths: <b>%{y}</b><extra></extra>',
+        ))
+
+    for year, label, col in [
+        (1933, 'Holodomor 1933', '#8E44AD'),
+        (1937, 'Great Terror 1937', '#1B2A4A'),
+        (1941, 'WWII begins 1941', '#7F8C8D'),
+    ]:
+        fig_p07.add_vline(x=year, line_dash='dash', line_color=col, line_width=1.8,
+                          annotation_text=label, annotation_position='top right',
+                          annotation_font_color=col, annotation_font_size=10)
+
+    fig_p07.update_layout(
+        title=dict(text='Figure 7 — Death Year Distribution 1900–2024 (Migrated vs Non-Migrated)',
+                   font=dict(size=15)),
+        xaxis_title='Year of Death',
+        yaxis_title='Number of Deaths',
+        barmode='overlay',
+        plot_bgcolor='white', paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee'),
+        xaxis=dict(gridcolor='#eee'),
+        legend=dict(orientation='h', yanchor='top', y=-0.18,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=60, b=110, l=60, r=20),
+        height=490,
+    )
+    _save_interactive(fig_p07, 'fig07_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 13 — Birth year distribution (selection bias check)
+    # -----------------------------------------------------------------------
+    fig_p13 = go.Figure()
+    for ms in ALL_GROUPS:
+        bys_p13 = [r['_by'] for r in groups[ms] if r['_by'] and 1830 <= r['_by'] <= 1990]
+        fig_p13.add_trace(go.Histogram(
+            name=GROUP_LABELS[ms],
+            x=bys_p13,
+            xbins=dict(start=1830, end=1991, size=5),
+            marker_color=_hex_rgba(_PCOLOUR[ms], 0.6),
+            marker_line_color=_PCOLOUR[ms],
+            marker_line_width=0.5,
+            opacity=0.85,
+            hovertemplate=(
+                f'{GROUP_LABELS[ms]}<br>'
+                'Birth decade: <b>%{x}</b><br>'
+                'n born in period: <b>%{y}</b><extra></extra>'
+            ),
+        ))
+    fig_p13.update_layout(
+        title=dict(text='Figure 13 — Birth Year Distribution by Migration Group (Selection Bias Check)',
+                   font=dict(size=15)),
+        xaxis_title='Birth Year (5-year bins)',
+        yaxis_title='Number of Creative Workers',
+        barmode='overlay',
+        plot_bgcolor='white', paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee'),
+        xaxis=dict(gridcolor='#eee'),
+        legend=dict(orientation='h', yanchor='top', y=-0.18,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=60, b=110, l=60, r=20),
+        height=490,
+    )
+    _save_interactive(fig_p13, 'fig13_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 15 — Internal transfer vs non-migrated (null finding)
+    # -----------------------------------------------------------------------
+    fig_p15 = go.Figure()
+    for ms, les_15, label_15 in [
+        ('internal_transfer', it_les, GROUP_LABELS['internal_transfer']),
+        ('non_migrated',      nm_les, GROUP_LABELS['non_migrated']),
+    ]:
+        d15 = descs_i[ms]
+        fig_p15.add_trace(go.Box(
+            name=label_15,
+            y=les_15,
+            marker_color=_PCOLOUR[ms],
+            line_color=_PCOLOUR[ms],
+            fillcolor=_hex_rgba(_PCOLOUR[ms], 0.55),
+            notched=True,
+            boxpoints=False,
+            hovertemplate=(
+                f'<b>{label_15}</b><br>'
+                'n = ' + str(len(les_15)) + '<br>'
+                'Median: %{median:.1f} yrs<br>'
+                'Q1–Q3: %{q1:.1f}–%{q3:.1f} yrs<extra></extra>'
+            ),
+        ))
+    p_label15 = f'p = {p15:.3f}' if p15 >= 0.001 else 'p < 0.001'
+    fig_p15.add_annotation(
+        x=0.5, y=1.06, xref='paper', yref='paper',
+        text=f'<b>Null finding: no significant difference</b>  |  Mann-Whitney {p_label15}  |  '
+             f'IT mean: {it_mean} yrs   NM mean: {nm_mean} yrs',
+        showarrow=False, font=dict(size=11, color='#27AE60'),
+        bgcolor='rgba(240,255,240,0.9)', bordercolor='#27AE60', borderwidth=1, borderpad=5,
+    )
+    fig_p15.update_layout(
+        title=dict(text='Figure 15 — Internal Transfer vs Non-Migrated LE (Null Finding)',
+                   font=dict(size=15)),
+        yaxis_title='Age at Death (years)',
+        plot_bgcolor='white', paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee', range=[0, 115]),
+        showlegend=True,
+        legend=dict(orientation='h', yanchor='top', y=-0.18,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=80, b=110, l=60, r=20),
+        height=500,
+    )
+    _save_interactive(fig_p15, 'fig15_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 15b — All four groups LE box plot
+    # -----------------------------------------------------------------------
+    fig_p15b = go.Figure()
+    for ms, les_15b, label_15b in _all_groups_15b:
+        mn_15b = round(statistics.mean(les_15b), 2) if les_15b else 0
+        fig_p15b.add_trace(go.Box(
+            name=label_15b,
+            y=les_15b,
+            marker_color=_PCOLOUR[ms],
+            line_color=_PCOLOUR[ms],
+            fillcolor=_hex_rgba(_PCOLOUR[ms], 0.55),
+            notched=True,
+            boxpoints=False,
+            hovertemplate=(
+                f'<b>{label_15b}</b><br>'
+                'n = ' + str(len(les_15b)) + '<br>'
+                f'Mean: {mn_15b:.2f} yrs<br>'
+                'Median: %{median:.1f} yrs<br>'
+                'Q1–Q3: %{q1:.1f}–%{q3:.1f} yrs<extra></extra>'
+            ),
+        ))
+    _p_label_mn = (f'p = {p_mig_nm:.4f}' if p_mig_nm >= 0.0001 else 'p < 0.0001')
+    _p_label_it = (f'p = {p_it_nm:.3f}'  if p_it_nm  >= 0.001  else 'p < 0.001')
+    fig_p15b.add_annotation(
+        x=0.5, y=1.07, xref='paper', yref='paper',
+        text=(f'Migrated vs Non-migrated: {_p_label_mn}  |  '
+              f'Internal transfer vs Non-migrated: {_p_label_it}'),
+        showarrow=False, font=dict(size=10, color='#333'),
+        bgcolor='rgba(250,250,250,0.9)', bordercolor='#ccc', borderwidth=1, borderpad=5,
+    )
+    fig_p15b.update_layout(
+        title=dict(text='Figure 15b — All Four Groups: Life Expectancy Distribution',
+                   font=dict(size=15)),
+        yaxis_title='Age at Death (years)',
+        plot_bgcolor='white', paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee', range=[0, 115]),
+        legend=dict(orientation='h', yanchor='top', y=-0.18,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=80, b=110, l=60, r=20),
+        height=520,
+    )
+    _save_interactive(fig_p15b, 'fig15b_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 17 — Gender distribution by migration group
+    # -----------------------------------------------------------------------
+    _gcols17 = {'male': '#2980B9', 'female': '#E74C3C', 'unknown': '#BDC3C7'}
+    fig_p17 = go.Figure()
+    for gender in ['male', 'female', 'unknown']:
+        counts_17 = [gender_counts[ms].get(gender, 0) for ms in ALL_GROUPS]
+        totals_17 = [sum(gender_counts[ms].values()) for ms in ALL_GROUPS]
+        pcts_17   = [round(100 * c / t, 1) if t else 0 for c, t in zip(counts_17, totals_17)]
+        fig_p17.add_trace(go.Bar(
+            name=gender.capitalize(),
+            x=[GROUP_LABELS[ms] for ms in ALL_GROUPS],
+            y=counts_17,
+            marker_color=_gcols17[gender],
+            customdata=list(zip(pcts_17, totals_17)),
+            hovertemplate=(
+                f'<b>{gender.capitalize()}</b><br>'
+                'Group: %{x}<br>'
+                'Count: <b>%{y}</b><br>'
+                '% of group: <b>%{customdata[0]:.1f}%</b><br>'
+                'Group total: %{customdata[1]:,}<extra></extra>'
+            ),
+        ))
+    fig_p17.update_layout(
+        title=dict(text='Figure 17 — Gender Distribution by Migration Group',
+                   font=dict(size=15)),
+        yaxis_title='Number of Creative Workers',
+        barmode='group',
+        plot_bgcolor='white', paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee'),
+        legend=dict(orientation='h', yanchor='top', y=-0.18,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=60, b=110, l=60, r=20),
+        height=490,
+    )
+    _save_interactive(fig_p17, 'fig17_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 18 — Mean LE by gender × migration group
+    # -----------------------------------------------------------------------
+    fig_p18 = go.Figure()
+    for gender in ['male', 'female']:
+        means_18, ses_18, ns_18 = [], [], []
+        for ms in ALL_GROUPS:
+            v18 = [r['_le'] for r in groups[ms]
+                   if r['_le'] is not None and r.get('gender', '').lower() == gender]
+            means_18.append(round(statistics.mean(v18), 2) if v18 else 0)
+            ses_18.append(statistics.stdev(v18) / math.sqrt(len(v18)) if len(v18) > 1 else 0)
+            ns_18.append(len(v18))
+        fig_p18.add_trace(go.Bar(
+            name=gender.capitalize(),
+            x=[GROUP_LABELS[ms] for ms in ALL_GROUPS],
+            y=means_18,
+            error_y=dict(type='data', array=[round(s, 2) for s in ses_18],
+                         visible=True, color='#333', thickness=1.8, width=6),
+            marker_color=_gcols17[gender],
+            customdata=list(zip(ns_18, [round(s * 1.96, 2) for s in ses_18])),
+            hovertemplate=(
+                f'<b>{gender.capitalize()}</b> — %{{x}}<br>'
+                'Mean LE: <b>%{y:.2f} years</b><br>'
+                '±1.96 SE: ±%{customdata[1]:.2f} yrs<br>'
+                'n = %{customdata[0]:,}<extra></extra>'
+            ),
+        ))
+    fig_p18.update_layout(
+        title=dict(text='Figure 18 — Mean Life Expectancy by Gender and Migration Group',
+                   font=dict(size=15)),
+        yaxis_title='Mean Life Expectancy (years)',
+        barmode='group',
+        plot_bgcolor='white', paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee', range=[0, 90]),
+        legend=dict(orientation='h', yanchor='top', y=-0.18,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=60, b=110, l=60, r=20),
+        height=490,
+    )
+    _save_interactive(fig_p18, 'fig18_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 19 — Annual death rate 1921–1992 (4-line normalised)
+    # -----------------------------------------------------------------------
+    _EVENT_COLS = {'#8E44AD': 'rgba(142,68,173,0.07)', '#8B0000': 'rgba(139,0,0,0.09)',
+                   '#7F8C8D': 'rgba(127,140,141,0.07)', '#BDC3C7': 'rgba(189,195,199,0.06)'}
+
+    fig_p19 = go.Figure()
+    # Event period shading (numeric year axis — use add_vrect directly)
+    for yr0, yr1, ecol, elabel in EVENT_BANDS19:
+        fig_p19.add_vrect(
+            x0=yr0, x1=yr1,
+            fillcolor=_EVENT_COLS.get(ecol, 'rgba(200,200,200,0.07)'),
+            layer='below', line_width=0,
+            annotation_text=elabel.replace('\n', '<br>'),
+            annotation_position='top left',
+            annotation_font_size=9, annotation_font_color=ecol,
+        )
+
+    for ms, norm_vals, label_19, _ls, lw_19 in LINE_DATA19:
+        fig_p19.add_trace(go.Scatter(
+            name=label_19,
+            x=spike_years,
+            y=norm_vals,
+            mode='lines',
+            line=dict(color=_PCOLOUR[ms], width=lw_19,
+                      dash='dash' if _ls == '--' else ('dot' if _ls == ':' else 'solid')),
+            hovertemplate=(
+                'Year: <b>%{x}</b><br>'
+                f'{label_19}<br>'
+                'Deaths that year: <b>%{y:.3f}%</b> of group<extra></extra>'
+            ),
+        ))
+    fig_p19.update_layout(
+        title=dict(text='Figure 19 — Annual Death Rate by Migration Group 1921–1992 (% of Group)',
+                   font=dict(size=15)),
+        xaxis_title='Year',
+        yaxis_title='Deaths per Year (% of group)',
+        plot_bgcolor='white', paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee'),
+        xaxis=dict(gridcolor='#eee'),
+        legend=dict(orientation='h', yanchor='top', y=-0.22,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=60, b=130, l=60, r=20),
+        height=540,
+    )
+    _save_interactive(fig_p19, 'fig19_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 19b — Simplified 3-line death rate
+    # -----------------------------------------------------------------------
+    fig_p19b = go.Figure()
+    for yr0, yr1, ecol, elabel in EVENT_BANDS19:
+        fig_p19b.add_vrect(
+            x0=yr0, x1=yr1,
+            fillcolor=_EVENT_COLS.get(ecol, 'rgba(200,200,200,0.07)'),
+            layer='below', line_width=0,
+            annotation_text=elabel.replace('\n', '<br>'),
+            annotation_position='top left',
+            annotation_font_size=9, annotation_font_color=ecol,
+        )
+    for ms, norm_vals, label_19b, _ls, lw_19b in LINE_DATA19b:
+        fig_p19b.add_trace(go.Scatter(
+            name=label_19b,
+            x=spike_years,
+            y=norm_vals,
+            mode='lines',
+            line=dict(color=_PCOLOUR[ms], width=lw_19b,
+                      dash='dash' if _ls == '--' else ('dot' if _ls == ':' else 'solid')),
+            hovertemplate=(
+                'Year: <b>%{x}</b><br>'
+                'Deaths that year: <b>%{y:.3f}%</b> of group<extra></extra>'
+            ),
+        ))
+    fig_p19b.update_layout(
+        title=dict(text='Figure 19b — Simplified Annual Death Rate (3-Line: Combined Non-Mig+Dep, IT, Migrated)',
+                   font=dict(size=15)),
+        xaxis_title='Year',
+        yaxis_title='Deaths per Year (% of group)',
+        plot_bgcolor='white', paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee'),
+        xaxis=dict(gridcolor='#eee'),
+        legend=dict(orientation='h', yanchor='top', y=-0.22,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=60, b=130, l=60, r=20),
+        height=530,
+    )
+    _save_interactive(fig_p19b, 'fig19b_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 20 — Two-group conservative comparison
+    # -----------------------------------------------------------------------
+    _cd2g_str = f'd = {cd2g:.3f}'
+    _p2g_str  = (f'p = {p2g:.4f}' if p2g >= 0.0001 else 'p < 0.0001')
+    ci_left_lo  = round(mean_left  - 1.96 * se_left,  2)
+    ci_left_hi  = round(mean_left  + 1.96 * se_left,  2)
+    ci_stayed_lo = round(mean_stayed - 1.96 * se_stayed, 2)
+    ci_stayed_hi = round(mean_stayed + 1.96 * se_stayed, 2)
+
+    fig_p20 = go.Figure()
+    bar_labels_20 = [
+        f'Left USSR<br>(migrated, n={len(left_ussr):,})',
+        f'Stayed in Soviet sphere<br>(non-mig + deported + IT,<br>n={len(stayed_in_ussr):,})',
+    ]
+    fig_p20.add_trace(go.Bar(
+        name='Mean LE',
+        x=bar_labels_20,
+        y=[mean_left, mean_stayed],
+        error_y=dict(type='data', array=[round(se_left, 3), round(se_stayed, 3)],
+                     visible=True, color='#333', thickness=2, width=10),
+        marker_color=[_PCOLOUR['migrated'], _PCOLOUR['non_migrated']],
+        customdata=[[len(left_ussr),   ci_left_lo,   ci_left_hi],
+                    [len(stayed_in_ussr), ci_stayed_lo, ci_stayed_hi]],
+        hovertemplate=(
+            'Group: <b>%{x}</b><br>'
+            'Mean LE: <b>%{y:.2f} years</b><br>'
+            '95% CI: [%{customdata[1]:.2f} – %{customdata[2]:.2f}]<br>'
+            'n = %{customdata[0]:,}<extra></extra>'
+        ),
+        text=[f'{mean_left:.2f} yrs', f'{mean_stayed:.2f} yrs'],
+        textposition='outside',
+    ))
+    fig_p20.add_annotation(
+        x=0.5, y=1.10, xref='paper', yref='paper',
+        text=(f'<b>Gap: +{gap_2g} years</b>  |  Mann-Whitney {_p2g_str}  |  Cohen\'s {_cd2g_str}'),
+        showarrow=False, font=dict(size=12, color='#2980B9'),
+        bgcolor='rgba(240,248,255,0.9)', bordercolor='#2980B9', borderwidth=1, borderpad=6,
+    )
+    fig_p20.update_layout(
+        title=dict(text='Figure 20 — Conservative Two-Group Life Expectancy Comparison',
+                   font=dict(size=15)),
+        yaxis_title='Mean Life Expectancy (years)',
+        plot_bgcolor='white', paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee', range=[0, max(mean_left, mean_stayed) * 1.25]),
+        showlegend=False,
+        margin=dict(t=85, b=60, l=60, r=20),
+        height=490,
+    )
+    _save_interactive(fig_p20, 'fig20_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 21 — Soviet republic comparison (cohort LE by decade)
+    # -----------------------------------------------------------------------
+    fig_p21 = go.Figure()
+
+    # Background republic lines (lighter, dashed)
+    _rep21_dash = {'Baltic SSRs avg': 'solid', 'Ukrainian SSR': 'solid',
+                   'Russian SFSR': 'solid', 'Central Asian SSRs avg': 'dash'}
+    for rep_name, rep_data in REPUBLIC_DATA_21.items():
+        xs_r = sorted(rep_data.keys())
+        ys_r = [rep_data[x] for x in xs_r]
+        fig_p21.add_trace(go.Scatter(
+            name=f'{rep_name} (general pop.)',
+            x=xs_r, y=ys_r,
+            mode='lines+markers',
+            line=dict(color=REP21_COL[rep_name], width=1.6,
+                      dash=_rep21_dash.get(rep_name, 'solid')),
+            marker=dict(size=7),
+            opacity=0.55,
+            hovertemplate=(
+                f'<b>{rep_name}</b> (general population)<br>'
+                'Year: %{x}<br>'
+                'LE: <b>%{y:.1f} years</b><extra></extra>'
+            ),
+        ))
+
+    # Our 3 group overlays — bold, solid
+    for ms in ['migrated', 'non_migrated', 'deported']:
+        xs_d21, ys_d21, ns_d21 = [], [], []
+        for dec in DEATH_DECADES:
+            if dec >= 1990:
+                continue
+            v21 = [r['_le'] for r in groups[ms]
+                   if r['_dy'] and dec <= r['_dy'] < dec + 10 and r['_le'] is not None]
+            if len(v21) >= MIN_N:
+                xs_d21.append(dec + 5)
+                ys_d21.append(round(statistics.mean(v21), 2))
+                ns_d21.append(len(v21))
+        if not xs_d21:
+            continue
+        fig_p21.add_trace(go.Scatter(
+            name=f'{GROUP_LABELS[ms]} (creative workers)',
+            x=xs_d21, y=ys_d21,
+            mode='lines+markers',
+            line=dict(color=_PCOLOUR[ms], width=2.8),
+            marker=dict(size=10, symbol='circle'),
+            customdata=list(zip(ns_d21, [f'{d}s' for d in xs_d21])),
+            hovertemplate=(
+                f'<b>{GROUP_LABELS[ms]}</b><br>'
+                'Decade of death: %{customdata[1]}<br>'
+                'Mean age at death: <b>%{y:.1f} years</b><br>'
+                'n = %{customdata[0]}<extra></extra>'
+            ),
+        ))
+
+    fig_p21.add_vrect(x0=1930, x1=1939, fillcolor='rgba(139,0,0,0.06)',
+                      layer='below', line_width=0,
+                      annotation_text='Repression era<br>1930–39',
+                      annotation_position='bottom left',
+                      annotation_font_size=9, annotation_font_color='#8B0000')
+    fig_p21.update_layout(
+        title=dict(text='Figure 21 — Soviet Republic LE Comparison: Creative Workers vs General Population',
+                   font=dict(size=15)),
+        xaxis_title='Decade of Death (midpoint year)',
+        yaxis_title='Life Expectancy / Mean Age at Death (years)',
+        plot_bgcolor='white', paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee', range=[25, 80]),
+        xaxis=dict(gridcolor='#eee', range=[1918, 1992]),
+        legend=dict(orientation='h', yanchor='top', y=-0.22,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=60, b=150, l=60, r=20),
+        height=580,
+    )
+    _save_interactive(fig_p21, 'fig21_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 22 — Educated urban Ukrainian comparison
+    # -----------------------------------------------------------------------
+    fig_p22 = go.Figure()
+
+    # Edu premium band (fill between lo and hi)
+    fig_p22.add_trace(go.Scatter(
+        name=f'Est. educated urban Ukrainian LE (+{EDU_PREMIUM_LOW}–{EDU_PREMIUM_HIGH} yr premium)',
+        x=edu_xs + edu_xs[::-1],
+        y=edu_hi + edu_lo[::-1],
+        fill='toself',
+        fillcolor='rgba(41,128,185,0.10)',
+        line=dict(color='rgba(0,0,0,0)'),
+        hoverinfo='skip',
+        showlegend=True,
+    ))
+    # Mid-line dashed
+    fig_p22.add_trace(go.Scatter(
+        name='Educated urban est. midpoint',
+        x=edu_xs, y=edu_mid,
+        mode='lines',
+        line=dict(color='#2980B9', width=1.8, dash='dash'),
+        opacity=0.7,
+        hovertemplate=(
+            'Year: %{x}<br>'
+            'Educated urban est. LE: <b>%{y:.1f} yrs</b><br>'
+            f'(SSR baseline +{EDU_PREMIUM_LOW}–{EDU_PREMIUM_HIGH} yrs premium)<extra></extra>'
+        ),
+    ))
+    # SSR baseline
+    fig_p22.add_trace(go.Scatter(
+        name='Ukrainian SSR general population',
+        x=edu_xs, y=edu_base,
+        mode='lines+markers',
+        line=dict(color='#27AE60', width=1.5, dash='dot'),
+        marker=dict(size=6),
+        opacity=0.7,
+        hovertemplate='Year: %{x}<br>SSR LE: <b>%{y:.1f} yrs</b><extra></extra>',
+    ))
+
+    # Our 4 group lines by death decade
+    _mkr22 = {'migrated': 'circle', 'non_migrated': 'square',
+               'internal_transfer': 'triangle-up', 'deported': 'diamond'}
+    for ms in ALL_GROUPS:
+        xs_d22, ys_d22, ns_d22 = [], [], []
+        for dec in DEATH_DECADES:
+            if dec >= 1990:
+                continue
+            v22 = [r['_le'] for r in groups[ms]
+                   if r['_dy'] and dec <= r['_dy'] < dec + 10 and r['_le'] is not None]
+            if len(v22) >= MIN_N:
+                xs_d22.append(dec + 5)
+                ys_d22.append(round(statistics.mean(v22), 2))
+                ns_d22.append(len(v22))
+        if not xs_d22:
+            continue
+        fig_p22.add_trace(go.Scatter(
+            name=GROUP_LABELS[ms].split('(')[0].strip() + ' (creative workers)',
+            x=xs_d22, y=ys_d22,
+            mode='lines+markers',
+            line=dict(color=_PCOLOUR[ms], width=2.5),
+            marker=dict(size=10, symbol=_mkr22[ms]),
+            customdata=list(zip(ns_d22, [f'{d}s' for d in xs_d22])),
+            hovertemplate=(
+                f'<b>{GROUP_LABELS[ms]}</b><br>'
+                'Decade of death: %{customdata[1]}<br>'
+                'Mean age at death: <b>%{y:.1f} years</b><br>'
+                'n = %{customdata[0]}<extra></extra>'
+            ),
+        ))
+
+    fig_p22.add_vrect(x0=1930, x1=1939, fillcolor='rgba(139,0,0,0.06)',
+                      layer='below', line_width=0,
+                      annotation_text='Great Terror<br>& Holodomor',
+                      annotation_position='bottom left',
+                      annotation_font_size=9, annotation_font_color='#8B0000')
+    fig_p22.update_layout(
+        title=dict(text='Figure 22 — Creative Workers Mean Age at Death vs Educated Urban Ukrainian Population',
+                   font=dict(size=15)),
+        xaxis_title='Decade of Death (midpoint year)',
+        yaxis_title='Life Expectancy / Mean Age at Death (years)',
+        plot_bgcolor='white', paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee', range=[26, 82]),
+        xaxis=dict(gridcolor='#eee', range=[1918, 1992]),
+        legend=dict(orientation='h', yanchor='top', y=-0.28,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=60, b=160, l=60, r=20),
+        height=600,
+    )
+    _save_interactive(fig_p22, 'fig22_interactive.html')
+
     print("Interactive charts complete.")
 
 # ===========================================================================

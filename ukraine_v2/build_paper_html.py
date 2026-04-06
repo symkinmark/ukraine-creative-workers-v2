@@ -17,7 +17,11 @@ OUT_PATH = os.path.join(PROJECT, 'paper_preview.html')
 CHARTS   = os.path.join(PROJECT, 'charts')
 
 # Figures that have interactive Plotly versions (figXX_interactive.html)
-INTERACTIVE_FIGS = {'1', '2', '4', '8', '9', '10', '11', '12', '14'}
+INTERACTIVE_FIGS = {
+    '1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+    '11', '12', '13', '14', '15', '15b', '17', '18', '19', '19b',
+    '20', '21', '22',
+}
 
 # Map each Figure N to its PNG filename (file number = paper figure number)
 FIGURE_MAP = {
@@ -57,7 +61,16 @@ def img_b64(filename):
 
 def load_interactive(fig_num):
     """Load the Plotly HTML div for a figure number, or None if not available."""
-    path = os.path.join(CHARTS, f'fig{int(fig_num):02d}_interactive.html')
+    # Handle suffixed numbers like '15b', '19b' — keep suffix, zero-pad numeric prefix
+    import re as _re
+    m = _re.match(r'^(\d+)([a-z]*)$', str(fig_num))
+    if m:
+        num_part = f'{int(m.group(1)):02d}'
+        suffix   = m.group(2)
+    else:
+        num_part = str(fig_num)
+        suffix   = ''
+    path = os.path.join(CHARTS, f'fig{num_part}{suffix}_interactive.html')
     if os.path.exists(path):
         with open(path, encoding='utf-8') as f:
             return f.read()
