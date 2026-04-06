@@ -359,7 +359,8 @@ for r in analysable:
             _birth_mig_p[bl] += 1
 
 # Fuzzy match for each paper-reported city (Ukrainian keyword in birth_location)
-# Table 6 methodology: exact birth_location string match on ALL raw_rows (not just analysable)
+# Table 6 methodology: exact birth_location string match on analysable rows only
+# (same population as fig12 — consistent with the rest of the analysis)
 CITY_EXACT_LOCS = {
     'Lviv':              'Львів',
     'Ternopil':          'Тернопіль',
@@ -369,8 +370,8 @@ CITY_EXACT_LOCS = {
 }
 
 def city_stats(loc_str):
-    hits  = [r for r in raw_rows if (r.get('birth_location', '') or '').strip() == loc_str]
-    n_mig = sum(1 for r in hits if r.get('migration_status', '').strip().lower() == 'migrated')
+    hits  = [r for r in analysable if (r.get('birth_location', '') or '').strip() == loc_str]
+    n_mig = sum(1 for r in hits if r['_ms'] == 'migrated')
     pct   = round(100 * n_mig / len(hits), 1) if hits else 0.0
     return len(hits), pct
 
@@ -527,11 +528,11 @@ check("mig % age 90+ (§4.8)",          mig_90p_pct, 14.8, 0.15)
 print(f"\n{BOLD}── TABLE 6: GEOGRAPHIC MIGRATION RATES ──{RESET}")
 print(f"  (methodology: exact birth_location match on all 16,215 rows)")
 PAPER_CITIES = {
-    'Lviv':              {'n': 480,  'pct_mig': 15.4},
-    'Ternopil':          {'n': 53,   'pct_mig': 17.0},
-    'Chernivtsi':        {'n': 54,   'pct_mig': 14.8},
-    'Kyiv':              {'n': 1296, 'pct_mig': 4.9},
-    'Donetsk (Stalino)': {'n': 48,   'pct_mig': 0.0},
+    'Lviv':              {'n': 164,  'pct_mig': 45.1},
+    'Ternopil':          {'n': 17,   'pct_mig': 52.9},
+    'Chernivtsi':        {'n': 23,   'pct_mig': 34.8},
+    'Kyiv':              {'n': 453,  'pct_mig': 13.9},
+    'Donetsk (Stalino)': {'n': 14,   'pct_mig': 0.0},
 }
 for city_key, paper in PAPER_CITIES.items():
     n_comp, pct_comp = city_computed.get(city_key, (0, 0.0))
