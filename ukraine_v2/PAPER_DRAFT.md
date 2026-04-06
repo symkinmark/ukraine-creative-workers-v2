@@ -339,9 +339,9 @@ V2 removes the cutoff entirely and includes all confirmed death dates. The 4.04-
 
 ### 4.5 The 1937 Spotlight
 
-The year 1937 — the peak of the Stalinist Great Terror — warrants dedicated analysis. Figure 7b shows the deported group's death year histogram restricted to 1920–1960
+The year 1937 — the peak of the Stalinist Great Terror — warrants dedicated analysis. Figure 7b shows the deported group's death year histogram restricted to 1920–1960, where the 1937 spike is unmistakable.
 
-**Figure 7b.** Death year histogram for the deported group only (n=183), 1920–1960. The 1937 peak — 65 deaths (35.5% of all deported deaths) in a single year — is the most concentrated mortality event in the dataset, consistent with mass execution during the Great Terror. The 1934–1938 period accounts for 95 of 183 deported deaths (51.9%)., where the 1937 spike (65 deaths, 35.5% of the entire deported cohort in a single year) is the most concentrated mortality event in the dataset. Across all four groups, **100 creative workers in our dataset died in 1937**, with a blended mean age at death of approximately 46.2 years. This is the single most lethal year for Ukrainian creative workers in our dataset.
+**Figure 7b.** Death year histogram for the deported group only (n=183), 1920–1960. The 1937 peak — 65 deaths (35.5% of all deported deaths) in a single year — is the most concentrated mortality event in the dataset, consistent with mass execution during the Great Terror. The 1934–1938 period accounts for 95 of 183 deported deaths (51.9%). Across all four groups, **100 creative workers in our dataset died in 1937**, with a blended mean age at death of approximately 46.2 years. This is the single most lethal year for Ukrainian creative workers in our dataset.
 
 The deaths are not evenly distributed. Among those who remained under Soviet rule, 24 non-migrated workers died at an average age of 48.0, and 65 deported workers died at an average age of 42.4 — a combined repression cluster of 89 deaths concentrated in a single year. The deported group's figure is particularly stark: 65 of the 183 total deported workers in our dataset (35.5%) died in a single calendar year, at an average age of 42.4. Among the internal transfer group, 1 death is recorded in 1937 at age 25.
 
