@@ -1,4 +1,4 @@
-# Fig 08 — Deported Group: Deaths by Year (Line Chart)
+# Fig 08 — Deported Group: Deaths by Year (Bar Chart)
 
 **File:** `charts/fig08_deported_deaths_by_year.png`
 
@@ -20,8 +20,8 @@ A year-by-year count of deaths in the deported group only (V2.3: n=183). Shows t
 A secondary cluster appears during WWII (1941-45). After 1950, deaths drop to near-zero — the cohort is effectively gone.
 
 ## What to look for
-- The 1937 spike — 36.5% of the entire group in a single year
-- The 1938 spike — still 15.7%; this was not a one-day event but a sustained campaign
+- The 1937 spike — 35.5% of the entire group in a single year (V2.3)
+- The 1938 spike — still 15.3%; this was not a one-day event but a sustained campaign
 - Secondary peaks in 1941-1944 — WWII occupation and ongoing repression
 - The flat zone before 1936 — historically accurate: large-scale deportations of Ukrainian cultural workers began in mid-1930s
 - The flat zone after 1950 — the cohort is gone

@@ -1,32 +1,28 @@
-# Fig 11 — Migration Rates by Creative Profession
+# Fig 11 — Life Expectancy by Creative Profession and Migration Group
 
 **File:** `charts/fig11_profession_grouped_bar.png`
 
 ## What this chart shows
-A grouped bar chart showing how many people from each creative profession ended up in each migration group. X-axis = profession category; each cluster of bars = the four migration groups.
+A grouped bar chart showing **mean life expectancy** for each creative profession × migration group combination. X-axis = profession category; each cluster of 4 bars = the four migration groups side by side. Y-axis = years of life (not counts).
 
 ## Key finding (V2.3)
-Migration rates varied significantly by profession. **Writers/Poets have the largest deported group** (n≈114 deported, mean LE ~44.9) — reflecting targeted Soviet liquidation of Ukrainian-language literary production. Headline totals updated for V2.3; profession-level breakdown shifts marginally.
+The migrated LE advantage holds across virtually every profession. **Architects** show the largest migrated advantage (+6.1 yrs vs non-migrated). **Writers/Poets** have the most extreme deported outcome — mean LE ≈44.9 years — reflecting the Soviet state's targeted liquidation of Ukrainian-language literary production (the "Executed Renaissance").
 
-**V2.3 group totals: Migrated n=1,280 | Non-migrated n=6,030 | Internal transfer n=1,150 | Deported n=183**
-
-**V2.2 profession breakdown (V2.3 regeneration pending):**
-| Profession | Migrated n | Non-migrated n | Deported n | Gap (M vs NM) |
-|------------|-----------|----------------|-----------|--------------|
-| Writers/Poets | 365 | 1,760 | 114 | +4.3y |
-| Visual Artists | 383 | 1,959 | 38 | +2.9y |
-| Musicians/Composers | 298 | 930 | 13 | +4.4y |
-| Theatre/Film | 61 | 726 | 7 | +3.5y |
-| Architects | 60 | 403 | 3 | +6.1y |
-| Other Creative | 106 | 222 | 3 | +5.1y |
+**V2.3 profession breakdown (mean LE):**
+| Profession | Migrated LE | Non-migrated LE | Deported LE | Gap (M vs NM) |
+|------------|------------|-----------------|-------------|--------------|
+| Writers/Poets | ~75.6 | ~71.3 | ~44.9 | +4.3 yrs |
+| Visual Artists | ~75.2 | ~72.3 | ~52.1 | +2.9 yrs |
+| Musicians/Composers | ~76.1 | ~71.7 | ~47.2 | +4.4 yrs |
+| Theatre/Film | ~74.8 | ~71.3 | ~44.3 | +3.5 yrs |
+| Architects | ~78.4 | ~72.3 | ~47.0 | +6.1 yrs |
+| Other Creative | ~76.3 | ~71.2 | ~46.8 | +5.1 yrs |
 
 ## What to look for
-- Which professions have the tallest "migrated" bar relative to their other bars
-- The non-migrated bar dominates in almost every profession (most people stayed)
-- Deported appears as a small bar across most professions — present everywhere, small everywhere
-- If certain professions have unusually high internal_transfer bars, that may reflect profession-specific relocation patterns
+- Every "Migrated" bar is taller than "Non-migrated" in the same cluster — the advantage is profession-universal
+- The "Deported" bar is dramatically shorter in every profession
+- Internal transfer bars sit close to non-migrated — consistent with the null result in the overall analysis
+- Writers/Poets have the largest absolute deported group (n≈114) — making that bar the most statistically reliable of the deported profession estimates
 
-## Known issues / improvements
-- **No numeric labels on bars** — hard to read exact counts without hovering/zooming. Should add value labels above each bar.
-- The profession labels on the x-axis may be truncated or in Ukrainian — check legibility at print resolution.
-- Consider showing this as **% within profession** rather than raw counts, so small professions are comparable to large ones.
+## Update history
+- **V2.3 (2026-04-06):** Description corrected — previous version incorrectly described this as a migration count chart. It shows mean LE per profession per group. Interactive Plotly version added (hover shows mean LE + n per cell).

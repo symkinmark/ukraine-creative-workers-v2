@@ -1952,23 +1952,10 @@ if _PLOTLY_AVAIL:
         font=dict(family='Georgia, serif', size=12),
         yaxis=dict(gridcolor='#eee', range=[25, 90]),
         xaxis=dict(gridcolor='#eee'),
-        # Legend moved inside the plot — upper left, away from the subtitle
-        legend=dict(
-            orientation='v',
-            yanchor='top', y=0.98,
-            xanchor='left', x=0.01,
-            bgcolor='rgba(255,255,255,0.85)',
-            bordercolor='#ccc', borderwidth=1,
-        ),
-        margin=dict(t=60, b=60, l=60, r=20),
-        height=520,
-        # Hover instruction as a separate annotation at the bottom
-        annotations=[dict(
-            text='Hover for exact values · Click legend to show/hide · Zoom/pan with mouse',
-            xref='paper', yref='paper', x=0.5, y=-0.1,
-            showarrow=False, font=dict(size=10, color='#888'),
-            xanchor='center',
-        )],
+        legend=dict(orientation='h', yanchor='top', y=-0.22,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=60, b=130, l=60, r=20),
+        height=540,
     )
     _save_interactive(fig_p10, 'fig10_interactive.html')
 
@@ -2050,6 +2037,287 @@ if _PLOTLY_AVAIL:
         height=480,
     )
     _save_interactive(fig_p14, 'fig14_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 02 — Kaplan-Meier survival curves
+    # -----------------------------------------------------------------------
+    from lifelines import KaplanMeierFitter as _KMF
+
+    # Hex → rgba helper for CI bands
+    def _hex_rgba(hex_col, alpha):
+        h = hex_col.lstrip('#')
+        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+        return f'rgba({r},{g},{b},{alpha})'
+
+    fig_p02 = go.Figure()
+    for ms in ALL_GROUPS:
+        les = le_values(groups[ms])
+        if not les:
+            continue
+        kmf = _KMF()
+        kmf.fit(les, [1] * len(les), label=GROUP_LABELS[ms])
+        sf       = kmf.survival_function_
+        ci       = kmf.confidence_interval_
+        timeline = sf.index.values.tolist()
+        survival = sf.iloc[:, 0].values.tolist()
+        ci_lo    = ci.iloc[:, 0].values.tolist()
+        ci_hi    = ci.iloc[:, 1].values.tolist()
+        colour   = _PCOLOUR[ms]
+        n_val    = len(les)
+
+        # CI band (drawn first, behind the line)
+        fig_p02.add_trace(go.Scatter(
+            x=timeline + timeline[::-1],
+            y=ci_hi + ci_lo[::-1],
+            fill='toself',
+            fillcolor=_hex_rgba(colour, 0.10),
+            line=dict(color='rgba(0,0,0,0)'),
+            showlegend=False,
+            hoverinfo='skip',
+            name=f'{GROUP_LABELS[ms]} CI',
+        ))
+        # Main survival curve — step function
+        fig_p02.add_trace(go.Scatter(
+            name=f'{GROUP_LABELS[ms]} (n={n_val:,})',
+            x=timeline,
+            y=survival,
+            mode='lines',
+            line=dict(color=colour, width=2.5, shape='hv'),
+            customdata=[[n_val]] * len(timeline),
+            hovertemplate=(
+                'Age: <b>%{x} yrs</b><br>'
+                'Survival probability: <b>%{y:.3f}</b> (%{y:.1%})<br>'
+                f'{GROUP_LABELS[ms]} (n={n_val:,})<extra></extra>'
+            ),
+        ))
+
+    # Reference line at V2.3 non-migrated median (73 yrs)
+    fig_p02.add_vline(x=73, line_dash='dot', line_color='grey', line_width=1,
+                      annotation_text='Non-migrated median (73 yrs)',
+                      annotation_position='top right',
+                      annotation_font_size=10, annotation_font_color='grey')
+    fig_p02.add_vline(x=45, line_dash='dot', line_color=_PCOLOUR['deported'], line_width=1,
+                      annotation_text='Deported median (45 yrs)',
+                      annotation_position='top left',
+                      annotation_font_size=10,
+                      annotation_font_color=_PCOLOUR['deported'])
+
+    fig_p02.update_layout(
+        title=dict(text='Figure 2 — Kaplan-Meier Survival Curves by Migration Group',
+                   font=dict(size=15)),
+        xaxis_title='Age (years)',
+        yaxis_title='Proportion Surviving',
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee', range=[0, 1.05], tickformat='.0%'),
+        xaxis=dict(gridcolor='#eee', range=[0, 110]),
+        legend=dict(orientation='h', yanchor='top', y=-0.18,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=60, b=120, l=60, r=20),
+        height=530,
+    )
+    _save_interactive(fig_p02, 'fig02_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 04 — Box plots
+    # -----------------------------------------------------------------------
+    fig_p04 = go.Figure()
+    for ms in ALL_GROUPS:
+        les = le_values(groups[ms])
+        if not les:
+            continue
+        d = descs_i[ms]
+        fig_p04.add_trace(go.Box(
+            name=GROUP_LABELS[ms],
+            y=les,
+            marker_color=_PCOLOUR[ms],
+            line_color=_PCOLOUR[ms],
+            fillcolor=_hex_rgba(_PCOLOUR[ms], 0.6),
+            notched=True,
+            boxpoints=False,
+            hovertemplate=(
+                f'<b>{GROUP_LABELS[ms]}</b><br>'
+                'n = ' + str(len(les)) + '<br>'
+                'Median: %{median:.1f} yrs<br>'
+                'Q1: %{q1:.1f} | Q3: %{q3:.1f} yrs<br>'
+                'Upper fence: %{upperfence:.1f} yrs<extra></extra>'
+            ),
+        ))
+
+    fig_p04.update_layout(
+        title=dict(text='Figure 4 — Life Expectancy Distribution by Group (Box Plots)',
+                   font=dict(size=15)),
+        yaxis_title='Life Expectancy (years)',
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee', range=[0, 115]),
+        showlegend=False,
+        margin=dict(t=60, b=50, l=60, r=20),
+        height=480,
+    )
+    _save_interactive(fig_p04, 'fig04_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 08 — Deported deaths by year
+    # -----------------------------------------------------------------------
+    dep_death_years_p = [r['_dy'] for r in deported if r['_dy'] and 1921 <= r['_dy'] <= 1965]
+    dep_year_counter_p = collections.Counter(dep_death_years_p)
+    years_range_p = list(range(1921, 1966))
+    counts_p = [dep_year_counter_p.get(y, 0) for y in years_range_p]
+    total_dep = len(dep_death_years_p)
+
+    bar_colours_p = [('#8B0000' if y in (1937, 1938) else _PCOLOUR['deported'])
+                     for y in years_range_p]
+    pct_labels = [round(100 * c / total_dep, 1) if total_dep else 0 for c in counts_p]
+
+    fig_p08 = go.Figure()
+    fig_p08.add_trace(go.Bar(
+        name='Deaths',
+        x=years_range_p,
+        y=counts_p,
+        marker_color=bar_colours_p,
+        customdata=list(zip(pct_labels, years_range_p)),
+        hovertemplate=(
+            'Year: <b>%{x}</b><br>'
+            'Deaths: <b>%{y}</b><br>'
+            '% of deported group: %{customdata[0]:.1f}%<extra></extra>'
+        ),
+    ))
+    fig_p08.add_vline(x=1937, line_dash='dash', line_color='#8B0000', line_width=2,
+                      annotation_text=f'1937 — {dep_year_counter_p.get(1937,0)} deaths '
+                                      f'({round(100*dep_year_counter_p.get(1937,0)/total_dep,1) if total_dep else 0}% of group)',
+                      annotation_position='top right',
+                      annotation_font_color='#8B0000', annotation_font_size=11)
+
+    fig_p08.update_layout(
+        title=dict(text='Figure 8 — Deported Creative Workers: Deaths by Year 1921–1965',
+                   font=dict(size=15)),
+        xaxis_title='Year',
+        yaxis_title='Number of Deaths',
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee'),
+        xaxis=dict(gridcolor='#eee', dtick=5),
+        showlegend=False,
+        margin=dict(t=60, b=50, l=60, r=20),
+        height=450,
+    )
+    _save_interactive(fig_p08, 'fig08_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 11 — LE by profession × migration group
+    # -----------------------------------------------------------------------
+    professions_p = list(PROFESSION_KEYWORDS.keys())
+    fig_p11 = go.Figure()
+    for ms in ALL_GROUPS:
+        x_profs, y_means, n_counts = [], [], []
+        for prof in professions_p:
+            v = [r['_le'] for r in groups[ms] if r['_prof'] == prof and r['_le'] is not None]
+            x_profs.append(prof)
+            y_means.append(round(statistics.mean(v), 2) if v else None)
+            n_counts.append(len(v))
+        fig_p11.add_trace(go.Bar(
+            name=GROUP_LABELS[ms],
+            x=x_profs,
+            y=y_means,
+            marker_color=_PCOLOUR[ms],
+            customdata=list(zip(n_counts, x_profs)),
+            hovertemplate=(
+                '<b>%{x}</b><br>'
+                f'{GROUP_LABELS[ms]}<br>'
+                'Mean LE: <b>%{y:.1f} years</b><br>'
+                'n = %{customdata[0]}<extra></extra>'
+            ),
+        ))
+
+    fig_p11.update_layout(
+        title=dict(text='Figure 11 — Mean Life Expectancy by Creative Profession and Migration Group',
+                   font=dict(size=15)),
+        yaxis_title='Mean Life Expectancy (years)',
+        xaxis_title='Creative Profession',
+        barmode='group',
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        yaxis=dict(gridcolor='#eee', range=[0, 95]),
+        legend=dict(orientation='h', yanchor='top', y=-0.22,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=60, b=140, l=60, r=20),
+        height=540,
+    )
+    _save_interactive(fig_p11, 'fig11_interactive.html')
+
+    # -----------------------------------------------------------------------
+    # INTERACTIVE FIG 12 — Geographic migration rates (top 20 birth cities)
+    # -----------------------------------------------------------------------
+    birth_all_p  = collections.Counter()
+    birth_mig_p  = collections.Counter()
+    for ms in ALL_GROUPS:
+        for r in groups[ms]:
+            bl = str(r.get('birth_location', '')).strip()
+            if bl:
+                birth_all_p[bl] += 1
+                if ms == 'migrated':
+                    birth_mig_p[bl] += 1
+
+    top20_p    = birth_all_p.most_common(20)
+    cities_p   = [loc[:35] for loc, _ in top20_p]
+    total_c    = [cnt for _, cnt in top20_p]
+    mig_c      = [birth_mig_p.get(loc, 0) for loc, _ in top20_p]
+    mig_pct_p  = [round(100 * mc / tc, 1) if tc else 0
+                  for mc, tc in zip(mig_c, total_c)]
+
+    # Reverse for horizontal bar (bottom-to-top = highest at top)
+    cities_p  = cities_p[::-1]
+    total_c   = total_c[::-1]
+    mig_c     = mig_c[::-1]
+    mig_pct_p = mig_pct_p[::-1]
+
+    fig_p12 = go.Figure()
+    fig_p12.add_trace(go.Bar(
+        name='Total creative workers',
+        x=total_c, y=cities_p,
+        orientation='h',
+        marker_color='#BDC3C7',
+        customdata=list(zip(mig_c, mig_pct_p, cities_p)),
+        hovertemplate=(
+            '<b>%{y}</b><br>'
+            'Total workers: %{x}<br>'
+            'Migrated: %{customdata[0]} (%{customdata[1]:.1f}%)<extra></extra>'
+        ),
+    ))
+    fig_p12.add_trace(go.Bar(
+        name='Migrated (left USSR)',
+        x=mig_c, y=cities_p,
+        orientation='h',
+        marker_color=_PCOLOUR['migrated'],
+        customdata=list(zip(mig_pct_p, total_c, cities_p)),
+        hovertemplate=(
+            '<b>%{y}</b><br>'
+            'Migrated: <b>%{x}</b> of %{customdata[1]} total<br>'
+            'Migration rate: <b>%{customdata[0]:.1f}%</b><extra></extra>'
+        ),
+    ))
+
+    fig_p12.update_layout(
+        title=dict(text='Figure 12 — Migration Rate by Birth City (Top 20)',
+                   font=dict(size=15)),
+        xaxis_title='Number of Creative Workers',
+        yaxis_title='Birth City',
+        barmode='overlay',
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        font=dict(family='Georgia, serif', size=12),
+        xaxis=dict(gridcolor='#eee'),
+        legend=dict(orientation='h', yanchor='top', y=-0.12,
+                    xanchor='center', x=0.5, borderwidth=0),
+        margin=dict(t=60, b=100, l=160, r=20),
+        height=600,
+    )
+    _save_interactive(fig_p12, 'fig12_interactive.html')
 
     print("Interactive charts complete.")
 

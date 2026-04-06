@@ -17,7 +17,7 @@ OUT_PATH = os.path.join(PROJECT, 'paper_preview.html')
 CHARTS   = os.path.join(PROJECT, 'charts')
 
 # Figures that have interactive Plotly versions (figXX_interactive.html)
-INTERACTIVE_FIGS = {'1', '9', '10', '14'}
+INTERACTIVE_FIGS = {'1', '2', '4', '8', '9', '10', '11', '12', '14'}
 
 # Map each Figure N to its PNG filename (file number = paper figure number)
 FIGURE_MAP = {
