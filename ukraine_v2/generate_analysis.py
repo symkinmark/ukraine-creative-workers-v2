@@ -1884,6 +1884,7 @@ if _PLOTLY_AVAIL:
         title=dict(
             text='Figure 9 — Mean Age at Death by Soviet Period and Migration Group',
             font=dict(size=15),
+            pad=dict(b=10),
         ),
         yaxis_title='Mean Age at Death (years)',
         xaxis_title='Soviet Historical Period',
@@ -1893,20 +1894,14 @@ if _PLOTLY_AVAIL:
         font=dict(family='Georgia, serif', size=12),
         yaxis=dict(gridcolor='#eee', range=[0, 95]),
         legend=dict(
-            orientation='v',
-            yanchor='top', y=0.98,
-            xanchor='left', x=0.01,
-            bgcolor='rgba(255,255,255,0.85)',
-            bordercolor='#ccc', borderwidth=1,
+            orientation='h',
+            yanchor='top', y=-0.22,
+            xanchor='center', x=0.5,
+            bgcolor='rgba(255,255,255,0)',
+            borderwidth=0,
         ),
-        margin=dict(t=60, b=70, l=60, r=20),
-        height=520,
-        annotations=[dict(
-            text='Hover for exact values · Click legend to show/hide · Red-outline bars = repression periods (n≥5 shown)',
-            xref='paper', yref='paper', x=0.5, y=-0.12,
-            showarrow=False, font=dict(size=10, color='#888'),
-            xanchor='center',
-        )],
+        margin=dict(t=55, b=130, l=60, r=20),
+        height=560,
     )
     _save_interactive(fig_p09, 'fig09_interactive.html')
 
