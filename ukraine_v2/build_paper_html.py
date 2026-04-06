@@ -20,7 +20,7 @@ CHARTS   = os.path.join(PROJECT, 'charts')
 INTERACTIVE_FIGS = {
     '1', '2', '3', '4', '5', '6', '7', '7b', '8', '9', '10',
     '11', '12', '13', '14', '15', '15b', '17', '18', '19', '19b',
-    '20', '21', '22', '23', '24', '25', '26',
+    '20', '21', '22', '23', '24', '25', '26', '28',
 }
 
 # Map each Figure N to its PNG filename (file number = paper figure number)
@@ -54,6 +54,9 @@ FIGURE_MAP = {
     '24':  'fig24_cox_forest_plot.png',
     '25':  'fig25_censoring_pattern.png',
     '26':  'fig26_km_censored.png',
+    '27':  'fig27_sensitivity_summary.png',
+    '28':  'fig28_deported_hr_by_age.png',
+    '28b': 'fig28b_schoenfeld_smooth.png',
 }
 
 def img_b64(filename):

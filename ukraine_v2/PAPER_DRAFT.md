@@ -485,7 +485,29 @@ In other words: without adjustment, the model is partly comparing historical-coh
 
 This reversal is itself a methodologically important result. It demonstrates that in a right-censored survival analysis where censoring is not evenly distributed across groups, a naive unadjusted comparison can actively mislead. Covariate adjustment is not merely a statistical nicety here — it is the difference between a finding and a mirage.
 
-**A note on the shape of mortality over time.** A technical check called the Schoenfeld residuals test examines whether the hazard ratio for each group stays constant across age — the Cox model's key assumption. For the deported group, this assumption is violated (p < 0.0001), and for the migrated group it is borderline (p = 0.011). In statistical terms this is a limitation; in historical terms it makes complete sense. Deported workers did not face a steady, constant elevated risk throughout their lives — they faced a catastrophic, concentrated killing event between 1937 and 1945, followed by lower mortality among survivors. A single hazard ratio cannot fully capture that shape. The HRs reported here are best understood as average excess mortality rates across the entire life course, not as descriptions of a constant steady-state risk. This limitation does not undermine the finding; it simply means the Cox model understates the severity of what deportees experienced in specific historical periods, which is if anything a conservative bias.
+**When did the killing happen? — Time-varying hazard ratios for the deported group.** A technical check called the Schoenfeld residuals test examines whether the hazard ratio for each group stays constant across age — the Cox model's key assumption. For the deported group, this assumption is violated (p < 0.0001). This is not a statistical inconvenience — it is a historical signal. It tells us that the deported group's excess mortality was not spread evenly across their lives; it was concentrated in specific years. To map *when* the excess killing happened, we fitted a separate Cox model within each 10-year age window, asking: "Among people still alive at age 30, how much more likely were deportees to die between 30 and 40 than non-migrants?" — then the same question for ages 40–50, 50–60, and so on. This approach is known as a landmark analysis.
+
+**Table A-Cox-TV — Time-Varying Hazard Ratios for Deported Workers by Age Band**
+
+| Age band | n at risk | Deported deaths | HR | 95% CI | p |
+|----------|-----------|-----------------|-----|--------|---|
+| 20–30 | 15,046 | 10 | 1.10 | [0.90, 1.34] | 0.35 |
+| 30–40 | 14,969 | 40 | 1.51 | [1.23, 1.84] | < 0.001 *** |
+| **40–50** | **14,665** | **48** | **1.89** | **[1.50, 2.38]** | **< 0.001 ***\*** |
+| 50–60 | 13,786 | 26 | 1.61 | [1.21, 2.15] | 0.001 ** |
+| 60–70 | 12,051 | 19 | 1.50 | [1.07, 2.10] | 0.018 * |
+| 70–80 | 8,546 | 11 | 1.21 | [0.80, 1.84] | 0.36 |
+| 80–90 | 4,035 | 5 | 0.95 | [0.53, 1.70] | 0.86 |
+
+*Reference = non-migrated. HR > 1 = higher mortality risk than non-migrants at that age. Each band is independent; only individuals alive at the start of each window contribute. Unadjusted (migration dummy only).*
+
+The pattern is exactly what the historical record would predict. In their twenties, deportees were barely more likely to die than non-migrants — an HR of 1.10, not statistically distinguishable from zero. Then, as they entered their thirties and forties — the ages at which most Great Terror arrests occurred and at which Gulag conditions were most lethal — the hazard ratio rose sharply, peaking at **1.89 in the 40–50 age band** (48 deported deaths in that window). This is the age cohort of workers born roughly 1890–1910, the same generation responsible for the Executed Renaissance — the writers, poets, and artists systematically liquidated in 1937–1938. Among survivors who made it to their seventies, the excess mortality risk had collapsed to near-null (HR = 1.21, p = 0.36). By their eighties, deportees who survived that far were dying at essentially the same rate as non-migrants (HR = 0.95).
+
+The single HR of 4.646 in Table A-Cox is an average across this entire arc — it captures the fact that deportees were dying at catastrophic rates at some points, but it compresses a time-varying story into one number. The landmark analysis restores the shape. What it shows is not a steady-state elevated risk but a concentrated event: the Soviet state killing Ukrainian creative workers at a specific historical moment, in their middle years, at nearly double the rate of those who were not targeted. The HRs in Table A-Cox-TV are the mortality signature of the Great Terror.
+
+**Figure 28.** Time-varying hazard ratios for the deported group across age bands (landmark Cox analysis, reference = non-migrated). Each point shows the hazard ratio for deported workers dying within that 10-year age window; error bars are 95% confidence intervals. The dashed line at HR=1.0 is the null. The peak at age 40–50 (HR=1.89) marks the Stalinist Terror killing years; the collapse toward null at ages 70+ reflects the mortality of survivors, whose risk had converged back toward the non-migrated baseline by late life.
+
+**Figure 28b.** Schoenfeld residual plot for the deported group from the full (non-banded) Cox model, showing a smoothed log hazard ratio over age. The positive slope confirms that deported workers' excess hazard was highest in middle age and declined thereafter — consistent with the landmark analysis findings above.
 
 **Figure 24.** Cox proportional hazards forest plot. Each row shows the hazard ratio for one migration group relative to non-migrants, with 95% confidence intervals as error bars. Squares = Model 1 (unadjusted); diamonds = Model 2 (adjusted). The dashed vertical line at HR=1.0 is the null — no difference from non-migrants. Points to the left of the line indicate lower mortality risk; points to the right indicate higher risk. The migrated group's shift from right of the line (unadjusted) to left (adjusted) illustrates the cohort-mixing effect described above. N=15,053.
 
@@ -643,6 +665,8 @@ All figures were generated computationally from the dataset described in §3 and
 | Fig 25 | §4.10 | Censoring pattern — % dead vs alive by migration group (V2.4, proper distribution) |
 | Fig 26 | §4.10 | KM survival curves with right-censored living individuals (N=15,053) |
 | Fig 27 | §4.11 | Sensitivity analysis summary — migrated HR across all scenarios |
+| Fig 28 | §4.10 | Time-varying HR for deported group by age band (landmark Cox) |
+| Fig 28b | §4.10 | Schoenfeld residual smoothed log-HR for deported group |
 
 ---
 
