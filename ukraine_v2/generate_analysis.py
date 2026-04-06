@@ -30,6 +30,18 @@ import numpy as np
 from scipy import stats
 from lifelines import KaplanMeierFitter
 
+def cliffs_delta(x, y):
+    """Non-parametric effect size consistent with Mann-Whitney U.
+    Returns P(X>Y) - P(Y>X). Range: -1 to +1. No distributional assumption."""
+    x, y = list(x), list(y)
+    n1, n2 = len(x), len(y)
+    if n1 == 0 or n2 == 0:
+        return float('nan')
+    greater = sum(1 for xi in x for yj in y if xi > yj)
+    less    = sum(1 for xi in x for yj in y if xi < yj)
+    return (greater - less) / (n1 * n2)
+
+
 # ---------------------------------------------------------------------------
 # PATHS
 # ---------------------------------------------------------------------------
