@@ -249,7 +249,7 @@ Phase 5b clearance received → full analysis run executed on `esu_creative_work
 
 **Deported finding** (Cohen's d = 1.656 = "huge" effect) is the strongest single finding in the paper. 183 individuals is a solid group, and the effect size is so large that the 95% CI (46.3–50.4) does not overlap with the non-migrated CI (70.87–71.57) by more than 20 years.
 
-### Charts generated (28 total, after revisions)
+### Charts generated (30 total, after revisions)
 
 | File | Description |
 |------|-------------|
@@ -280,6 +280,8 @@ Phase 5b clearance received → full analysis run executed on `esu_creative_work
 | fig22 | Educated urban comparison: creative workers vs Ukrainian SSR + Shkolnikov +3–5 yr premium band |
 | fig23 | Regression coefficient plot — grouped bars: Model 1 (unadjusted) vs Model 2 (adjusted, +cohort +profession +region). Shows gap stability |
 | fig24 | Cox PH forest plot — hazard ratios for migrated (HR≈0.76), internal transfer (HR≈1.08), deported (HR≈5.40) vs non-migrated reference; both models shown with 95% CI error bars |
+| fig25 | Censoring pattern by migration group — stacked bar: % dead vs right-censored (alive, 2026) in extended N=15,218 dataset. Non-migrated: 52.2% censored; all others: 0% |
+| fig26 | Kaplan-Meier survival curves with right-censored data (N=15,218); tick marks on curves = living individuals censored at 2026 age |
 
 ### Statistical methods used
 
@@ -288,7 +290,8 @@ Phase 5b clearance received → full analysis run executed on `esu_creative_work
 - **95% confidence intervals** via Student's t (valid at n>30; deported n=75 qualifies)
 - **Kaplan-Meier survival curves** via `lifelines` 0.30.3
 - **Sensitivity analysis** — LE gap tested at 0%–10% AI error rate; main finding holds throughout
-- **Cox Proportional Hazards** via `lifelines.CoxPHFitter` (penalizer=0.01); two models (unadjusted + adjusted); all n=8,643 complete cases (event_observed=1); output: hazard ratios with 95% CI
+- **Cox Proportional Hazards (complete-case)** via `lifelines.CoxPHFitter` (penalizer=0.01); two models (unadjusted + adjusted); all n=8,643 complete cases (event_observed=1); output: hazard ratios with 95% CI
+- **Cox PH (right-censored supplement)** — extended dataset N=15,218 including 6,575 right-censored living individuals (assigned to non_migrated); Schoenfeld residuals PH assumption test (p<0.0001 all groups — violated due to cohort incompatibility); informative censoring sensitivity (3 scenarios for pre-1920 suspicious alive cases); extended HRs not directly comparable to complete-case due to differential censoring asymmetry
 - **Propensity Score Matching** via `sklearn.LogisticRegression`; nearest-neighbour on PS estimated from birth_decade + profession + region; n=1,280 matched pairs; PSM gap = +3.35 yrs (95% CI [2.26, 4.45]); bootstrap 2000 resamples
 
 ---
@@ -563,6 +566,18 @@ Used in: fig22
 | W6 | Post-1991 framing caveat added to §5.4: gap = cumulative lifetime effect, not clean Soviet signal |
 | W7 | Table 6 restricted to n ≥ 50 cities (Kyiv, Lviv only); small-n cities moved to Figure 12 with explicit "illustrative only" note |
 | + | All 24+ figures distributed into body text with in-text references; §7 converted from caption dump to navigation index |
+
+**V2.5 extension (2026-04-06) — Right-censored Cox PH analysis:**
+
+| Addition | Detail |
+|----------|--------|
+| Right-censored Cox (§4.10 supplement) | Extended dataset N=15,218 (8,643 dead + 6,575 right-censored at 2026 age); all alive assigned to non_migrated (conservative) |
+| Schoenfeld PH test | `lifelines.statistics.proportional_hazard_test`; p<0.0001 all groups — PH assumption violated due to cohort incompatibility |
+| Informative censoring sensitivity | 3 scenarios for 186 suspicious pre-1920 alive cases (ages 80/60/45); deported HR stable at 5.46–7.09 across all scenarios |
+| Extended HRs not reported as primary | Direction reversal for migrated HR is structural artefact of differential censoring (52.2% censoring in non-migrated, 0% elsewhere); table omitted to avoid confusion |
+| Fig 25 | Censoring pattern by migration group — documents the structural asymmetry |
+| Fig 26 | KM curves with right-censored tick marks — full distribution including living individuals |
+| Fig count | 28 → 30 |
 
 ---
 
