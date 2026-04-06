@@ -1,7 +1,7 @@
 """
 generate_analysis.py — V2.1 Full Analysis & Chart Suite
 Mortality Differentials Among Ukrainian Creative Workers During Soviet Occupation
-Berdnyk & Symkin 2026
+Symkin 2026
 
 Generates:
   - analysis_v2_1.txt  (full statistical report)
@@ -53,7 +53,7 @@ CHARTS_DIR   = os.path.join(PROJECT_ROOT, 'charts')
 os.makedirs(CHARTS_DIR, exist_ok=True)
 
 SOURCE_NOTE = ("Source: Encyclopedia of Modern Ukraine (esu.com.ua), V2.3 dataset, "
-               "Berdnyk & Symkin 2026")
+               "Symkin 2026")
 
 # ---------------------------------------------------------------------------
 # UKRAINIAN SSR GENERAL POPULATION LIFE EXPECTANCY (reference baseline)
@@ -280,7 +280,7 @@ def h(text=''):   lines.append(text)
 def hr(c='=', w=80): lines.append(c * w)
 
 hr(); h("UKRAINIAN CREATIVE WORKERS V2.1 — EXTENDED STATISTICAL ANALYSIS")
-h("Berdnyk & Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)")
+h("Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)")
 hr(); h()
 
 # ── 1. DATASET OVERVIEW ──────────────────────────────────────────────────────
@@ -374,7 +374,7 @@ h()
 h("4. BIRTH COHORT ANALYSIS (decade-by-decade)")
 hr('-')
 decades = list(range(1840, 1990, 10))
-h(f"  {'Cohort':8s}  {'n all':>6}  {'M LE migr':>11}  {'n':>4}  {'M LE nonmig':>12}  {'n':>4}  {'M LE dep':>9}  {'n':>4}")
+h(f"  {'Cohort':8s}  {'n all':>6}  {'Avg age migr':>12}  {'n':>4}  {'Avg age nonmig':>14}  {'n':>4}  {'Avg age dep':>11}  {'n':>4}")
 h("  " + "-" * 75)
 for dec in decades:
     def in_decade(r): return r['_by'] and dec <= r['_by'] < dec + 10
@@ -1015,6 +1015,48 @@ save(fig, 'fig11_profession_grouped_bar.png')
 # ===========================================================================
 print("  fig12_geographic_migration_rates.png")
 
+# Ukrainian → English city name translations for fig12 labels
+CITY_EN = {
+    'Київ':                   'Kyiv',
+    'Харків':                 'Kharkiv',
+    'Одеса':                  'Odesa',
+    'Львів':                  'Lviv',
+    'Москва':                 'Moscow',
+    'Запоріжжя':              'Zaporizhzhia',
+    'Полтава':                'Poltava',
+    'Миколаїв':               'Mykolaiv',
+    'Херсон':                 'Kherson',
+    'Чернівці':               'Chernivtsi',
+    'Дніпропетровськ':        'Dnipropetrovsk',
+    'Вінниця':                'Vinnytsia',
+    'Сімферополь':            'Simferopol',
+    'Варшава':                'Warsaw',
+    'Ужгород':                'Uzhhorod',
+    'Тернопіль':              'Ternopil',
+    'Чернігів':               'Chernihiv',
+    'Житомир':                'Zhytomyr',
+    'Суми':                   'Sumy',
+    'Кременчук':              'Kremenchuk',
+    'Черкаси':                'Cherkasy',
+    'Кам\'янець-Подільський': 'Kamianets-Podilskyi',
+    'Рівне':                  'Rivne',
+    'Луцьк':                  'Lutsk',
+}
+
+def _translate_city(raw):
+    """Return 'English (Ukrainian)' label; falls back to raw[:35] if no translation."""
+    raw = str(raw).strip()
+    # Try exact match first
+    if raw in CITY_EN:
+        return f'{CITY_EN[raw]} ({raw})'
+    # Try prefix match (handles long ESU strings like "Дніпропетровськ, нині Дніпро")
+    for uk, en in CITY_EN.items():
+        if raw.startswith(uk):
+            suffix = raw[len(uk):].strip().strip(',').strip()
+            suffix_short = f'; {suffix[:20]}' if suffix else ''
+            return f'{en}{suffix_short} ({uk})'
+    return raw[:35]
+
 birth_all = collections.Counter()
 birth_mig = collections.Counter()
 for ms in ALL_GROUPS:
@@ -1026,7 +1068,7 @@ for ms in ALL_GROUPS:
                 birth_mig[bl] += 1
 
 top20 = birth_all.most_common(20)
-cities    = [loc[:35] for loc, _ in top20]
+cities    = [_translate_city(loc) for loc, _ in top20]
 total_cnt = [cnt for _, cnt in top20]
 mig_cnt   = [birth_mig.get(loc, 0) for loc, _ in top20]
 mig_pct   = [round(100 * mc / tc, 1) if tc else 0
@@ -2384,7 +2426,7 @@ if _PLOTLY_AVAIL:
                     birth_mig_p[bl] += 1
 
     top20_p    = birth_all_p.most_common(20)
-    cities_p   = [loc[:35] for loc, _ in top20_p]
+    cities_p   = [_translate_city(loc) for loc, _ in top20_p]
     total_c    = [cnt for _, cnt in top20_p]
     mig_c      = [birth_mig_p.get(loc, 0) for loc, _ in top20_p]
     mig_pct_p  = [round(100 * mc / tc, 1) if tc else 0

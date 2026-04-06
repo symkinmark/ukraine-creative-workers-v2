@@ -1,6 +1,6 @@
 ================================================================================
 UKRAINIAN CREATIVE WORKERS V2.1 — EXTENDED STATISTICAL ANALYSIS
-Berdnyk & Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)
+Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)
 ================================================================================
 
 1. DATASET OVERVIEW
@@ -63,7 +63,7 @@ Berdnyk & Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)
 
 4. BIRTH COHORT ANALYSIS (decade-by-decade)
 --------------------------------------------------------------------------------
-  Cohort     n all    M LE migr     n   M LE nonmig     n   M LE dep     n
+  Cohort     n all  Avg age migr     n  Avg age nonmig     n  Avg age dep     n
   ---------------------------------------------------------------------------
   1840s       40         68.3     6          72.5    22          —     0
   1850s      126           76    28          69.0    66         61     1
