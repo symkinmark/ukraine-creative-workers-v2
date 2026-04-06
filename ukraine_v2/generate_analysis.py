@@ -3343,8 +3343,9 @@ try:
             error_y=dict(type='data', symmetric=False,
                          array=errs_hi, arrayminus=errs_lo,
                          color='#444', thickness=2, width=6),
-            hovertemplate='%{text}<extra></extra>',
-            text=texts,
+            customdata=texts,
+            hovertemplate='%{customdata}<extra></extra>',
+            textposition='none',
         ))
 
     fig_p23.add_hline(y=0, line_dash='dash', line_color='#444', line_width=1.5)
