@@ -74,16 +74,20 @@ All data were extracted from the Encyclopedia of Modern Ukraine (Енцикло�
 
 The ESU was selected as the primary source for three reasons: (1) it is the most comprehensive Ukrainian-language biographical reference work covering the relevant time period; (2) its entries consistently include birth and death dates, biographical summaries, and sufficient information to determine migration status; and (3) it focuses specifically on individuals of cultural, intellectual, and creative significance, making it a natural population of interest for this study.
 
-### 3.2 Data Collection
+### 3.2 Reproducibility and Open Methodology
+
+The complete analytical pipeline for this study — including all data collection scripts, classification prompts, statistical analysis code, and chart generation — is version-controlled and publicly accessible via Git. This is a deliberate methodological commitment: every figure, table, and statistical claim in this paper can be reproduced in full by any researcher with access to a standard computing environment and the esu.com.ua source. The repository records the precise sequence of analytical decisions, corrections, and reclassifications made across dataset versions V2.1 through V2.3, including the specific prompt texts used for AI-assisted classification (see Section 9 and SCIENTIFIC_METHODOLOGY.md). Researchers wishing to replicate, extend, or challenge the findings of this study are encouraged to do so using the archived codebase. This approach reflects our view that computational historical research should be held to the same standards of source transparency as archival historical research — the "sources" in this case include not only the ESU entries but the algorithms and decision rules applied to them.
+
+### 3.3 Data Collection
 
 Data were collected via automated web scraping of esu.com.ua using Python scripts developed specifically for this project (see the companion SCIENTIFIC_METHODOLOGY.md for full technical details). The scraper extracted, for each entry: full name (Ukrainian and transliterated), birth year, death year, birth city, listed profession(s), and the full biographical text in Ukrainian. The raw dataset comprised 16,215 entries identified as potentially relevant Ukrainian creative workers.
 
-### 3.3 Inclusion and Exclusion Criteria
+### 3.4 Inclusion and Exclusion Criteria
 
 **Inclusion criteria.** An entry was included in the primary life expectancy analysis if it met all of the following conditions:
 
-1. The individual was confirmed as Ukrainian (see Nationality Determination Protocol, Section 3.5).
-2. The individual's primary profession fell within our definition of "creative worker" (see Section 3.4).
+1. The individual was confirmed as Ukrainian (see Nationality Determination Protocol, Section 3.6).
+2. The individual's primary profession fell within our definition of "creative worker" (see Section 3.5).
 3. The entry contained a confirmed birth year.
 4. The entry contained a confirmed death year.
 5. The individual's migration status could be determined with reasonable confidence.
@@ -97,10 +101,10 @@ Of the 16,215 entries initially collected, 8,643 met all five criteria and form 
 - Individuals whose nationality could not be determined: excluded rather than misclassified.
 - Non-Ukrainian individuals: 1,218 entries in the ESU referred to foreign artists or intellectuals with no substantive Ukrainian connection and were excluded.
 - Individuals whose migration status was ambiguous and could not be resolved: excluded rather than assigned to a group incorrectly.
-- ⚠ **[V2.1 correction]** Individuals with `death_year < 1921`: excluded as pre-Soviet deaths. The Ukrainian SSR was not consolidated until 1920–1922; individuals who died before 1921 were never subject to Soviet conditions and cannot meaningfully be included in a study of Soviet-era mortality.
-- ⚠ **[V2.1 correction]** Galician-born individuals with `death_year < 1939`: excluded because Galicia (Lviv, Ternopil, Ivano-Frankivsk regions) was not part of the Soviet Union until the 1939 annexation of Western Ukraine from Poland. Galician workers who died before 1939 were never under Soviet rule. Those alive after 1939 are included.
+- Individuals whose death year preceded 1921: excluded on the grounds that the Ukrainian SSR was not consolidated until 1920–1922, and individuals who died before that threshold were never subject to Soviet conditions. Their inclusion would conflate pre-Soviet and Soviet-era mortality within the non-migrated group.
+- Galician-born individuals whose death year preceded 1939: excluded because the Galician regions (Lviv, Ternopil, and Ivano-Frankivsk oblasts) remained under Polish administration until the Soviet annexation of Western Ukraine following the Molotov-Ribbentrop Pact of 1939. Creative workers from these regions who died before 1939 were never under Soviet rule and are therefore analytically incommensurable with the core dataset population. Galician-born individuals who survived beyond 1939 are included in the dataset under the standard classification criteria.
 
-### 3.4 Creative Worker Definition
+### 3.5 Creative Worker Definition
 
 The following Ukrainian-language profession keywords were used to filter entries for inclusion as "creative workers." This list was developed iteratively against the ESU's own profession taxonomy:
 
@@ -110,9 +114,9 @@ The following Ukrainian-language profession keywords were used to filter entries
 
 Where individuals held multiple professions (e.g., a writer who was also a journalist), they were included if any of their listed professions appeared on the primary inclusion list. They were assigned to a single profession category for analytical purposes using the profession listed first or most prominently in their ESU entry.
 
-### 3.5 Nationality Determination Protocol
+### 3.6 Nationality Determination Protocol
 
-#### 3.5.1 Definition of Ukrainian
+#### 3.6.1 Definition of Ukrainian
 
 This study applies a **cultural participation definition of Ukrainian identity**, not an ethnic or linguistic one. A person is counted as Ukrainian if they meet any of the following criteria: they were born or raised on territory that is now Ukraine and made a creative contribution that forms part of the Ukrainian cultural record; they contributed substantially to Ukrainian cultural life regardless of ethnic background; they self-identified as Ukrainian or were recognised as part of the Ukrainian creative community by their contemporaries; or they were subject to Soviet persecution specifically in the context of suppressing Ukrainian cultural identity.
 
@@ -127,13 +131,13 @@ The definition also excludes figures who merely appear in the ESU as foreign ref
 
 The full nationality determination protocol, including verbatim AI prompts and stress-test case decisions, is reproduced in SCIENTIFIC_METHODOLOGY.md (Section 6).
 
-#### 3.5.2 Classification Procedure
+#### 3.6.2 Classification Procedure
 
 Determining Ukrainian identity in practice proved less straightforward than applying the definition above, because Soviet administrative records frequently imposed or obscured national identities, and ESU biographical texts reflect the political constraints of the periods in which they were written. We developed a three-tier classification system.
 
 **Tier 1: Clean inclusion.** Entries explicitly described as Ukrainian (Українець/Українка) with no ambiguity markers were included directly without further review.
 
-**Tier 2: Claude AI review.** Entries containing markers suggesting possible nationality ambiguity — Jewish heritage, Polish origin, German or Austrian origin, descriptions as "Soviet" without an underlying national identity, or birth entirely outside Ukraine — were flagged for individual review by Claude (Anthropic, claude-haiku-4-5). Claude was presented with the full ESU biographical text in Ukrainian and asked to classify the individual against the Section 3.5.1 criteria. A total of 1,356 entries underwent this review.
+**Tier 2: Claude AI review.** Entries containing markers suggesting possible nationality ambiguity — Jewish heritage, Polish origin, German or Austrian origin, descriptions as "Soviet" without an underlying national identity, or birth entirely outside Ukraine — were flagged for individual review by Claude (Anthropic, claude-haiku-4-5). Claude was presented with the full ESU biographical text in Ukrainian and asked to classify the individual against the Section 3.6.1 criteria. A total of 1,356 entries underwent this review.
 
 Of the 1,356 reviewed:
 - 137 were confirmed as Ukrainian and included.
@@ -144,11 +148,9 @@ Of the 1,356 reviewed:
 
 The verbatim prompt used for Tier 2 review and the full list of Tier 3 auto-exclusion markers are reproduced in SCIENTIFIC_METHODOLOGY.md (Sections 6.4 and 6.5).
 
-### 3.6 Migration Classification
+### 3.7 Migration Classification
 
-⚠ **[V2.1 revision — 2026-04-03]:** The original two-group classification (migrant / non-migrant) was replaced with a four-group system following Phase 5 human review. The original system incorrectly conflated voluntary internal Soviet transfers and state-imposed deportations with non-migration. The corrected system is described below. All figures in Section 4 will be updated after the classification rerun.
-
-Migration status was classified into four categories:
+Migration status was classified into four categories. The original V1 classification used a two-group system (migrated / non-migrated) that incorrectly conflated voluntary internal Soviet transfers and state-imposed deportations with non-migration. This study adopts a four-group system that distinguishes these fundamentally different experiences of Soviet territorial control:
 
 **Migrated (left Soviet sphere):** The individual emigrated from Soviet-controlled territory and settled in a non-Soviet country — Western Europe, North America, South America, or non-Soviet Asia — for a substantial portion of their adult life. Movement to Soviet Russia or another Soviet republic does not qualify. The critical criterion is exit from the Soviet sphere entirely.
 
@@ -160,7 +162,7 @@ Migration status was classified into four categories:
 
 The ESU biographical texts consistently contain sufficient information to make this determination. Where the text was ambiguous, Claude was used to review the full Ukrainian-language text and classify migration status according to the above rules, with explicit instruction to prioritise DEPORTED classification whenever any evidence of forced displacement exists. The full revised classification prompt is reproduced verbatim in SCIENTIFIC_METHODOLOGY.md (Section 7.3).
 
-### 3.7 Statistical Methods
+### 3.8 Statistical Methods
 
 **Life expectancy calculation.** For each individual with both a confirmed birth year and death year, life expectancy was calculated as: death year minus birth year. This yields age at death to the nearest year. No actuarial adjustments were made; we report raw age at death as a direct and transparent measure of longevity. The terms "life expectancy" and "average age at death" are used interchangeably in this paper.
 
@@ -483,4 +485,4 @@ We believe that transparent disclosure of AI tool use is essential for the integ
 
 [^7]: E. M. Andreev, L. E. Darsky, and T. L. Kharkova, *Demographic History of Russia: 1927–1959* (Moscow: Informatika Publishers, 1998) [covers 1927–1959; documents Soviet-era demographic conditions]; France Meslé and Jacques Vallin, "Mortality in Europe: The Divergence Between East and West," *Population* (English edition) 57, no. 1 (2002): 157–197 [documents the East-West LE divergence from 1950s through 1990s, including 1970s–80s gap of approximately 3–10 years depending on country and sex].
 
-[^8]: The Mann-Whitney U test (also known as the Wilcoxon rank-sum test) is a standard non-parametric statistical test that compares the full distribution of ages at death between two groups without assuming a normal distribution — appropriate here because political executions produce a heavily skewed left tail of very young deaths. *p* < 0.001 means the result is statistically significant: there is less than a one-in-a-thousand probability that a gap of this magnitude arose by chance. Cohen's *d* is a standardised effect size measure expressing the gap in units of the pooled standard deviation; d = 0.292 falls in the small-to-medium range, meaning the difference is large enough to be observable at the level of individual lives, not merely as a population-level aggregate. Full discussion of statistical method choices is in Section 3.7.
+[^8]: The Mann-Whitney U test (also known as the Wilcoxon rank-sum test) is a standard non-parametric statistical test that compares the full distribution of ages at death between two groups without assuming a normal distribution — appropriate here because political executions produce a heavily skewed left tail of very young deaths. *p* < 0.001 means the result is statistically significant: there is less than a one-in-a-thousand probability that a gap of this magnitude arose by chance. Cohen's *d* is a standardised effect size measure expressing the gap in units of the pooled standard deviation; d = 0.292 falls in the small-to-medium range, meaning the difference is large enough to be observable at the level of individual lives, not merely as a population-level aggregate. Full discussion of statistical method choices is in Section 3.8.
