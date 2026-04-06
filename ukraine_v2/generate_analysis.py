@@ -669,24 +669,39 @@ save(fig, 'fig05_deported_age_histogram.png')
 
 
 # ===========================================================================
-# FIG 06 — VIOLIN PLOTS (4 GROUPS)
+# FIG 06 — VIOLIN PLOTS (4 GROUPS, SPLIT BY GENDER)
 # ===========================================================================
 print("  fig06_violin_plots.png")
 
+_gender_palette = {'Male': '#2980B9', 'Female': '#E74C3C'}
 df_violin = pd.DataFrame([
-    {'group': GROUP_LABELS[ms], 'le': r['_le']}
-    for ms in ALL_GROUPS for r in groups[ms] if r['_le'] is not None
+    {'group': GROUP_LABELS[ms],
+     'le':    r['_le'],
+     'gender': r.get('gender', 'unknown').capitalize()}
+    for ms in ALL_GROUPS for r in groups[ms]
+    if r['_le'] is not None and r.get('gender', 'unknown').lower() in ('male', 'female')
 ])
 
-fig, ax = plt.subplots(figsize=(12, 7))
-palette = {GROUP_LABELS[ms]: COLOUR[ms] for ms in ALL_GROUPS}
-sns.violinplot(data=df_violin, x='group', y='le', palette=palette,
-               inner='quartile', ax=ax, linewidth=1)
+_order = [GROUP_LABELS[ms] for ms in ALL_GROUPS]
+fig, ax = plt.subplots(figsize=(13, 7))
+sns.violinplot(data=df_violin, x='group', y='le', hue='gender',
+               split=True, inner='quartile', palette=_gender_palette,
+               order=_order, ax=ax, linewidth=1)
 
-apply_style(ax, 'Figure 6 — Life Expectancy Full Distribution (Violin Plots)',
+# Annotate n (male / female) below each violin pair
+for i, ms in enumerate(ALL_GROUPS):
+    nm = sum(1 for r in groups[ms]
+             if r.get('gender', '').lower() == 'male' and r['_le'] is not None)
+    nf = sum(1 for r in groups[ms]
+             if r.get('gender', '').lower() == 'female' and r['_le'] is not None)
+    ax.text(i, -6, f"M:{nm}\nF:{nf}", ha='center', va='top',
+            fontsize=7, color=COLOUR['navy'])
+
+apply_style(ax, 'Figure 6 — Life Expectancy Distribution by Group and Gender (Split Violin)',
             xlabel='', ylabel='Life Expectancy (years)')
-ax.set_xticklabels([GROUP_LABELS[ms] for ms in ALL_GROUPS], rotation=15, ha='right')
-ax.set_ylim(0, 110)
+ax.set_xticklabels(_order, rotation=15, ha='right')
+ax.set_ylim(-12, 110)
+ax.legend(title='Gender', fontsize=9, loc='lower right')
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 add_source(fig)
 save(fig, 'fig06_violin_plots.png')
@@ -873,6 +888,12 @@ for dec in decades_ch:
 fig, ax = plt.subplots(figsize=(13, 7))
 MARKERS10 = {'migrated': 'o', 'non_migrated': 's', 'internal_transfer': '^', 'deported': 'D'}
 
+# Fixed per-group label direction + x-nudge so labels at the same decade never collide
+_LBL_DY = {'migrated': +14, 'non_migrated': -14,
+            'internal_transfer': +7, 'deported': -7}   # points
+_LBL_DX = {'migrated': -3,  'non_migrated': +3,
+            'internal_transfer': -1, 'deported': +1}   # points
+
 for ms in ALL_GROUPS:
     vals = cohort_means[ms]
     xs   = [dec for dec, v in zip(valid_decs, vals) if v is not None]
@@ -882,12 +903,10 @@ for ms in ALL_GROUPS:
         continue
     ax.plot(xs, ys, marker=MARKERS10[ms], linestyle='-', color=COLOUR[ms],
             label=GROUP_LABELS[ms], linewidth=2, markersize=7, zorder=5)
-    # Numeric label on every dot — alternate above/below to reduce overlap
-    for j, (x_pt, y_pt, n_pt) in enumerate(zip(xs, ys, ns)):
-        offset_y = 1.5 if j % 2 == 0 else -3.0
+    for x_pt, y_pt, n_pt in zip(xs, ys, ns):
         ax.annotate(f"{y_pt:.0f}", xy=(x_pt, y_pt),
-                    xytext=(0, offset_y * 4), textcoords='offset points',
-                    ha='center', fontsize=7, color=COLOUR[ms], fontweight='bold')
+                    xytext=(_LBL_DX[ms], _LBL_DY[ms]), textcoords='offset points',
+                    ha='center', fontsize=6.5, color=COLOUR[ms], fontweight='bold')
 
 # Shade the Terror/Holodomor birth cohorts
 ax.axvspan(1890, 1910, alpha=0.06, color='#8B0000', zorder=0)
