@@ -112,6 +112,33 @@ Of the 16,215 entries initially collected, 8,643 met all five criteria and form 
 - Individuals whose death year preceded 1921: excluded on the grounds that the Ukrainian SSR was not consolidated until 1920–1922, and individuals who died before that threshold were never subject to Soviet conditions. Their inclusion would conflate pre-Soviet and Soviet-era mortality within the non-migrated group.
 - Galician-born individuals whose death year preceded 1939: excluded because the Galician regions (Lviv, Ternopil, and Ivano-Frankivsk oblasts) remained under Polish administration until the Soviet annexation of Western Ukraine following the Molotov-Ribbentrop Pact of 1939. Creative workers from these regions who died before 1939 were never under Soviet rule and are therefore analytically incommensurable with the core dataset population. Galician-born individuals who survived beyond 1939 are included in the dataset under the standard classification criteria.
 
+### 3.4.1 Sample Construction and Missing Data
+
+Of the 16,215 entries initially extracted from the ESU, 8,643 (53.3%) met all inclusion criteria and form the primary analytical dataset. The remaining 7,572 entries (46.7%) were excluded. Table A presents the exclusion flow.
+
+**Table B — Sample Construction: Exclusion Flow**
+
+| Stage | n excluded | Reason | % of total scraped |
+|---|---|---|---|
+| Living individuals (no death year) | 6,680 | Cannot compute age at death | 41.2% |
+| Died before Soviet period (<1921) | 371 | Never subject to Soviet conditions | 2.3% |
+| Missing birth or death year | 246 | Insufficient data for age calculation | 1.5% |
+| Migration status unclassifiable | 119 | Cannot assign to a comparison group | 0.7% |
+| Galician-born, died before 1939 | 89 | Outside Soviet jurisdiction at time of death | 0.5% |
+| **Analysable (retained)** | **8,643** | | **53.3%** |
+
+*Note: Non-Ukrainian entries (n=1,218) identified during nationality review are excluded upstream and not reflected in this flow. Counts above reflect the Ukrainian creative worker pool after nationality filtering.*
+
+**Potential selection biases arising from exclusions.**
+
+The largest excluded group — individuals with no recorded death year (n=6,680) — consists primarily of living individuals or cases where death records have not yet been incorporated into the ESU. If the probability of having a death year recorded in the ESU correlates with migration status or group membership, this exclusion could introduce bias. In particular, if workers who died under Soviet repression had their records suppressed or destroyed — making them less likely to have a documented death year — then the included dataset may underrepresent the most severely affected individuals, causing the mortality differential to be *underestimated* rather than overestimated. We cannot directly test this hypothesis with the available data.
+
+The 246 cases excluded for missing birth or death year represent a similarly uncertain group. If the ESU is systematically less likely to record full biographical details for individuals who died young, in obscure circumstances, or as victims of state violence — all of which correlate with repression — then the included dataset is positively selected for those with complete records, who may on average have lived longer. Again, this bias would operate in the direction of underestimating the mortality differential.
+
+The 119 cases excluded for unclassifiable migration status are the most directly problematic for group comparisons: if individuals whose movement histories were suppressed in Soviet-era records (e.g., internal deportees or those who fled under false identities) are disproportionately represented in this group, their exclusion distorts the relative sizes of the migrated, non-migrated, and deported categories. The directional effect on the mean age at death gap is unknown.
+
+Taken together, these exclusion mechanisms suggest that the estimates reported here should be treated as conservative with respect to the magnitude of the mortality differential: the biases most plausibly operate in the direction of *reducing* the observed gap rather than inflating it.
+
 ### 3.5 Creative Worker Definition
 
 The following Ukrainian-language profession keywords were used to filter entries for inclusion as "creative workers." This list was developed iteratively against the ESU's own profession taxonomy:
