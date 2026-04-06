@@ -1891,8 +1891,15 @@ if _PLOTLY_AVAIL:
                 line_width=0,
                 layer='below',
             )
-    repression_x = [lbl for lbl in period_labels_clean
-                    if lbl.replace('\n', ' ') in _REPRESSION_SET or lbl in _REPRESSION_SET]
+    # Dummy trace so the shading gets a legend entry
+    fig_p09.add_trace(go.Bar(
+        name='Repression period (shaded)',
+        x=[None], y=[None],
+        marker_color='rgba(139,0,0,0.25)',
+        marker_line_color='rgba(139,0,0,0.6)',
+        marker_line_width=1,
+        showlegend=True,
+    ))
     fig_p09.update_layout(
         title=dict(
             text='Figure 9 — Mean Age at Death by Soviet Period and Migration Group',
@@ -2504,14 +2511,20 @@ if _PLOTLY_AVAIL:
             hovertemplate='Year range: <b>%{x}</b><br>Deaths: <b>%{y}</b><extra></extra>',
         ))
 
-    for year, label, col in [
-        (1933, 'Holodomor 1933', '#8E44AD'),
-        (1937, 'Great Terror 1937', '#1B2A4A'),
-        (1941, 'WWII begins 1941', '#7F8C8D'),
+    for year, label, col, y_frac in [
+        (1933, 'Holodomor 1933',    '#8E44AD', 0.97),
+        (1937, 'Great Terror 1937', '#1B2A4A', 0.84),
+        (1941, 'WWII begins 1941', '#7F8C8D', 0.71),
     ]:
-        fig_p07.add_vline(x=year, line_dash='dash', line_color=col, line_width=1.8,
-                          annotation_text=label, annotation_position='top right',
-                          annotation_font_color=col, annotation_font_size=10)
+        fig_p07.add_vline(x=year, line_dash='dash', line_color=col, line_width=1.8)
+        fig_p07.add_annotation(
+            x=year + 0.5, y=y_frac, xref='x', yref='paper',
+            text=f'<b>{label}</b>',
+            showarrow=False,
+            xanchor='left', yanchor='top',
+            font=dict(color=col, size=10, family='Georgia, serif'),
+            bgcolor='rgba(255,255,255,0.75)',
+        )
 
     fig_p07.update_layout(
         title=dict(text='Figure 7 — Death Year Distribution 1900–2024 (Migrated vs Non-Migrated)',
@@ -2594,10 +2607,9 @@ if _PLOTLY_AVAIL:
     p_label15 = f'p = {p15:.3f}' if p15 >= 0.001 else 'p < 0.001'
     fig_p15.add_annotation(
         x=0.5, y=1.06, xref='paper', yref='paper',
-        text=f'<b>Null finding: no significant difference</b>  |  Mann-Whitney {p_label15}  |  '
-             f'IT mean: {it_mean} yrs   NM mean: {nm_mean} yrs',
-        showarrow=False, font=dict(size=11, color='#27AE60'),
-        bgcolor='rgba(240,255,240,0.9)', bordercolor='#27AE60', borderwidth=1, borderpad=5,
+        text=f'Mann-Whitney {p_label15}  |  IT mean: {it_mean} yrs   NM mean: {nm_mean} yrs',
+        showarrow=False, font=dict(size=11, color='#555'),
+        bgcolor='rgba(250,250,250,0.9)', bordercolor='#ccc', borderwidth=1, borderpad=5,
     )
     fig_p15.update_layout(
         title=dict(text='Figure 15 — Internal Transfer vs Non-Migrated LE (Null Finding)',
@@ -2638,12 +2650,16 @@ if _PLOTLY_AVAIL:
         ))
     _p_label_mn = (f'p = {p_mig_nm:.4f}' if p_mig_nm >= 0.0001 else 'p < 0.0001')
     _p_label_it = (f'p = {p_it_nm:.3f}'  if p_it_nm  >= 0.001  else 'p < 0.001')
+    _it_label_sig = 'NOT significant' if p_it_nm >= 0.05 else 'significant'
     fig_p15b.add_annotation(
-        x=0.5, y=1.07, xref='paper', yref='paper',
-        text=(f'Migrated vs Non-migrated: {_p_label_mn}  |  '
-              f'Internal transfer vs Non-migrated: {_p_label_it}'),
+        x=0.5, y=1.10, xref='paper', yref='paper',
+        text=(
+            f'<b>Migrated vs Non-migrated: {_p_label_mn} — significant ✓</b>'
+            f'&nbsp;&nbsp;|&nbsp;&nbsp;'
+            f'Internal transfer vs Non-migrated: {_p_label_it} — <b>{_it_label_sig} (null finding)</b>'
+        ),
         showarrow=False, font=dict(size=10, color='#333'),
-        bgcolor='rgba(250,250,250,0.9)', bordercolor='#ccc', borderwidth=1, borderpad=5,
+        bgcolor='rgba(250,250,250,0.9)', bordercolor='#ccc', borderwidth=1, borderpad=6,
     )
     fig_p15b.update_layout(
         title=dict(text='Figure 15b — All Four Groups: Life Expectancy Distribution',
@@ -2813,9 +2829,27 @@ if _PLOTLY_AVAIL:
                 'Deaths that year: <b>%{y:.3f}%</b> of group<extra></extra>'
             ),
         ))
+    # Build n values for annotation from LINE_DATA19b
+    _n19b_parts = [f'{lbl.split("(")[0].strip()} n={len([r for g in (non_migrated+deported if ms=="non_migrated" else groups[ms]) for r in [g]] if False else (stayed_deported if ms=="non_migrated" else groups[ms])):,}'
+                   for ms, _, lbl, _, _ in LINE_DATA19b]
+    _n19b_str = (
+        f'Non-mig + Deported combined: n={len(stayed_deported):,}  |  '
+        f'Internal transfer: n={len(internal_transfer):,}  |  '
+        f'Migrated: n={len(migrated):,}  |  '
+        f'Total N = {len(stayed_deported) + len(internal_transfer) + len(migrated):,}'
+    )
+    fig_p19b.add_annotation(
+        x=0.5, y=1.06, xref='paper', yref='paper',
+        text=_n19b_str,
+        showarrow=False, font=dict(size=10, color='#555'),
+        bgcolor='rgba(250,250,250,0.92)', bordercolor='#ccc', borderwidth=1, borderpad=5,
+    )
     fig_p19b.update_layout(
-        title=dict(text='Figure 19b — Simplified Annual Death Rate (3-Line: Combined Non-Mig+Dep, IT, Migrated)',
-                   font=dict(size=15)),
+        title=dict(
+            text='Figure 19b — Annual Death Rate by Group 1921–1992<br>'
+                 '<sup>Deaths per year as % of each group — three-line simplified view</sup>',
+            font=dict(size=15),
+        ),
         xaxis_title='Year',
         yaxis_title='Deaths per Year (% of group)',
         plot_bgcolor='white', paper_bgcolor='white',
@@ -2824,8 +2858,8 @@ if _PLOTLY_AVAIL:
         xaxis=dict(gridcolor='#eee'),
         legend=dict(orientation='h', yanchor='top', y=-0.22,
                     xanchor='center', x=0.5, borderwidth=0),
-        margin=dict(t=60, b=130, l=60, r=20),
-        height=530,
+        margin=dict(t=80, b=130, l=60, r=20),
+        height=560,
     )
     _save_interactive(fig_p19b, 'fig19b_interactive.html')
 
