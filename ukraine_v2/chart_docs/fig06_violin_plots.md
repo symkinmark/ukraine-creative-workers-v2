@@ -1,21 +1,24 @@
-# Fig 06 — Violin Plots: Distribution Shape by Group
+# Fig 06 — Split Violin Plots: Distribution Shape by Group × Gender
 
 **File:** `charts/fig06_violin_plots.png`
 
 ## What this chart shows
-Violin plots — like box plots but the width of the shape shows where the data is concentrated. Fat in the middle = lots of people died at that age. The inner box shows the IQR, the dot shows the median.
+Split violin plots — each violin is divided down the middle by gender. **Blue (left half) = Male, Red (right half) = Female.** The width of each half shows where that gender's deaths are concentrated. Inner quartile lines mark the median and IQR within each half.
 
-This gives a richer view of distribution shape than box plots — you can see whether data is symmetrical, skewed, or bimodal.
+This gives a richer view of distribution shape than box plots, and now shows whether the group-level mortality patterns hold for both sexes independently.
+
+Sample counts (M: / F:) are annotated below each violin pair.
 
 ## Key finding
-- **Migrated violin:** Wide at the top (many people dying in their 70s-80s), narrow at the bottom
-- **Deported violin:** Wide in the middle (many dying in their 40s-50s), fat at the bottom relative to others
-- **Non-migrated & Internal transfer:** Similar bell-shaped distributions, slightly lower than migrated
+- **Migrated:** Both male and female halves are wide at the top (70s–80s) — the long upper tail is present in both sexes
+- **Deported:** Both halves are fat in the 40s–50s and truncated above — state violence hit male and female creative workers alike
+- **Non-migrated & Internal transfer:** Similar symmetrical distributions in both sexes, slightly lower than migrated
 
 ## What to look for
-- The widest part of each violin = where most deaths are concentrated
-- Deported violin is much fatter lower down than the others
-- Migrated violin is the tallest and fattest at high ages
+- Whether the male and female halves are similarly shaped (they broadly are — the group-level pattern is not gender-specific)
+- The female deported half is based on a small n (~30 women) — it will be wider and less smooth than the male half
+- The migrated female violin extends into the 90s — consistent with the general female longevity advantage in the diaspora
 
-## ⚠️ Y-axis bug — FIXED in V2.2 (still clean in V2.3)
-`ax.set_ylim(0, 110)` is in `generate_analysis.py`. Y-axis no longer extends below 0. V2.3 regenerated chart is clean.
+## Update history
+- **V2.3 (2026-04-06):** Chart redesigned as a **split violin by gender** (was previously a single undivided violin per group). `hue='gender'`, `split=True` in seaborn. Y-axis extended to −12 to accommodate M:/F: annotations below the x-axis.
+- **V2.2:** Y-axis bug fixed (`ax.set_ylim(0, 110)`). Now `(-12, 110)` to allow annotation space.

@@ -33,3 +33,6 @@ Fig10 is **cohort data** (grouped by birth decade). Fig09 is **period data** (gr
 ## Known issues / improvements
 - Clean after redesign (removed the Ukrainian SSR period data overlay, which was methodologically incompatible with cohort x-axis).
 - The deported line drops sharply at the right side (1960s birth decade) — this reflects very sparse data (likely 10-15 people). Worth noting in the caption.
+
+## Update history
+- **V2.3 (2026-04-06):** Fixed overlapping numeric labels. Previous code used a per-index alternating above/below offset, which caused same-decade labels from different groups to stack on top of each other. Replaced with per-group fixed directions: migrated always up-left, non_migrated always down-right, internal_transfer up, deported down. Small x-nudge per group added to further separate annotations.
