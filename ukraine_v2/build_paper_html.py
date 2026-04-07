@@ -20,7 +20,7 @@ CHARTS   = os.path.join(PROJECT, 'charts')
 INTERACTIVE_FIGS = {
     '1', '2', '3', '4', '5', '6', '7', '7b', '8', '9', '10',
     '11', '12', '13', '14', '15', '15b', '17', '18', '19', '19b',
-    '20', '21', '22', '23', '24', '25', '26', '28',
+    '20', '21', '22', '23', '24', '25', '26', '28', '28b',
 }
 
 # Map each Figure N to its PNG filename (file number = paper figure number)

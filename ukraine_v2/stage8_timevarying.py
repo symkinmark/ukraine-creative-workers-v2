@@ -32,7 +32,6 @@ warnings.filterwarnings('ignore')
 
 try:
     from lifelines import CoxPHFitter
-    from lifelines.statistics import proportional_hazard_test
 except ImportError:
     print("ERROR: lifelines not installed."); sys.exit(1)
 
@@ -253,68 +252,88 @@ def _fig28_plotly(band_results, labels, hrs, los, his, ns, ps):
     print(f"    ✓ {out}")
 
 
-def make_schoenfeld_plot(d):
+def make_fig28b_narrative(band_results):
     """
-    Plot scaled Schoenfeld residuals for mig_deported over age,
-    showing the smoothed log-HR trajectory — confirming the PH violation
-    and its historical shape (peak in middle age, collapse in old age).
-    Uses compute_residuals() directly — consistent size/DPI with other charts.
+    Figure 28b — "When were deported workers most at risk?"
+    A plain-language area chart for historian readers, not a statistics diagnostic.
+    Uses the landmark band HRs already computed — no Schoenfeld residuals.
+
+    Design:
+    - X axis: age in years (readable, no transformations)
+    - Y axis: hazard ratio (1.0 = same risk as non-migrants)
+    - Filled area between CI lower and upper bound
+    - Terror/Gulag years shaded with label
+    - Annotated peak band
+    - Every axis label in plain English
     """
-    print("\n  Generating fig28b (Schoenfeld smoothed log-HR)...", flush=True)
+    print("\n  Generating fig28b (narrative HR arc)...", flush=True)
     try:
-        d_dead = d[d['event_observed'] == 1].copy()
-        d_dead['mig_deported']          = (d_dead['migration_status'] == 'deported').astype(int)
-        d_dead['mig_migrated']          = (d_dead['migration_status'] == 'migrated').astype(int)
-        d_dead['mig_internal_transfer'] = (d_dead['migration_status'] == 'internal_transfer').astype(int)
-
-        fit_cols = ['duration', 'event_observed', 'mig_deported',
-                    'mig_migrated', 'mig_internal_transfer']
-        df_fit = d_dead[fit_cols].dropna()
-
-        cph = CoxPHFitter(penalizer=0.1)
-        cph.fit(df_fit, duration_col='duration', event_col='event_observed')
-
-        # Compute raw Schoenfeld residuals
-        resid = cph.compute_residuals(df_fit, kind='schoenfeld')
-
-        if 'mig_deported' not in resid.columns:
-            print("    fig28b: mig_deported not in residuals — skipping")
-            return
-
-        times = resid.index.get_level_values(0) if resid.index.nlevels > 1 else resid.index
-        vals  = resid['mig_deported'].values
+        labels   = [r['label']    for r in band_results]
+        midpoints = [(r['band_lo'] + r['band_hi']) / 2 for r in band_results]
+        hrs      = [r['hr']  for r in band_results]
+        los      = [r['lo']  for r in band_results]
+        his      = [r['hi']  for r in band_results]
+        ns       = [r['n_deported_events'] for r in band_results]
+        ps       = [r['p']   for r in band_results]
 
         fig, ax = plt.subplots(figsize=(14, 7))
 
-        ax.scatter(times, vals, alpha=0.25, s=14, color='#B71C1C', zorder=2,
-                   label='Schoenfeld residual (each death)')
+        # Filled CI band
+        ax.fill_between(midpoints, los, his,
+                        alpha=0.18, color='#B71C1C', label='95% confidence interval')
 
-        # LOWESS smooth
-        try:
-            from statsmodels.nonparametric.smoothers_lowess import lowess
-            sm = lowess(vals, times, frac=0.35)
-            ax.plot(sm[:, 0], sm[:, 1], color='#1a237e', linewidth=2.5, zorder=3,
-                    label='Smoothed log-HR (LOWESS, frac=0.35)')
-        except ImportError:
-            pass
+        # HR line
+        ax.plot(midpoints, hrs, color='#B71C1C', linewidth=3,
+                marker='o', markersize=10, zorder=4,
+                label='Relative mortality risk vs. non-migrated workers')
 
-        ax.axhline(0, color='black', linestyle='--', linewidth=1, alpha=0.6,
-                   label='Zero = constant HR (PH holds)')
+        # Null line
+        ax.axhline(1.0, color='#333', linestyle='--', linewidth=1.2, alpha=0.7,
+                   label='1.0 = same mortality rate as non-migrated workers')
 
-        # Shade Terror years (ages 30–55)
-        ax.axvspan(30, 55, alpha=0.07, color='#B71C1C',
-                   label='Primary Terror / Gulag exposure (ages 30–55)')
+        # Terror / Gulag shading — ages 30–55 are the prime exposure window
+        ax.axvspan(30, 55, alpha=0.09, color='#B71C1C', zorder=1)
+        ax.text(42.5, ax.get_ylim()[0] if ax.get_ylim()[0] > 0 else 0.85,
+                'Great Terror &\nGulag years\n(ages 30–55)',
+                ha='center', va='bottom', fontsize=9, color='#7f0000',
+                style='italic')
 
-        ax.set_xlabel('Age at death (years)', fontsize=12)
-        ax.set_ylabel('Scaled Schoenfeld residual\n(positive = higher HR than average at that age)', fontsize=11)
+        # Annotate each band with n deported deaths
+        for i, (x, hr, n, p) in enumerate(zip(midpoints, hrs, ns, ps)):
+            sig = '***' if p < 0.001 else ('**' if p < 0.01 else ('*' if p < 0.05 else ''))
+            ax.annotate(
+                f'n={n}{sig}',
+                xy=(x, hr), xytext=(0, 14),
+                textcoords='offset points',
+                ha='center', fontsize=9, color='#555',
+            )
+
+        # Annotate peak
+        peak_idx = hrs.index(max(hrs))
+        ax.annotate(
+            f'Peak risk: {hrs[peak_idx]:.2f}×\n(ages {labels[peak_idx]})',
+            xy=(midpoints[peak_idx], hrs[peak_idx]),
+            xytext=(12, 12), textcoords='offset points',
+            fontsize=10, color='#B71C1C', fontweight='bold',
+            arrowprops=dict(arrowstyle='->', color='#B71C1C', lw=1.5),
+        )
+
+        ax.set_xlim(15, 95)
+        ax.set_xticks(midpoints)
+        ax.set_xticklabels(labels, fontsize=11)
+        ax.set_xlabel('Age range (years)', fontsize=12)
+        ax.set_ylabel('Mortality risk relative to non-migrated workers\n'
+                      '(e.g. 1.89 = dying at 1.89× the rate at that age)',
+                      fontsize=11)
         ax.set_title(
-            'Figure 28b — Schoenfeld Residuals: Deported Group\n'
-            'Log-HR trajectory over age — upward values in middle age confirm Terror-era killing concentration\n'
-            'Schoenfeld PH test: deported p < 0.0001 (PH violated — as historically expected)',
-            fontsize=10
+            'Figure 28b — When Were Deported Ukrainian Creative Workers Most at Risk?\n'
+            'Mortality hazard by decade of life (reference = workers who stayed in Soviet Ukraine)\n'
+            '* p<0.05  ** p<0.01  *** p<0.001  |  n = deported deaths in each age window',
+            fontsize=10, pad=14
         )
         ax.legend(fontsize=9, loc='upper right')
-        ax.grid(alpha=0.3)
+        ax.grid(axis='y', alpha=0.3)
+        ax.set_ylim(bottom=0.5)
 
         plt.tight_layout()
         out = os.path.join(CHARTS_DIR, 'fig28b_schoenfeld_smooth.png')
@@ -322,8 +341,69 @@ def make_schoenfeld_plot(d):
         plt.close()
         print(f"    ✓ {out}")
 
+        # Interactive Plotly version
+        if HAS_PLOTLY:
+            _fig28b_plotly(band_results, midpoints, labels, hrs, los, his, ns, ps)
+
     except Exception as e:
         print(f"    fig28b: skipped — {e}")
+
+
+def _fig28b_plotly(band_results, midpoints, labels, hrs, los, his, ns, ps):
+    fig = go.Figure()
+
+    # CI fill
+    fig.add_trace(go.Scatter(
+        x=midpoints + midpoints[::-1],
+        y=his + los[::-1],
+        fill='toself',
+        fillcolor='rgba(179,0,0,0.15)',
+        line=dict(color='rgba(255,255,255,0)'),
+        hoverinfo='skip',
+        name='95% CI',
+    ))
+
+    # HR line
+    fig.add_trace(go.Scatter(
+        x=midpoints, y=hrs,
+        mode='lines+markers',
+        line=dict(color='#B71C1C', width=3),
+        marker=dict(size=12, color=[
+            '#D32F2F' if p < 0.05 else '#FF8A65' for p in ps
+        ]),
+        hovertemplate=[
+            f'Ages {r["label"]}<br>'
+            f'Hazard ratio: {r["hr"]:.2f}<br>'
+            f'95% CI: {r["lo"]:.2f}–{r["hi"]:.2f}<br>'
+            f'p = {r["p"]:.4f}<br>'
+            f'Deported deaths in window: {r["n_deported_events"]}<extra></extra>'
+            for r in band_results
+        ],
+        name='Mortality risk (deported vs. non-migrated)',
+    ))
+
+    fig.add_hline(y=1.0, line_dash='dash', line_color='#333',
+                  annotation_text='HR = 1.0 (same rate as non-migrants)',
+                  annotation_position='bottom right', opacity=0.7)
+
+    fig.add_vrect(x0=30, x1=55, fillcolor='#B71C1C', opacity=0.08,
+                  annotation_text='Great Terror & Gulag years',
+                  annotation_position='top left')
+
+    fig.update_xaxes(title='Age range (years)', tickvals=midpoints, ticktext=labels)
+    fig.update_yaxes(title='Mortality risk relative to non-migrated workers<br>(1.0 = same rate)',
+                     rangemode='tozero')
+    fig.update_layout(
+        title='Figure 28b — When Were Deported Ukrainian Creative Workers Most at Risk?<br>'
+              '<sup>Mortality hazard by decade of life. Reference = workers who stayed in Soviet Ukraine.</sup>',
+        template='plotly_white',
+        height=520,
+        legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
+    )
+
+    out = os.path.join(CHARTS_DIR, 'fig28b_interactive.html')
+    pio.write_html(fig, out, include_plotlyjs='cdn', full_html=True)
+    print(f"    ✓ {out}")
 
 
 
@@ -370,7 +450,7 @@ def main():
     print(f"\n✓ Written: {OUTPUT_TXT}")
 
     make_fig28(band_results)
-    make_schoenfeld_plot(d)
+    make_fig28b_narrative(band_results)
 
     print("\n" + output)
     return band_results

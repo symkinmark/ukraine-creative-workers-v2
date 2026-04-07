@@ -513,7 +513,7 @@ The single HR of 4.646 in Table A-Cox is an average across this entire arc — i
 
 **Figure 28.** Time-varying hazard ratios for the deported group across age bands (landmark Cox analysis, reference = non-migrated). Each point shows the hazard ratio for deported workers dying within that 10-year age window; error bars are 95% confidence intervals. The dashed line at HR=1.0 is the null. The peak at age 40–50 (HR=1.89) marks the Stalinist Terror killing years; the collapse toward null at ages 70+ reflects the mortality of survivors, whose risk had converged back toward the non-migrated baseline by late life.
 
-**Figure 28b.** Schoenfeld residual plot for the deported group from the full (non-banded) Cox model, showing a smoothed log hazard ratio over age. The positive slope confirms that deported workers' excess hazard was highest in middle age and declined thereafter — consistent with the landmark analysis findings above.
+**Figure 28b.** The same time-varying mortality risk shown as a continuous arc — designed to be read without statistical training. The y-axis is the hazard ratio: a value of 1.89 means deportees were dying at 1.89 times the rate of non-migrants in that age window. The shaded band marks the Great Terror and Gulag exposure years. The curve rises sharply through the thirties and forties, peaks at ages 40–50, then collapses back toward 1.0 (no excess risk) by the seventies. What the graph shows is not a steady elevated risk but a concentrated killing event: the Soviet state liquidating Ukrainian creative workers at a specific historical moment, then stopping — because it had done its work.
 
 ### 4.11 Robustness Checks
 
