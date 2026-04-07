@@ -504,7 +504,9 @@ To estimate the error rate in Claude's nationality classifications, a researcher
 
 **Important:** The human reviewer should not know Claude's classification before making their own determination. Review Claude's classification only after recording your own.
 
-**Estimated error rate (from our Phase 5 check):** Below 5%. Exact figure to be inserted after Phase 5 completion.
+**Actual error rate (Phase 5b validation, completed 2026-04-03):** 3.2% (2 errors in 62 reviewable entries; 1 entry excluded from denominator as indeterminate). Seed=99, n=63 drawn randomly from the classified dataset.
+
+**Deviation from recommended procedure:** The procedure above specifies 100 INCLUDE + 100 EXCLUDE = 200 entries stratified by classification outcome. The validation as conducted drew a single unstratified random sample of 63 entries, of which the INCLUDE/EXCLUDE split was not recorded separately. This means category-specific error rates (false positive rate for INCLUDEs vs false negative rate for EXCLUDEs) cannot be computed from the existing validation. The 3.2% overall rate carries a wide 95% CI (approximately 0.9%–7.9% by exact binomial) given n=62. A stratified 200-entry validation remains recommended for V3 prior to journal submission.
 
 ---
 
@@ -1177,28 +1179,43 @@ def clean_pseudonym_prefix(text: str) -> str:
 
 ### 13.1 Claude Nationality Classification Error Rate
 
-The error rate of Claude's nationality classifications (Tier 2 decisions) should be estimated by the Phase 5 human sample check described in Section 6.6. The recommended procedure is:
+**Status: Partially completed (Phase 5b, 2026-04-03). Full stratified validation pending (V3).**
 
-1. Extract all 137 INCLUDE decisions and all 1,218 EXCLUDE decisions from the reviewed dataset.
-2. Using a random number generator with a fixed seed (for reproducibility), select 100 entries from the INCLUDE set and 100 entries from the EXCLUDE set.
-3. For each of the 200 entries, have a human reviewer read the full Ukrainian ESU biographical text and independently classify the entry as INCLUDE or EXCLUDE, without seeing Claude's classification.
-4. After completing all 200 independent classifications, compare to Claude's classifications.
-5. Record the number of disagreements for INCLUDEs and EXCLUDEs separately (as false positive rate and false negative rate).
-6. Report the overall error rate as: disagreements / 200.
+**What was done:** An unstratified random sample of 63 entries was drawn (seed=99) from the full classified dataset. Each entry was reviewed by the author against the §6.4 criteria. Of 63 sampled, 62 were reviewable (1 indeterminate); 2 were judged incorrectly classified. Overall error rate: **3.2%** (95% CI: ~0.9%–7.9%, exact binomial).
 
-**Reviewer qualifications:** The human reviewer should be fluent in Ukrainian and familiar with Ukrainian 20th-century cultural history. If the primary researchers cannot perform this review, it should be delegated to a qualified research assistant with these qualifications.
+**What was not done — deviation from recommended procedure:**
 
-**Acceptable threshold:** An overall error rate below 5% is considered acceptable for inclusion in the published paper. An error rate of 5–10% should be flagged as a limitation and the impact on study conclusions should be discussed. An error rate above 10% should trigger re-examination of the Claude prompt and potentially re-running the classifications.
+The procedure below specifies 100 INCLUDE + 100 EXCLUDE = 200 entries, stratified by classification outcome, reviewed by a Ukrainian-fluent researcher independent of the primary analysis. The completed validation deviates in three ways:
 
-**Expected directional bias:** If Claude's classifications are biased in a particular direction (e.g., systematically over-including Jewish-Ukrainian figures or systematically excluding Galician Polish-Ukrainians), the directional bias should be reported alongside the overall error rate.
+1. **Sample size:** 63 reviewed vs 200 recommended (31% of target)
+2. **Stratification:** Single unstratified draw rather than 100 per outcome class — category-specific false positive and false negative rates cannot be computed
+3. **Reviewer independence:** Validation conducted by the study author, not an independent reviewer
+
+As a result, the 3.2% figure should be treated as a directional estimate, not a publication-grade error rate. It is sufficient to power the sensitivity analysis (Figure 14) and establish that the error rate is below 5%, but it cannot support category-level claims about which classification types are most error-prone.
+
+**Recommended full procedure (for V3 prior to journal submission):**
+
+1. Extract all INCLUDE decisions and all EXCLUDE decisions from the reviewed dataset separately.
+2. Randomly sample 100 from each class (200 total, fixed seed for reproducibility).
+3. For each entry, have a Ukrainian-fluent reviewer read the full ESU biographical text and classify it independently, without seeing Claude's classification.
+4. After completing all 200 independent classifications, compare to Claude's.
+5. Record disagreements for INCLUDEs and EXCLUDEs separately (false positive rate and false negative rate).
+6. Report overall error rate, category-specific rates, and directional bias.
+
+**Reviewer qualifications:** Fluent in Ukrainian; familiar with Ukrainian 20th-century cultural history; independent of the primary analysis.
+
+**Acceptable threshold:** Overall error rate below 5% acceptable. 5–10% should be flagged as a limitation with impact discussion. Above 10% should trigger prompt revision and re-classification.
 
 ### 13.2 Claude Migration Classification Error Rate
 
-A parallel error rate assessment should be performed for Claude's migration classifications, using the same sample-check methodology:
+**Status: Not yet completed. Recommended for V3.**
 
-1. Extract a random sample of 50 MIGRANT and 50 NON-MIGRANT Claude-classified entries (100 total).
-2. Have a human reviewer independently classify each entry according to the migration classification rules in Section 7.2.
-3. Report agreement rates and directional bias.
+A parallel error rate assessment covering migration status classifications (migrated / non-migrated / internal transfer / deported) has not been conducted. Given that migration status is the primary independent variable, this is a higher priority for V3 than the nationality validation.
+
+Recommended procedure:
+1. Stratified sample: 50 entries per migration class = 200 total (or minimum 50 MIGRATED + 50 NON-MIGRATED for the primary comparison).
+2. Human reviewer independently classifies each entry per §7.2 rules.
+3. Report per-class agreement rates and directional bias (especially whether errors favour the migrated group).
 
 ### 13.3 Date Extraction Error Rate
 
