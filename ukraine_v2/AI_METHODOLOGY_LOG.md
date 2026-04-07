@@ -931,11 +931,38 @@ Schoenfeld PH test: deported p<0.0001 (violated), migrated p=0.011 (violated), i
 | fig26 | Updated KM curves — N=15,053, all groups have tick marks |
 | fig27 | NEW sensitivity summary chart |
 
-### Stage 8 — Paper + Docs Updated
+### Stage 8 — Time-Varying Hazard Analysis (script: `stage8_timevarying.py`)
 
-- PAPER_DRAFT.md: §4.10 rewritten, §4.11 new, abstract HR references corrected
-- SCIENTIFIC_METHODOLOGY.md: §8.11–8.12 rewritten/added (v1.5)
-- HTML rebuilt and pushed to GitHub Pages
+**What was done:** Address the Schoenfeld PH violation for the deported group (p<0.0001) identified in Stage 5 by running a landmark Cox analysis — fitting a separate unadjusted Cox model within each 10-year age band (20–90). Each band model asks: among individuals still alive at the start of the window, were deportees dying faster than non-migrants during that specific decade?
+
+**Key results:**
+
+| Age band | HR | p | Interpretation |
+|----------|----|---|----------------|
+| 20–30 | 1.10 | 0.35 | No excess mortality in youth |
+| 30–40 | 1.51 | <0.001 | Killing begins — early Terror |
+| **40–50** | **1.89** | **<0.001** | **PEAK — Great Terror / Gulag** |
+| 50–60 | 1.61 | 0.001 | Elevated but declining |
+| 60–70 | 1.50 | 0.018 | Fading |
+| 70–80 | 1.21 | 0.36 | Not significant |
+| 80–90 | 0.95 | 0.86 | Null — survivors converge |
+
+**Historical interpretation:** Workers born ~1890–1910 (Executed Renaissance generation) were in their 30s–40s during the 1937–38 Great Terror — exactly the peak band. The overall HR=4.646 is a lifetime average that compresses this concentrated event into one number. The landmark analysis restores the temporal structure.
+
+**Figures generated:**
+- `fig28_deported_hr_by_age.png` / `fig28_interactive.html` — landmark HR by age band
+- `fig28b_schoenfeld_smooth.png` — Schoenfeld residual smoothed log-HR (bootstrapped lowess)
+
+**Paper updates:**
+- PAPER_DRAFT.md §4.10: "note on shape" paragraph replaced with Table A-Cox-TV + full historical interpretation
+- Fig24/25/26 captions moved to appear immediately after main Cox results (before time-varying section)
+- Fig28/28b captions placed at end of time-varying section
+- Figure map table updated
+
+**Docs updated:**
+- SCIENTIFIC_METHODOLOGY.md: §8.13 added (v1.6); version history row 2.7 added
+- AI_METHODOLOGY_LOG.md: this entry
+- HTML rebuilt (32 static + 29 interactive figures) and pushed to GitHub Pages
 
 ### Files Created/Modified in V2.4
 
@@ -954,8 +981,15 @@ Schoenfeld PH test: deported p<0.0001 (violated), migrated p=0.011 (violated), i
 | `results/sensitivity_results.json` | Created |
 | `charts/fig24–27 (png + html)` | Updated/Created |
 | `chart_docs/fig24–27.md` | Updated/Created |
-| `PAPER_DRAFT.md` | Updated |
-| `SCIENTIFIC_METHODOLOGY.md` | Updated (v1.5) |
+| `stage8_timevarying.py` | Created |
+| `results/timevarying_output.txt` | Created |
+| `charts/fig28_deported_hr_by_age.png` | Created |
+| `charts/fig28_interactive.html` | Created |
+| `charts/fig28b_schoenfeld_smooth.png` | Created |
+| `chart_docs/fig28_deported_hr_by_age.md` | Created |
+| `PAPER_DRAFT.md` | Updated (§4.10 time-varying section + fig positioning) |
+| `SCIENTIFIC_METHODOLOGY.md` | Updated (v1.6, §8.13) |
+| `AI_METHODOLOGY_LOG.md` | Updated (Stage 8 entry) |
 | `docs/index.html` | Rebuilt |
 
 *This log phase completed: 2026-04-07*

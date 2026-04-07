@@ -5,7 +5,7 @@
 **Author:** Mark Symkin
 **Study completed:** 2026
 **Data source:** Encyclopedia of Modern Ukraine (esu.com.ua)
-**This document version:** 1.5 — revised 2026-04-07 following V2.4 right-censored Cox PH rework (properly classified living cohort, §8.11–8.12)
+**This document version:** 1.6 — revised 2026-04-07 following V2.4 Stage 8: time-varying landmark Cox analysis (§8.13), fig28/28b
 
 
 ## Version History
@@ -20,6 +20,7 @@
 | 2.4 | 2026-04-06 | Peer-review batch 2 (7 major weaknesses): Cox PH (§4.10, Fig 24), PSM (+3.35 yrs matched), argument restructure (deportee leads), figures distributed into narrative, nationality circularity note, post-1991 caveat, Table 6 small-n fix |
 | 2.5 | 2026-04-06 | Right-censored Cox PH extension (§4.10 supplement): N=15,218 extended dataset, Schoenfeld PH test, informative censoring sensitivity analysis, Fig 25 (censoring pattern), Fig 26 (KM with censored data) |
 | 2.6 | 2026-04-07 | V2.4 right-censored rework: living cohort classified via AI pipeline (6,314 properly distributed); Cox N=15,053; migrated HR=0.832 adjusted; §8.11–8.12 sensitivity analyses; fig24–27 regenerated |
+| 2.7 | 2026-04-07 | Stage 8: time-varying landmark Cox by age band (§8.13); peak HR=1.89 at age 40–50; fig28/28b; §4.10 updated with Table A-Cox-TV |
 
 ---
 > **V2.4 CURRENT.** Primary dataset: `esu_creative_workers_v2_3.csv` (dead cohort) + `data/esu_extended_for_cox.csv` (extended with classified living individuals). Primary OLS analysable: **n=8,643**. Right-censored Cox: **N=15,053**. See AI_METHODOLOGY_LOG.md Phase V2.4 for full log.
@@ -831,6 +832,40 @@ AI classification validated at 3.2% error rate (V2.1 Phase 5b, n=62 review). Boo
 - `fig27_sensitivity_summary.png` / `fig27_interactive.html` — migrated HR across all 12 sensitivity scenarios + baseline
 
 **Code location:** `stage6_sensitivity.py`. Output: `results/sensitivity_output.txt`, `results/sensitivity_results.json`.
+
+### 8.13 Time-Varying Hazard Analysis — Landmark Cox by Age Band (V2.4)
+
+**Purpose:** Address the Schoenfeld PH assumption violation for the deported group (§8.11) by decomposing the single overall HR into age-band-specific HRs. Instead of treating the PH violation as a limitation, the landmark approach treats it as information: the variation in HR across age bands reveals *when* the excess killing was concentrated.
+
+**Method:** For each 10-year age band [lo, hi], only individuals alive at age `lo` contribute. Duration is truncated at `hi`; event is flagged if death occurred before `hi`. A separate unadjusted Cox PH model (migration dummies only) is fitted within each band. The deported HR from each band-model is the excess mortality rate for deportees *within that age window*, relative to non-migrated.
+
+**Script:** `stage8_timevarying.py`. Output: `results/timevarying_output.txt`.
+
+**Results — Deported group HR by age band:**
+
+| Age band | n at risk | Dep events | HR | 95% CI | p |
+|----------|-----------|------------|----|--------|---|
+| 20–30 | 15,046 | 10 | 1.10 | [0.90, 1.34] | 0.35 |
+| 30–40 | 14,969 | 40 | 1.51 | [1.23, 1.84] | <0.001 |
+| **40–50** | **14,665** | **48** | **1.89** | **[1.50, 2.38]** | **<0.001** |
+| 50–60 | 13,786 | 26 | 1.61 | [1.21, 2.15] | 0.001 |
+| 60–70 | 12,051 | 19 | 1.50 | [1.07, 2.10] | 0.018 |
+| 70–80 | 8,546 | 11 | 1.21 | [0.80, 1.84] | 0.36 |
+| 80–90 | 4,035 | 5 | 0.95 | [0.53, 1.70] | 0.86 |
+
+**Key summary:** Peak HR 1.89 at age 40–50; collapses to near-null (HR=0.95) by age 80–90. Workers born ~1890–1910 (Executed Renaissance generation) were in their 30s–40s during the 1937–38 Terror — exactly the peak band.
+
+**Interpretation:** The single HR=4.646 in §8.11 is a lifetime average compressing a concentrated event. The landmark analysis shows the actual temporal structure: Soviet state killing was concentrated in a specific historical window (Terror + Gulag years), not a steady-state risk. Survivors who cleared that window converged back to baseline mortality by their 70s.
+
+**Also generated:** Schoenfeld residual smoothed log-HR plot (fig28b), bootstrapped lowess confidence envelope. Confirms non-constant log-HR across age (positive slope in middle age, decline toward zero in old age).
+
+**Figures generated:**
+- `fig28_deported_hr_by_age.png` / `fig28_interactive.html` — landmark Cox HR by age band, deported group
+- `fig28b_schoenfeld_smooth.png` — Schoenfeld residual smoothed log-HR, deported group
+
+**Version note:** Added in V2.4, 2026-04-07. Directly addresses the Schoenfeld PH violation flagged in §8.11.
+
+**Code location:** `stage8_timevarying.py`. Output: `results/timevarying_output.txt`.
 
 ---
 
