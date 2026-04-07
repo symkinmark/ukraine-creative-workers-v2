@@ -5,7 +5,7 @@
 **Author:** Mark Symkin
 **Study completed:** 2026
 **Data source:** Encyclopedia of Modern Ukraine (esu.com.ua)
-**This document version:** 1.7 — revised 2026-04-07 following V2.5 Stage 9: emigration wave disaggregation (§8.14), Stage 10: missing figures bias bounding (§8.15), fig29/fig30
+**This document version:** 1.8 — revised 2026-04-07 following Stage 9 retraction: wave disaggregation findings withdrawn after manual review confirmed classifier recovered death/birth year rather than departure year (§8.14); §8.14 updated to document failure mode and V3 fix; Stage 10 missing figures bias bounding retained (§8.15)
 
 
 ## Version History
@@ -21,8 +21,9 @@
 | 2.5 | 2026-04-06 | Right-censored Cox PH extension (§4.10 supplement): N=15,218 extended dataset, Schoenfeld PH test, informative censoring sensitivity analysis, Fig 25 (censoring pattern), Fig 26 (KM with censored data) |
 | 2.6 | 2026-04-07 | V2.4 right-censored rework: living cohort classified via AI pipeline (6,314 properly distributed); Cox N=15,053; migrated HR=0.832 adjusted; §8.11–8.12 sensitivity analyses; fig24–27 regenerated |
 | 2.7 | 2026-04-07 | Stage 8: time-varying landmark Cox by age band (§8.13); peak HR=1.89 at age 40–50; fig28/28b; §4.10 updated with Table A-Cox-TV |
-| 2.8 | 2026-04-07 | Stage 9: emigration wave disaggregation (§8.14); 1,313 migrants classified into 3 waves; WAVE3 gap=+4.44y largest (structural argument vs self-selection); fig29 KM by wave |
+| 2.8 | 2026-04-07 | Stage 9: emigration wave disaggregation attempted (§8.14); classifier built and run; manual review of 50-entry sample confirmed death year / birth year recovery rather than departure year; findings retracted; §5.1 replaced with methodology limitation; defined as V3 deliverable |
 | 2.9 | 2026-04-07 | Stage 10: missing figures bias bounding (§8.15); 7 confirmed absent repressed non-migrants documented; sensitivity table shows 4.04y gap is conservative lower bound; fig30 |
+| 2.10 | 2026-04-07 | Doc version 1.8: §8.14 rewritten to document Stage 9 failure mode and retraction; SCIENTIFIC_METHODOLOGY and AI_METHODOLOGY_LOG updated to reflect that wave figures are not reported findings |
 
 ---
 > **V2.5 CURRENT.** Primary dataset: `esu_creative_workers_v2_3.csv` (dead cohort) + `data/esu_extended_for_cox.csv` (extended with classified living individuals). Primary OLS analysable: **n=8,643**. Right-censored Cox: **N=15,053**. See AI_METHODOLOGY_LOG.md Phase V2.4 for full log.
@@ -1293,42 +1294,42 @@ A replicating researcher who has successfully reproduced the dataset and analysi
 
 ---
 
-### 8.14 Emigration Wave Disaggregation (V2.5)
+### 8.14 Emigration Wave Disaggregation (V2.5) — RETRACTED
 
 **Purpose:** Test the self-selection critique structurally by disaggregating all 1,313 migrant entries into historically distinct emigration waves, each defined by a different selection mechanism.
 
-**Script:** `stage9_wave_disaggregation.py`
+**Script:** `stage9_wave_disaggregation.py` (retained; not re-run)
 
-**Method:** Rule-based classification from `migration_reasoning` column (English biographical reasoning text, 78.5% year coverage) with fallback to `notes` column (original Ukrainian ESU text, 100% filled). No LLM required. Year extraction via regex `\b1[89]\d\d\b`; wave assignment by priority hierarchy: WAVE1 > WAVE2 > WAVE3 > WAVE4 > UNKNOWN.
+**Method attempted:** Rule-based year extraction (regex `\b1[89]\d\d\b`) from `migration_reasoning` (English biographical reasoning text) with keyword fallback (`"civil war"`, `"UNR"`, `"WWII"`, `"DP camp"`, `"Cold War"`, `"defect"`). Priority hierarchy: WAVE1 (pre-1922) > WAVE2 (1939–45) > WAVE3 (1946–91) > WAVE4 (post-1992) > UNKNOWN.
 
-**Wave boundaries:**
+**Why the results were retracted:**
 
-| Wave | Period | Selection mechanism |
-|------|--------|-------------------|
-| WAVE1 | Before 1922 | UNR/Civil War flight; pre-revolutionary elite |
-| WAVE2 | 1939–1945 | WWII displacement; DP camps; German retreat |
-| WAVE3 | 1946–1991 | Cold War defectors; DP survivors resettled; dissidents |
-| WAVE4 | 1992–present | Post-Soviet emigration — excluded from gap analysis |
-| UNKNOWN | — | Insufficient text; retained in aggregate, excluded from wave breakdown |
+The `migration_reasoning` column was generated in Stage 4 to answer the question *"did this person migrate?"* — not *"when did this person emigrate?"*. The typical text reads: *"died in New York in 1972, indicating long-term settlement outside the Soviet sphere."* The year 1972 is the death year used as evidence of migration status, not a departure year. The Stage 9 classifier extracted this death year and assigned WAVE3 (1946–91) to someone who may have left Ukraine in 1944.
 
-**Results:**
+Three specific failure modes were confirmed by manual review of a 50-entry random sample:
 
-| Wave | n | Mean age at death | 95% CI | Gap vs non-mig | p (MW) | Cohen's d |
-|------|---|-------------------|--------|----------------|--------|-----------|
-| Non-migrated | 6,030 | 71.22 | 70.87–71.57 | — | — | — |
-| WAVE1 | 212 | 73.62 | 71.23–75.76 | +2.41 | 0.0002 | 0.158 |
-| WAVE2 | 203 | 70.34 | 68.27–72.49 | −0.88 | 0.63 | −0.060 |
-| WAVE3 | 632 | 75.66 | 74.77–76.53 | +4.44 | <0.001 | 0.349 |
-| WAVE4 (excl) | 172 | 86.62 | 85.38–87.86 | — | — | — |
-| UNKNOWN | 66 | 62.97 | 60.27–65.71 | — | — | — |
+1. **Death year as migration year (WAVE3/WAVE4 contamination):** The dominant year in `migration_reasoning` is almost always the death year. Individuals who emigrated during WWII but died in 1968 or 1998 are misassigned to WAVE3 or WAVE4 respectively.
 
-**OLS adjusted gaps** (controlling for birth_decade, profession): WAVE3 = +4.54 years (p<0.001); WAVE1 and WAVE2 not significant after adjustment.
+2. **Birth year as migration year (WAVE1 contamination):** The WAVE1 trigger set {1917, 1918, 1919, 1920, 1921} overlaps with birth years common in this cohort. Individuals born in 1920 and dying in Philadelphia in 1999 — with `migration_reasoning` explicitly describing "post-Soviet emigration" — were classified as WAVE1 because their birth year triggered the classifier before any emigration signal appeared.
 
-**Interpretation:** The wave with the longest Soviet exposure (WAVE3) shows the largest gap; the most privileged wave (WAVE1) shows the smallest. This cross-wave pattern is inconsistent with a simple positive-selection explanation. WAVE2's null result (DP camp hardship partially cancelled survival advantage) is an honest finding reported as such.
+3. **Non-emigration events misread as departure signals:** Career milestones, award dates, publication years, and historical reference years all appear in biographical text and were treated as potential emigration years.
 
-**Classification rate:** 1,247/1,313 classified (95.0%); 66 UNKNOWN (5.0%).
+**Computed statistics (not reported — presented here for methodological record only):**
 
-**Output files:** `wave_assignments.csv`, `wave_stats.txt`, `charts/fig29_wave_km.png`, `charts/fig29_interactive.html`
+| Wave | n assigned | Mean age at death | Gap vs non-mig | p (MW) |
+|------|------------|-------------------|----------------|--------|
+| WAVE1 | 212 | 73.62 | +2.41 | 0.0002 |
+| WAVE2 | 203 | 70.34 | −0.88 | 0.63 |
+| WAVE3 | 632 | 75.66 | +4.44 | <0.001 |
+| WAVE4 (excl.) | 172 | 86.62 | — | — |
+
+These figures are not cited in the paper. The superficially plausible pattern (WAVE3 largest gap, WAVE2 null) cannot be distinguished from an artefact of the classifier preferentially assigning later-born or longer-lived individuals to later waves.
+
+**Root cause — data not collected in Stage 4:** Departure-specific language was not extracted. Ukrainian emigration verbs (`"виїхав у"`, `"емігрував до"`, `"залишив Україну"`) and English equivalents (`"fled in [year]"`, `"emigrated to [country] in [year]"`) would need to be extracted in a dedicated pipeline pass over the original Ukrainian ESU article text. This was not done.
+
+**Decision:** Findings retracted. Paper §5.1 wave analysis replaced with a methodology limitation note. Wave disaggregation is defined as a V3 data collection priority.
+
+**Output files retained for reference:** `wave_assignments.csv`, `wave_stats.txt`, `charts/fig29_wave_km.png`, `charts/fig29b_wave_volume.png`, `charts/fig29c_wave_lifespan.png`
 
 ---
 

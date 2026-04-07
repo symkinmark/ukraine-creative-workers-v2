@@ -996,39 +996,43 @@ Schoenfeld PH test: deported p<0.0001 (violated), migrated p=0.011 (violated), i
 
 ---
 
-## Stage 9 — Emigration Wave Disaggregation (V2.5)
+## Stage 9 — Emigration Wave Disaggregation (V2.5) — RETRACTED
 
 **Purpose:** Test the self-selection critique structurally by disaggregating the 1,313 migrant entries into three historically distinct emigration waves, each defined by a different selection mechanism.
 
-**Method:** Rule-based classification from `migration_reasoning` (English biographical text, 78.5% year coverage) and `notes` (Ukrainian ESU text, 100% filled). No LLM required. Priority hierarchy: WAVE1 (pre-1922) > WAVE2 (1939–45) > WAVE3 (1946–91) > WAVE4 (post-1992 excluded) > UNKNOWN.
+**Method attempted:** Rule-based year extraction (regex `\b1[89]\d\d\b`) from `migration_reasoning` (English biographical text) with keyword fallback. Priority hierarchy: WAVE1 (pre-1922) > WAVE2 (1939–45) > WAVE3 (1946–91) > WAVE4 (post-1992 excluded) > UNKNOWN.
 
-**Wave distribution (n=1,313):**
-- WAVE1 (UNR/Civil War flight): 214 (16.3%)
-- WAVE2 (WWII displacement): 210 (16.0%)
-- WAVE3 (Cold War emigration): 651 (49.6%)
-- WAVE4 (post-Soviet, excluded): 172 (13.1%)
-- UNKNOWN: 66 (5.0%)
+**Initial results computed (not reported):**
+- WAVE1 gap: +2.41 years, WAVE2: −0.88 years (p=0.63), WAVE3: +4.44 years (p<0.001)
+- Adjusted OLS: WAVE3 = +4.54 years (p<0.001); WAVE1 and WAVE2 not significant
 
-**Key results:**
-- Wave 1 gap: +2.41 years vs non-migrant (p=0.0002, d=0.158)
-- Wave 2 gap: −0.88 years (p=0.63, not significant) — DP camp hardship partially cancelled survival advantage
-- Wave 3 gap: +4.44 years (p<0.001, d=0.349) — largest gap for workers with longest Soviet exposure
-- Adjusted OLS: Wave 3 coef = +4.54 years (p<0.001); Waves 1 and 2 not significant after adjustment
-- Pattern inconsistent with simple positive-selection story: the most privileged sub-group (Wave 1) shows the *smallest* gap
+**Critical flaw identified — findings retracted:**
 
-**Interpretation:** Wave 3 workers lived their careers under Soviet conditions and only managed to leave during the Cold War. Their significant survival advantage, combined with Wave 2's null result despite emigration hardship, argues structurally against the self-selection critique.
+Manual review of a 50-entry random sample from `wave_assignments.csv` confirmed that the classifier was systematically recovering **death year** and **birth year** rather than emigration year. The `migration_reasoning` column was written by Stage 4 Claude to establish migration *status* (i.e., "died in New York in 1972 = settled outside Ukraine"), not to record departure *timing*. The death year is therefore the most prominent year in the text — and is what the regex extracted.
 
-### Files Created in V2.5 — Stage 9
+Specific failure modes identified:
+- **WAVE4 contamination:** Individuals who emigrated in 1944 or 1955 but died after 1992 were classified as WAVE4 because their death year (e.g., 1994, 2001) triggered the post-1992 threshold.
+- **WAVE1 contamination:** Individuals born in 1917–1921 and dying in the USA in the 1980s–2000s were classified as WAVE1 because their birth year fell in the WAVE1 trigger set {1917–1921}, despite the biographical text explicitly describing them as post-WWII or Cold War emigrants.
+- **WAVE3 inflation:** The majority of WAVE3 entries appear to be classified on the basis of a death year falling in 1946–1991, not any evidence of departure timing.
+
+The analytical pipeline and output files are retained in the repository for reference. The wave statistics and figures (fig29, fig29b, fig29c) are **not reported as findings** in the paper.
+
+**Root cause:** Stage 4 did not capture emigration year as a field. Departure-specific language (`"виїхав у"`, `"емігрував до"`, `"fled in [year]"`) was not extracted. Any reliable wave disaggregation requires a targeted re-pass over the original Ukrainian ESU article text.
+
+**Decision (2026-04-07):** Findings retracted. §5.1 wave analysis replaced with methodology limitation note. Defined as a V3 data collection deliverable.
+
+### Files Created in V2.5 — Stage 9 (retained for V3 reference)
 
 | File | Action |
 |------|--------|
-| `stage9_wave_disaggregation.py` | Created |
-| `wave_assignments.csv` | Created (1,313 rows) |
-| `wave_stats.txt` | Created |
-| `charts/fig29_wave_km.png` | Created (2778×1376, dpi=200) |
-| `charts/fig29_interactive.html` | Created |
-| `chart_docs/fig29_wave_km.md` | Created |
-| `PAPER_DRAFT.md` | Updated (§5.1 wave table + structural argument) |
+| `stage9_wave_disaggregation.py` | Created — retained, not re-run |
+| `stage9c_wave_lifespan_chart.py` | Created — retained, not re-run |
+| `wave_assignments.csv` | Created (1,313 rows) — classifications unreliable |
+| `wave_stats.txt` | Created — statistics not reported |
+| `charts/fig29_wave_km.png` | Created — not reported as finding |
+| `charts/fig29b_wave_volume.png` | Created — not reported as finding |
+| `charts/fig29c_wave_lifespan.png` | Created — not reported as finding |
+| `PAPER_DRAFT.md` | Updated — §5.1 wave analysis replaced with limitation note |
 
 ---
 
