@@ -357,21 +357,7 @@ try:
             n_wave = len(ages)
         ax.axvline(med, color=color, linestyle=':', linewidth=1.2, alpha=0.6)
 
-    # Wave period highlight bands (along top edge of plot)
-    ax.axhspan(0.995, 1.02, xmin=0/100, xmax=22/100,
-               color=WAVE_COLORS['WAVE1'], alpha=0.18, zorder=0)
-    ax.axhspan(0.995, 1.02, xmin=39/100, xmax=45/100,
-               color=WAVE_COLORS['WAVE2'], alpha=0.18, zorder=0)
-    ax.axhspan(0.995, 1.02, xmin=45/100, xmax=91/100,
-               color=WAVE_COLORS['WAVE3'], alpha=0.18, zorder=0)
-    ax.text(11, 1.008, 'W1', ha='center', va='center', fontsize=8,
-            color=WAVE_COLORS['WAVE1'], fontweight='bold')
-    ax.text(42, 1.008, 'W2', ha='center', va='center', fontsize=8,
-            color=WAVE_COLORS['WAVE2'], fontweight='bold')
-    ax.text(68, 1.008, 'W3', ha='center', va='center', fontsize=8,
-            color=WAVE_COLORS['WAVE3'], fontweight='bold')
-
-    # Legend below the plot
+    # Legend below the plot — does not overlap curves
     ax.legend(fontsize=10, loc='upper center', bbox_to_anchor=(0.5, -0.12),
               ncol=2, frameon=True, framealpha=0.9)
 
@@ -387,16 +373,6 @@ try:
         import plotly.graph_objects as go
 
         fig_p = go.Figure()
-
-        # Wave period highlight bands (vertical shading on age axis)
-        # These represent the birth-cohort ages during each emigration window,
-        # approximated as: W1 emigrants born ~1870-1900 (age 17-52 in 1917-22),
-        # shown as a top-edge colour bar via shape annotations.
-        wave_bands = [
-            dict(type='rect', xref='paper', yref='y',
-                 x0=0, x1=1, y0=1.01, y1=1.03,
-                 fillcolor='rgba(0,0,0,0)', line_width=0),
-        ]
 
         # Non-migrant
         kmf_nm2 = KaplanMeierFitter()
@@ -451,24 +427,6 @@ try:
                 ),
             ))
 
-        # Coloured wave-period annotation bar at top of plot
-        for wave, x0, x1, label_x, label_txt in [
-            ('WAVE1',  0,  22, 11,  'Wave 1\n<1922'),
-            ('WAVE2', 39,  45, 42,  'Wave 2\n1939–45'),
-            ('WAVE3', 45,  91, 68,  'Wave 3\n1946–91'),
-        ]:
-            fig_p.add_shape(type='rect',
-                x0=x0, x1=x1, y0=1.015, y1=1.035,
-                xref='x', yref='y',
-                fillcolor=WAVE_COLORS[wave], opacity=0.25,
-                line_width=0)
-            fig_p.add_annotation(
-                x=label_x, y=1.025, xref='x', yref='y',
-                text=label_txt, showarrow=False,
-                font=dict(size=9, color=WAVE_COLORS[wave]),
-                align='center',
-            )
-
         fig_p.update_layout(
             title=dict(
                 text='Figure 29. KM Survival Curves by Emigration Wave',
@@ -477,19 +435,18 @@ try:
             xaxis_title='Age (years)',
             yaxis_title='Proportion surviving',
             xaxis=dict(range=[0, 100]),
-            yaxis=dict(range=[0, 1.04]),
-            # Legend at bottom, outside plot
+            yaxis=dict(range=[0, 1.02]),
             legend=dict(
                 orientation='h',
-                yanchor='top', y=-0.18,
+                yanchor='top', y=-0.15,
                 xanchor='center', x=0.5,
                 font=dict(size=11),
                 bgcolor='rgba(255,255,255,0.9)',
                 bordercolor='#ccc', borderwidth=1,
             ),
             template='plotly_white',
-            height=580,
-            margin=dict(b=140),
+            height=560,
+            margin=dict(b=130),
         )
 
         out_html = os.path.join(CHARTS, 'fig29_interactive.html')
@@ -501,6 +458,178 @@ try:
 
 except Exception as e:
     print(f"KM figure skipped: {e}")
+
+# ---------------------------------------------------------------------------
+# Figure 29b — Emigration volume by decade (the actual "waves")
+# Shows how many workers emigrated in each decade, coloured by wave.
+# X-axis: historical decade. Y-axis: number of emigrants.
+# This is the chart that literally looks like waves.
+# ---------------------------------------------------------------------------
+
+try:
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    import plotly.graph_objects as go
+
+    WAVE_COLORS = {
+        'WAVE1': '#1a6b3c',
+        'WAVE2': '#d4600a',
+        'WAVE3': '#7b3fa0',
+        'WAVE4': '#888888',
+    }
+
+    # Estimate emigration decade from migration_reasoning year mentions.
+    # Priority: use the earliest year found that falls within the wave's range.
+    # Fallback: use wave midpoint decade.
+    WAVE_MIDPOINT = {
+        'WAVE1': 1919,
+        'WAVE2': 1942,
+        'WAVE3': 1965,  # rough mid-point, will be overridden by extracted years
+        'WAVE4': 2000,
+    }
+    WAVE_YEAR_RANGE = {
+        'WAVE1': (1900, 1922),
+        'WAVE2': (1939, 1945),
+        'WAVE3': (1946, 1991),
+        'WAVE4': (1992, 2026),
+    }
+
+    migrants_full = df[df['migration_status'] == 'migrated'].copy()
+    wave_lookup = wave_df.set_index('name')['wave'].to_dict()
+    reason_lookup = migrants_full.set_index('name')['migration_reasoning'].to_dict()
+
+    emigration_decades = []
+    for name, wave in wave_lookup.items():
+        if wave not in WAVE_YEAR_RANGE:
+            continue
+        lo, hi = WAVE_YEAR_RANGE[wave]
+        # Try to extract a specific year from the reasoning text
+        reasoning = str(reason_lookup.get(name, ''))
+        years_found = [int(y) for y in re.findall(r'\b(1[89]\d\d|20[012]\d)\b', reasoning)
+                       if lo <= int(y) <= hi]
+        if years_found:
+            emig_year = min(years_found)  # earliest plausible year in range
+        else:
+            emig_year = WAVE_MIDPOINT[wave]
+        decade = (emig_year // 10) * 10
+        emigration_decades.append({'wave': wave, 'decade': decade})
+
+    decade_df = pd.DataFrame(emigration_decades)
+
+    # Build counts per wave per decade
+    all_decades = sorted(decade_df['decade'].unique())
+    waves_to_plot = ['WAVE1', 'WAVE2', 'WAVE3', 'WAVE4']
+    wave_labels_short = {
+        'WAVE1': 'Wave 1 — UNR/Civil War flight (pre-1922)',
+        'WAVE2': 'Wave 2 — WWII displacement (1939–45)',
+        'WAVE3': 'Wave 3 — Cold War emigration (1946–91)',
+        'WAVE4': 'Wave 4 — post-Soviet (1992+, excluded from analysis)',
+    }
+
+    # --- Matplotlib static ---
+    fig2, ax2 = plt.subplots(figsize=(14, 7))
+
+    bar_width = 7
+    bottom = np.zeros(len(all_decades))
+    decade_idx = {d: i for i, d in enumerate(all_decades)}
+
+    for wave in waves_to_plot:
+        wdata = decade_df[decade_df['wave'] == wave]
+        counts = wdata['decade'].value_counts()
+        heights = np.array([counts.get(d, 0) for d in all_decades], dtype=float)
+        bars = ax2.bar(
+            [d + bar_width * 0.1 for d in all_decades],
+            heights, bottom=bottom,
+            width=bar_width * 0.8,
+            color=WAVE_COLORS[wave], alpha=0.88,
+            label=wave_labels_short[wave],
+        )
+        bottom += heights
+
+    # Shade wave periods
+    ax2.axvspan(1910, 1922, alpha=0.07, color=WAVE_COLORS['WAVE1'], zorder=0)
+    ax2.axvspan(1939, 1945, alpha=0.07, color=WAVE_COLORS['WAVE2'], zorder=0)
+    ax2.axvspan(1946, 1991, alpha=0.05, color=WAVE_COLORS['WAVE3'], zorder=0)
+
+    # Period labels
+    ax2.text(1916, ax2.get_ylim()[1] * 0.95 if ax2.get_ylim()[1] > 0 else 50,
+             'Wave 1\n<1922', ha='center', fontsize=9,
+             color=WAVE_COLORS['WAVE1'], fontweight='bold')
+    ax2.text(1942, 1, 'Wave 2\n1939–45', ha='center', fontsize=9,
+             color=WAVE_COLORS['WAVE2'], fontweight='bold')
+    ax2.text(1968, 1, 'Wave 3\n1946–91', ha='center', fontsize=9,
+             color=WAVE_COLORS['WAVE3'], fontweight='bold')
+
+    ax2.set_xlabel('Decade of emigration', fontsize=13)
+    ax2.set_ylabel('Number of emigrants', fontsize=13)
+    ax2.set_title(
+        'Figure 29b. Ukrainian creative workers who emigrated — by decade\n'
+        'Three historically distinct waves with different selection mechanisms',
+        fontsize=13, pad=14,
+    )
+    ax2.set_xticks(all_decades)
+    ax2.set_xticklabels([f"{d}s" for d in all_decades], rotation=45, ha='right')
+    ax2.grid(True, axis='y', alpha=0.3, linestyle=':')
+    ax2.legend(fontsize=10, loc='upper center', bbox_to_anchor=(0.5, -0.22),
+               ncol=2, frameon=True, framealpha=0.9)
+
+    plt.tight_layout()
+    plt.subplots_adjust(bottom=0.22)
+    out_png2 = os.path.join(CHARTS, 'fig29b_wave_volume.png')
+    fig2.savefig(out_png2, dpi=200, bbox_inches='tight')
+    plt.close(fig2)
+    print(f"Fig 29b saved → {out_png2}")
+
+    # --- Plotly interactive ---
+    fig_p2 = go.Figure()
+
+    for wave in waves_to_plot:
+        wdata = decade_df[decade_df['wave'] == wave]
+        counts = wdata['decade'].value_counts().sort_index()
+        fig_p2.add_trace(go.Bar(
+            x=[f"{d}s" for d in counts.index],
+            y=counts.values,
+            name=wave_labels_short[wave],
+            marker_color=WAVE_COLORS[wave],
+            opacity=0.88,
+            hovertemplate='%{x}: %{y} emigrants<extra>' + wave_labels_short[wave] + '</extra>',
+        ))
+
+    # Wave period shading
+    for x0, x1, wave, label in [
+        ('1910s', '1920s', 'WAVE1', 'Wave 1<br><1922'),
+        ('1930s', '1940s', 'WAVE2', 'Wave 2<br>1939–45'),
+        ('1940s', '1980s', 'WAVE3', 'Wave 3<br>1946–91'),
+    ]:
+        fig_p2.add_vrect(
+            x0=x0, x1=x1,
+            fillcolor=WAVE_COLORS[wave], opacity=0.07,
+            layer='below', line_width=0,
+        )
+
+    fig_p2.update_layout(
+        barmode='stack',
+        title='Figure 29b. Ukrainian creative workers who emigrated — by decade',
+        xaxis_title='Decade of emigration',
+        yaxis_title='Number of emigrants',
+        legend=dict(
+            orientation='h',
+            yanchor='top', y=-0.18,
+            xanchor='center', x=0.5,
+            font=dict(size=11),
+        ),
+        template='plotly_white',
+        height=520,
+        margin=dict(b=140),
+    )
+
+    out_html2 = os.path.join(CHARTS, 'fig29b_interactive.html')
+    fig_p2.write_html(out_html2, include_plotlyjs='cdn', full_html=False)
+    print(f"Fig 29b interactive saved → {out_html2}")
+
+except Exception as e:
+    print(f"Fig 29b skipped: {e}")
 
 # ---------------------------------------------------------------------------
 # Print paper-ready text
