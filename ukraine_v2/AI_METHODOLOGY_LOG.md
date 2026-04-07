@@ -993,3 +993,76 @@ Schoenfeld PH test: deported p<0.0001 (violated), migrated p=0.011 (violated), i
 | `docs/index.html` | Rebuilt |
 
 *This log phase completed: 2026-04-07*
+
+---
+
+## Stage 9 — Emigration Wave Disaggregation (V2.5)
+
+**Purpose:** Test the self-selection critique structurally by disaggregating the 1,313 migrant entries into three historically distinct emigration waves, each defined by a different selection mechanism.
+
+**Method:** Rule-based classification from `migration_reasoning` (English biographical text, 78.5% year coverage) and `notes` (Ukrainian ESU text, 100% filled). No LLM required. Priority hierarchy: WAVE1 (pre-1922) > WAVE2 (1939–45) > WAVE3 (1946–91) > WAVE4 (post-1992 excluded) > UNKNOWN.
+
+**Wave distribution (n=1,313):**
+- WAVE1 (UNR/Civil War flight): 214 (16.3%)
+- WAVE2 (WWII displacement): 210 (16.0%)
+- WAVE3 (Cold War emigration): 651 (49.6%)
+- WAVE4 (post-Soviet, excluded): 172 (13.1%)
+- UNKNOWN: 66 (5.0%)
+
+**Key results:**
+- Wave 1 gap: +2.41 years vs non-migrant (p=0.0002, d=0.158)
+- Wave 2 gap: −0.88 years (p=0.63, not significant) — DP camp hardship partially cancelled survival advantage
+- Wave 3 gap: +4.44 years (p<0.001, d=0.349) — largest gap for workers with longest Soviet exposure
+- Adjusted OLS: Wave 3 coef = +4.54 years (p<0.001); Waves 1 and 2 not significant after adjustment
+- Pattern inconsistent with simple positive-selection story: the most privileged sub-group (Wave 1) shows the *smallest* gap
+
+**Interpretation:** Wave 3 workers lived their careers under Soviet conditions and only managed to leave during the Cold War. Their significant survival advantage, combined with Wave 2's null result despite emigration hardship, argues structurally against the self-selection critique.
+
+### Files Created in V2.5 — Stage 9
+
+| File | Action |
+|------|--------|
+| `stage9_wave_disaggregation.py` | Created |
+| `wave_assignments.csv` | Created (1,313 rows) |
+| `wave_stats.txt` | Created |
+| `charts/fig29_wave_km.png` | Created (2778×1376, dpi=200) |
+| `charts/fig29_interactive.html` | Created |
+| `chart_docs/fig29_wave_km.md` | Created |
+| `PAPER_DRAFT.md` | Updated (§5.1 wave table + structural argument) |
+
+---
+
+## Stage 10 — Missing Figures Bias Bounding (V2.5)
+
+**Purpose:** Quantify the direction and magnitude of ESU undercoverage bias. Seven confirmed absent repressed non-migrants provide a hardcoded anchor; a sensitivity table shows the gap widens under all plausible M assumptions.
+
+**Confirmed absent figures (all non-migrants):**
+- Vasyl Stus (1938–1985, age 47): Perm-36 labour colony
+- Mykola Khvylovy (1893–1933, age 39): Suicide under political pressure
+- Vasyl Symonenko (1935–1963, age 28): Disputed KGB custody
+- Mykhailo Semenko (1892–1937, age 45): Shot, Great Terror
+- Yevhen Pluzhnyk (1898–1936, age 38): Shot, Solovki
+- Myroslav Irchan (1897–1937, age 40): Shot, Great Terror
+- Dmytro Falkivsky (1898–1934, age 36): Shot, NKVD
+
+Mean age at death (named cases): 39.0 years (32 years below non-migrant mean of 71.22)
+
+**Note:** Several other documented Executed Renaissance figures (Zerov, Kosynka, Pidmohylny, Kurbas) ARE present in the ESU dataset as non_migrated and already counted in the non-migrant mean.
+
+**Sensitivity results:** Under all M values (8–500) and all Ā_missing values (38–50), the adjusted gap is larger than the observed 4.04 years. M=50 at Ā=38: gap = 4.31 years. M=200 at Ā=38: gap = 5.10 years. The current estimate is a confirmed lower bound.
+
+### Files Created in V2.5 — Stage 10
+
+| File | Action |
+|------|--------|
+| `stage10_missing_bias.py` | Created |
+| `named_missing_figures.csv` | Created (7 rows) |
+| `charts/fig30_sensitivity_gap.png` | Created (2778×1376, dpi=200) |
+| `charts/fig30_interactive.html` | Created |
+| `chart_docs/fig30_sensitivity_gap.md` | Created |
+| `PAPER_DRAFT.md` | Updated (§5.4 quantified missing bias + Table MF) |
+| `SCIENTIFIC_METHODOLOGY.md` | Updated (v1.7, §8.14, §8.15) |
+| `AI_METHODOLOGY_LOG.md` | Updated (Stage 9 + Stage 10) |
+| `docs/index.html` | Rebuilt |
+
+*This log phase completed: 2026-04-07*

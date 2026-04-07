@@ -1,0 +1,8 @@
+name,birth_year,death_year,age_at_death,death_cause,migration_status,source,esu_absent,notes
+Vasyl Stus,1938,1985,47,Died in Perm-36 corrective labour colony (Soviet political prisoner),non_migrated,SBU archives; Memorial; Nobel Peace Prize nomination records,True,Nobel Peace Prize nominee; most celebrated Ukrainian poet of the 20th century
+Mykola Khvylovy,1893,1933,39,Suicide under direct political pressure (arrest of colleague M. Skrypnyk),non_migrated,Ukrainian Literary Encyclopedia; Institut literatury NAN Ukrainy,True,Central figure of the Executed Renaissance; pseudonym of Mykola Fitiliov
+Vasyl Symonenko,1935,1963,28,Disputed; suspected injuries sustained during KGB custody,non_migrated,Kharkiv Human Rights Group; Symonenko family memoirs,True,Shestydesiatnyky generation poet; note: Petro Symonenko in dataset is different person
+Mykhailo Semenko,1892,1937,45,"Shot; Great Terror, October 1937",non_migrated,SBU file 68718; Rehabilitovani istoriieiu Kyiv vol. 3,True,Founder of Ukrainian panfuturism (avant-garde movement)
+Yevhen Pluzhnyk,1898,1936,38,"Shot; Solovki execution, February 1936",non_migrated,Solovki martyrology; Memorial database; Rehabilitovani istoriieiu,True,"Lyric poet; arrested 1934 as member of alleged ""underground"" group"
+Myroslav Irchan,1897,1937,40,"Shot; Great Terror, 1937",non_migrated,Memorial database; Rehabilitovani istoriieiu; SBU declassified files,True,Playwright and short story writer; pseudonym of Andrii Babyuk
+Dmytro Falkivsky,1898,1934,36,"Shot; NKVD execution, 1934",non_migrated,Rehabilitovani istoriieiu; Ukrainian Literary Encyclopedia,True,Poet; associated with the Pluh literary organisation

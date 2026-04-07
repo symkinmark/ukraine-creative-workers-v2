@@ -1,0 +1,53 @@
+===========================================================================
+WAVE DISAGGREGATION — DESCRIPTIVE STATISTICS
+Reference group: non_migrated (n=6,030, mean age at death=71.22)
+===========================================================================
+
+WAVE1 (n=212)
+  Mean age at death: 73.62 (95% CI 71.23–75.76)
+  Median: 77.0  SD: 16.6
+  Gap vs non-migrant: +2.41 years
+  % dying before 50: 11.3%
+  % surviving to 80: 41.5%
+  Mann-Whitney p: 0.0002201  Cohen's d: 0.158
+
+WAVE2 (n=203)
+  Mean age at death: 70.34 (95% CI 68.27–72.49)
+  Median: 73.0  SD: 15.2
+  Gap vs non-migrant: -0.88 years
+  % dying before 50: 9.9%
+  % surviving to 80: 31.5%
+  Mann-Whitney p: 0.6256  Cohen's d: -0.060
+
+WAVE3 (n=632)
+  Mean age at death: 75.66 (95% CI 74.77–76.53)
+  Median: 77.0  SD: 11.5
+  Gap vs non-migrant: +4.44 years
+  % dying before 50: 2.4%
+  % surviving to 80: 39.2%
+  Mann-Whitney p: 5.814e-14  Cohen's d: 0.349
+
+WAVE4 (n=167)
+  Mean age at death: 86.62 (95% CI 85.38–87.86)
+  Median: 87.0  SD: 8.2
+  Gap vs non-migrant: +15.41 years
+  % dying before 50: 0.0%
+  % surviving to 80: 85.6%
+  Mann-Whitney p: 8.491e-51  Cohen's d: 1.359
+
+UNKNOWN (n=66)
+  Mean age at death: 62.97 (95% CI 60.27–65.71)
+  Median: 63.5  SD: 11.6
+  Gap vs non-migrant: -8.25 years
+  % dying before 50: 15.2%
+  % surviving to 80: 7.6%
+  Mann-Whitney p: 9.098e-08  Cohen's d: -0.646
+
+===========================================================================
+OLS REGRESSION — ADJUSTED GAP BY WAVE (ref: non_migrated)
+Controls: birth_decade, profession (first 15 chars)
+===========================================================================
+  C(wave, Treatment("NON_MIG"))[T.WAVE1]: coef=+0.77  p=0.4239
+  C(wave, Treatment("NON_MIG"))[T.WAVE2]: coef=-0.97  p=0.3137
+  C(wave, Treatment("NON_MIG"))[T.WAVE3]: coef=+4.54  p=4.456e-14
+  R² = 0.205  n = 7,077
