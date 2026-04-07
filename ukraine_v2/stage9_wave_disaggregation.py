@@ -357,9 +357,26 @@ try:
             n_wave = len(ages)
         ax.axvline(med, color=color, linestyle=':', linewidth=1.2, alpha=0.6)
 
-    ax.legend(fontsize=11, loc='upper right')
+    # Wave period highlight bands (along top edge of plot)
+    ax.axhspan(0.995, 1.02, xmin=0/100, xmax=22/100,
+               color=WAVE_COLORS['WAVE1'], alpha=0.18, zorder=0)
+    ax.axhspan(0.995, 1.02, xmin=39/100, xmax=45/100,
+               color=WAVE_COLORS['WAVE2'], alpha=0.18, zorder=0)
+    ax.axhspan(0.995, 1.02, xmin=45/100, xmax=91/100,
+               color=WAVE_COLORS['WAVE3'], alpha=0.18, zorder=0)
+    ax.text(11, 1.008, 'W1', ha='center', va='center', fontsize=8,
+            color=WAVE_COLORS['WAVE1'], fontweight='bold')
+    ax.text(42, 1.008, 'W2', ha='center', va='center', fontsize=8,
+            color=WAVE_COLORS['WAVE2'], fontweight='bold')
+    ax.text(68, 1.008, 'W3', ha='center', va='center', fontsize=8,
+            color=WAVE_COLORS['WAVE3'], fontweight='bold')
+
+    # Legend below the plot
+    ax.legend(fontsize=10, loc='upper center', bbox_to_anchor=(0.5, -0.12),
+              ncol=2, frameon=True, framealpha=0.9)
 
     plt.tight_layout()
+    plt.subplots_adjust(bottom=0.18)
     out_png = os.path.join(CHARTS, 'fig29_wave_km.png')
     fig.savefig(out_png, dpi=200, bbox_inches='tight')
     plt.close(fig)
@@ -371,6 +388,16 @@ try:
 
         fig_p = go.Figure()
 
+        # Wave period highlight bands (vertical shading on age axis)
+        # These represent the birth-cohort ages during each emigration window,
+        # approximated as: W1 emigrants born ~1870-1900 (age 17-52 in 1917-22),
+        # shown as a top-edge colour bar via shape annotations.
+        wave_bands = [
+            dict(type='rect', xref='paper', yref='y',
+                 x0=0, x1=1, y0=1.01, y1=1.03,
+                 fillcolor='rgba(0,0,0,0)', line_width=0),
+        ]
+
         # Non-migrant
         kmf_nm2 = KaplanMeierFitter()
         kmf_nm2.fit(nm_ages.values)
@@ -381,6 +408,13 @@ try:
             mode='lines', name=WAVE_LABELS['NON_MIG'],
             line=dict(color=WAVE_COLORS['NON_MIG'], width=2.5, dash='dash'),
         ))
+
+        WAVE_DASH = {'WAVE1': 'solid', 'WAVE2': 'dot', 'WAVE3': 'solid'}
+        WAVE_PERIOD = {
+            'WAVE1': 'Emigration period: before 1922',
+            'WAVE2': 'Emigration period: 1939–1945',
+            'WAVE3': 'Emigration period: 1946–1991',
+        }
 
         for wave in ['WAVE1', 'WAVE2', 'WAVE3']:
             wdf = wave_df[wave_df['wave'] == wave]
@@ -395,24 +429,67 @@ try:
             lo = ci.iloc[:, 0].values
             hi = ci.iloc[:, 1].values
             label = WAVE_LABELS[wave] + f' (n={len(ages):,})'
+            # CI band
             fig_p.add_trace(go.Scatter(
                 x=np.concatenate([t_w, t_w[::-1]]),
                 y=np.concatenate([hi, lo[::-1]]),
                 fill='toself', fillcolor=WAVE_COLORS[wave],
-                opacity=0.12, line=dict(color='rgba(0,0,0,0)'),
+                opacity=0.15, line=dict(color='rgba(0,0,0,0)'),
                 hoverinfo='skip', showlegend=False,
             ))
+            # Main line
             fig_p.add_trace(go.Scatter(
-                x=t_w, y=s_w, mode='lines', name=label,
-                line=dict(color=WAVE_COLORS[wave], width=2.5),
+                x=t_w, y=s_w, mode='lines',
+                name=f'<b>{label}</b><br><i style="font-size:10px">{WAVE_PERIOD[wave]}</i>',
+                line=dict(color=WAVE_COLORS[wave], width=3,
+                          dash=WAVE_DASH[wave]),
+                hovertemplate=(
+                    f'<b>{label}</b><br>'
+                    'Age: %{x:.0f} yrs<br>'
+                    'Surviving: %{y:.3f}<br>'
+                    f'{WAVE_PERIOD[wave]}<extra></extra>'
+                ),
             ))
 
+        # Coloured wave-period annotation bar at top of plot
+        for wave, x0, x1, label_x, label_txt in [
+            ('WAVE1',  0,  22, 11,  'Wave 1\n<1922'),
+            ('WAVE2', 39,  45, 42,  'Wave 2\n1939–45'),
+            ('WAVE3', 45,  91, 68,  'Wave 3\n1946–91'),
+        ]:
+            fig_p.add_shape(type='rect',
+                x0=x0, x1=x1, y0=1.015, y1=1.035,
+                xref='x', yref='y',
+                fillcolor=WAVE_COLORS[wave], opacity=0.25,
+                line_width=0)
+            fig_p.add_annotation(
+                x=label_x, y=1.025, xref='x', yref='y',
+                text=label_txt, showarrow=False,
+                font=dict(size=9, color=WAVE_COLORS[wave]),
+                align='center',
+            )
+
         fig_p.update_layout(
-            title='Figure 29. KM Survival Curves by Emigration Wave',
-            xaxis_title='Age (years)', yaxis_title='Proportion surviving',
-            xaxis=dict(range=[0, 100]), yaxis=dict(range=[0, 1.02]),
-            legend=dict(x=0.98, y=0.98, xanchor='right', yanchor='top'),
-            template='plotly_white', height=520,
+            title=dict(
+                text='Figure 29. KM Survival Curves by Emigration Wave',
+                font=dict(size=14),
+            ),
+            xaxis_title='Age (years)',
+            yaxis_title='Proportion surviving',
+            xaxis=dict(range=[0, 100]),
+            yaxis=dict(range=[0, 1.04]),
+            # Legend at bottom, outside plot
+            legend=dict(
+                orientation='h',
+                yanchor='top', y=-0.18,
+                xanchor='center', x=0.5,
+                font=dict(size=11),
+                bgcolor='rgba(255,255,255,0.9)',
+                bordercolor='#ccc', borderwidth=1,
+            ),
+            template='plotly_white',
+            height=580,
+            margin=dict(b=140),
         )
 
         out_html = os.path.join(CHARTS, 'fig29_interactive.html')
