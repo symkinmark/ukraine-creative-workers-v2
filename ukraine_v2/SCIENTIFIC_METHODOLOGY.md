@@ -5,7 +5,7 @@
 **Author:** Mark Symkin
 **Study completed:** 2026
 **Data source:** Encyclopedia of Modern Ukraine (esu.com.ua)
-**This document version:** 1.6 — revised 2026-04-07 following V2.4 Stage 8: time-varying landmark Cox analysis (§8.13), fig28/28b
+**This document version:** 1.7 — revised 2026-04-07 following V2.5 Stage 9: emigration wave disaggregation (§8.14), Stage 10: missing figures bias bounding (§8.15), fig29/fig30
 
 
 ## Version History
@@ -21,9 +21,11 @@
 | 2.5 | 2026-04-06 | Right-censored Cox PH extension (§4.10 supplement): N=15,218 extended dataset, Schoenfeld PH test, informative censoring sensitivity analysis, Fig 25 (censoring pattern), Fig 26 (KM with censored data) |
 | 2.6 | 2026-04-07 | V2.4 right-censored rework: living cohort classified via AI pipeline (6,314 properly distributed); Cox N=15,053; migrated HR=0.832 adjusted; §8.11–8.12 sensitivity analyses; fig24–27 regenerated |
 | 2.7 | 2026-04-07 | Stage 8: time-varying landmark Cox by age band (§8.13); peak HR=1.89 at age 40–50; fig28/28b; §4.10 updated with Table A-Cox-TV |
+| 2.8 | 2026-04-07 | Stage 9: emigration wave disaggregation (§8.14); 1,313 migrants classified into 3 waves; WAVE3 gap=+4.44y largest (structural argument vs self-selection); fig29 KM by wave |
+| 2.9 | 2026-04-07 | Stage 10: missing figures bias bounding (§8.15); 7 confirmed absent repressed non-migrants documented; sensitivity table shows 4.04y gap is conservative lower bound; fig30 |
 
 ---
-> **V2.4 CURRENT.** Primary dataset: `esu_creative_workers_v2_3.csv` (dead cohort) + `data/esu_extended_for_cox.csv` (extended with classified living individuals). Primary OLS analysable: **n=8,643**. Right-censored Cox: **N=15,053**. See AI_METHODOLOGY_LOG.md Phase V2.4 for full log.
+> **V2.5 CURRENT.** Primary dataset: `esu_creative_workers_v2_3.csv` (dead cohort) + `data/esu_extended_for_cox.csv` (extended with classified living individuals). Primary OLS analysable: **n=8,643**. Right-censored Cox: **N=15,053**. See AI_METHODOLOGY_LOG.md Phase V2.4 for full log.
 
 ---
 
@@ -1288,3 +1290,88 @@ A replicating researcher who has successfully reproduced the dataset and analysi
 
 *Document prepared 2026. Authors: Elza Berdnyk, Mark Symkin.*
 *This methodology document is intended to accompany the PAPER_DRAFT.md and should be cited when this study is referenced in subsequent work.*
+
+---
+
+### 8.14 Emigration Wave Disaggregation (V2.5)
+
+**Purpose:** Test the self-selection critique structurally by disaggregating all 1,313 migrant entries into historically distinct emigration waves, each defined by a different selection mechanism.
+
+**Script:** `stage9_wave_disaggregation.py`
+
+**Method:** Rule-based classification from `migration_reasoning` column (English biographical reasoning text, 78.5% year coverage) with fallback to `notes` column (original Ukrainian ESU text, 100% filled). No LLM required. Year extraction via regex `\b1[89]\d\d\b`; wave assignment by priority hierarchy: WAVE1 > WAVE2 > WAVE3 > WAVE4 > UNKNOWN.
+
+**Wave boundaries:**
+
+| Wave | Period | Selection mechanism |
+|------|--------|-------------------|
+| WAVE1 | Before 1922 | UNR/Civil War flight; pre-revolutionary elite |
+| WAVE2 | 1939–1945 | WWII displacement; DP camps; German retreat |
+| WAVE3 | 1946–1991 | Cold War defectors; DP survivors resettled; dissidents |
+| WAVE4 | 1992–present | Post-Soviet emigration — excluded from gap analysis |
+| UNKNOWN | — | Insufficient text; retained in aggregate, excluded from wave breakdown |
+
+**Results:**
+
+| Wave | n | Mean age at death | 95% CI | Gap vs non-mig | p (MW) | Cohen's d |
+|------|---|-------------------|--------|----------------|--------|-----------|
+| Non-migrated | 6,030 | 71.22 | 70.87–71.57 | — | — | — |
+| WAVE1 | 212 | 73.62 | 71.23–75.76 | +2.41 | 0.0002 | 0.158 |
+| WAVE2 | 203 | 70.34 | 68.27–72.49 | −0.88 | 0.63 | −0.060 |
+| WAVE3 | 632 | 75.66 | 74.77–76.53 | +4.44 | <0.001 | 0.349 |
+| WAVE4 (excl) | 172 | 86.62 | 85.38–87.86 | — | — | — |
+| UNKNOWN | 66 | 62.97 | 60.27–65.71 | — | — | — |
+
+**OLS adjusted gaps** (controlling for birth_decade, profession): WAVE3 = +4.54 years (p<0.001); WAVE1 and WAVE2 not significant after adjustment.
+
+**Interpretation:** The wave with the longest Soviet exposure (WAVE3) shows the largest gap; the most privileged wave (WAVE1) shows the smallest. This cross-wave pattern is inconsistent with a simple positive-selection explanation. WAVE2's null result (DP camp hardship partially cancelled survival advantage) is an honest finding reported as such.
+
+**Classification rate:** 1,247/1,313 classified (95.0%); 66 UNKNOWN (5.0%).
+
+**Output files:** `wave_assignments.csv`, `wave_stats.txt`, `charts/fig29_wave_km.png`, `charts/fig29_interactive.html`
+
+---
+
+### 8.15 Missing Figures Bias Bounding (V2.5)
+
+**Purpose:** Quantify the direction and plausible magnitude of ESU source undercoverage bias. ESU coverage gaps are not random: the encyclopedia systematically underrepresents individuals whose biographical documentation was destroyed along with them — exactly the most severely repressed non-migrants who died youngest.
+
+**Script:** `stage10_missing_bias.py`
+
+**Method:** Hardcoded named cases (verified absent from ESU by direct dataset lookup); sensitivity calculation using closed-form formula:
+
+```
+mean_nm_adj = (mean_nm × n_nm + Ā_missing × M) / (n_nm + M)
+adjusted_gap = mean_mig − mean_nm_adj
+```
+
+Because `Ā_missing < mean_nm` under all historical assumptions, the gap widens monotonically with M. No LLM or web scraping required.
+
+**Confirmed absent figures (all non-migrants, all meet study inclusion criteria):**
+
+| Name | Birth | Death | Age | Mechanism |
+|------|-------|-------|-----|-----------|
+| Vasyl Stus | 1938 | 1985 | 47 | Perm-36 labour colony |
+| Mykola Khvylovy | 1893 | 1933 | 39 | Suicide under political pressure |
+| Vasyl Symonenko | 1935 | 1963 | 28 | Disputed KGB custody |
+| Mykhailo Semenko | 1892 | 1937 | 45 | Shot, Great Terror |
+| Yevhen Pluzhnyk | 1898 | 1936 | 38 | Shot, Solovki |
+| Myroslav Irchan | 1897 | 1937 | 40 | Shot, Great Terror |
+| Dmytro Falkivsky | 1898 | 1934 | 36 | Shot, NKVD |
+
+Mean age at death (named cases): 39.0 years.
+
+**Note:** Zerov, Kosynka, Pidmohylny, Kurbas ARE present in dataset as non_migrated — not missing.
+
+**Sensitivity results (key scenarios):**
+
+| M | Ā=38 | Ā=43 | Ā=50 |
+|---|------|------|------|
+| 7 | +4.08 | +4.07 | +4.06 |
+| 50 | +4.31 | +4.27 | +4.21 |
+| 200 | +5.10 | +4.94 | +4.72 |
+| 500 | +6.58 | +6.20 | +5.66 |
+
+**Conclusion:** Current estimate of 4.04 years is a conservative lower bound. No plausible (M, Ā) combination narrows or reverses the gap.
+
+**Output files:** `named_missing_figures.csv`, `charts/fig30_sensitivity_gap.png`, `charts/fig30_interactive.html`
