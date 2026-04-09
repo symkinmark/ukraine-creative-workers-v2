@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 
 PROJECT = os.path.dirname(os.path.abspath(__file__))
-DATA    = os.path.join(PROJECT, 'esu_creative_workers_v2_3.csv')
+DATA    = os.path.join(PROJECT, 'esu_creative_workers_v2_6.csv')
 CHARTS  = os.path.join(PROJECT, 'charts')
 os.makedirs(CHARTS, exist_ok=True)
 

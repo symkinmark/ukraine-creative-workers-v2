@@ -17,11 +17,12 @@ OUT_PATH = os.path.join(PROJECT, 'paper_preview.html')
 CHARTS   = os.path.join(PROJECT, 'charts')
 
 # Figures that have interactive Plotly versions (figXX_interactive.html)
+# Note: fig29/29b/29c (wave disaggregation) retracted — classifier recovered
+# birth/death years not emigration dates. Excluded from V2.6 paper. See §6.7.
 INTERACTIVE_FIGS = {
     '1', '2', '3', '4', '5', '6', '7', '7b', '8', '9', '10',
     '11', '12', '13', '14', '15', '15b', '17', '18', '19', '19b',
-    '20', '21', '22', '23', '24', '25', '26', '28', '28b',
-    '29', '29b', '29c', '30',
+    '20', '21', '22', '23', '24', '25', '26', '28', '28b', '30',
 }
 
 # Map each Figure N to its PNG filename (file number = paper figure number)
@@ -58,9 +59,7 @@ FIGURE_MAP = {
     '27':  'fig27_sensitivity_summary.png',
     '28':  'fig28_deported_hr_by_age.png',
     '28b': 'fig28b_schoenfeld_smooth.png',
-    '29':  'fig29_wave_km.png',
-    '29b': 'fig29b_wave_volume.png',
-    '29c': 'fig29c_wave_lifespan.png',
+    # fig29/29b/29c retracted — wave disaggregation classifier unreliable (§6.7)
     '30':  'fig30_sensitivity_gap.png',
 }
 
@@ -254,7 +253,7 @@ HTML = f"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Life Expectancy of Ukrainian Creative Workers — V2.3</title>
+<title>Life Expectancy of Ukrainian Creative Workers — V2.6</title>
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
 <style>
   body {{

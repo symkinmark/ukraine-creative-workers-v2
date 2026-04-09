@@ -4,24 +4,24 @@ MODEL 1 — Unadjusted
 ==============================================================================
 Dep. Variable:           age_at_death   R-squared:                       0.066
 Model:                            OLS   Adj. R-squared:                  0.066
-Method:                 Least Squares   F-statistic:                     204.7
-Date:                Mon, 06 Apr 2026   Prob (F-statistic):          2.87e-128
-Time:                        21:03:54   Log-Likelihood:                -34943.
-No. Observations:                8643   AIC:                         6.989e+04
-Df Residuals:                    8639   BIC:                         6.992e+04
+Method:                 Least Squares   F-statistic:                     205.1
+Date:                Tue, 07 Apr 2026   Prob (F-statistic):          1.57e-128
+Time:                        20:30:48   Log-Likelihood:                -34950.
+No. Observations:                8645   AIC:                         6.991e+04
+Df Residuals:                    8641   BIC:                         6.994e+04
 Df Model:                           3                                         
 Covariance Type:            nonrobust                                         
 ================================================================================================================================
                                                                    coef    std err          t      P>|t|      [0.025      0.975]
 --------------------------------------------------------------------------------------------------------------------------------
-Intercept                                                       71.2169      0.178    400.936      0.000      70.869      71.565
-C(migration, Treatment("non_migrated"))[T.migrated]              4.0362      0.424      9.508      0.000       3.204       4.868
-C(migration, Treatment("non_migrated"))[T.internal_transfer]    -0.5178      0.444     -1.167      0.243      -1.388       0.352
-C(migration, Treatment("non_migrated"))[T.deported]            -22.8672      1.035    -22.094      0.000     -24.896     -20.838
+Intercept                                                       71.2160      0.178    400.914      0.000      70.868      71.564
+C(migration, Treatment("non_migrated"))[T.migrated]              4.0553      0.424      9.563      0.000       3.224       4.887
+C(migration, Treatment("non_migrated"))[T.internal_transfer]    -0.5168      0.444     -1.164      0.244      -1.387       0.353
+C(migration, Treatment("non_migrated"))[T.deported]            -22.8662      1.035    -22.094      0.000     -24.895     -20.837
 ==============================================================================
-Omnibus:                      613.893   Durbin-Watson:                   2.007
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):              763.164
-Skew:                          -0.674   Prob(JB):                    1.91e-166
+Omnibus:                      614.407   Durbin-Watson:                   2.008
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              763.922
+Skew:                          -0.674   Prob(JB):                    1.31e-166
 Kurtosis:                       3.549   Cond. No.                         7.14
 ==============================================================================
 
@@ -34,34 +34,34 @@ MODEL 2 — Adjusted
 ==============================================================================
 Dep. Variable:           age_at_death   R-squared:                       0.077
 Model:                            OLS   Adj. R-squared:                  0.075
-Method:                 Least Squares   F-statistic:                     55.12
-Date:                Mon, 06 Apr 2026   Prob (F-statistic):          8.40e-139
-Time:                        21:03:54   Log-Likelihood:                -34895.
-No. Observations:                8643   AIC:                         6.982e+04
-Df Residuals:                    8629   BIC:                         6.992e+04
+Method:                 Least Squares   F-statistic:                     55.23
+Date:                Tue, 07 Apr 2026   Prob (F-statistic):          4.36e-139
+Time:                        20:30:48   Log-Likelihood:                -34902.
+No. Observations:                8645   AIC:                         6.983e+04
+Df Residuals:                    8631   BIC:                         6.993e+04
 Df Model:                          13                                         
 Covariance Type:            nonrobust                                         
 ====================================================================================================================================
                                                                        coef    std err          t      P>|t|      [0.025      0.975]
 ------------------------------------------------------------------------------------------------------------------------------------
-Intercept                                                          156.7322     12.636     12.404      0.000     131.963     181.501
-C(migration, Treatment("non_migrated"))[T.migrated]                  3.3112      0.446      7.416      0.000       2.436       4.186
-C(migration, Treatment("non_migrated"))[T.internal_transfer]        -1.4318      0.461     -3.107      0.002      -2.335      -0.529
-C(migration, Treatment("non_migrated"))[T.deported]                -23.4404      1.048    -22.371      0.000     -25.494     -21.386
-C(profession, Treatment("Writers/Poets"))[T.Architects]              2.1680      0.658      3.296      0.001       0.878       3.458
-C(profession, Treatment("Writers/Poets"))[T.Musicians/Composers]     0.6662      0.449      1.483      0.138      -0.214       1.547
-C(profession, Treatment("Writers/Poets"))[T.Other Creative]          3.3861      0.778      4.354      0.000       1.862       4.911
-C(profession, Treatment("Writers/Poets"))[T.Theatre/Film]            1.3964      0.522      2.676      0.007       0.374       2.419
-C(profession, Treatment("Writers/Poets"))[T.Visual Artists]          1.1355      0.384      2.955      0.003       0.382       1.889
-C(birth_region, Treatment("Other/Unknown"))[T.Central]              -0.8438      0.471     -1.790      0.074      -1.768       0.080
-C(birth_region, Treatment("Other/Unknown"))[T.Eastern]               0.6134      0.558      1.099      0.272      -0.481       1.708
-C(birth_region, Treatment("Other/Unknown"))[T.Southern]              1.1202      0.766      1.462      0.144      -0.382       2.622
-C(birth_region, Treatment("Other/Unknown"))[T.Western]              -0.6278      0.582     -1.079      0.281      -1.768       0.513
-birth_decade                                                        -0.0451      0.007     -6.832      0.000      -0.058      -0.032
+Intercept                                                          156.7748     12.633     12.410      0.000     132.010     181.539
+C(migration, Treatment("non_migrated"))[T.migrated]                  3.3333      0.446      7.474      0.000       2.459       4.208
+C(migration, Treatment("non_migrated"))[T.internal_transfer]        -1.4311      0.461     -3.106      0.002      -2.334      -0.528
+C(migration, Treatment("non_migrated"))[T.deported]                -23.4400      1.048    -22.372      0.000     -25.494     -21.386
+C(profession, Treatment("Writers/Poets"))[T.Architects]              2.1675      0.658      3.295      0.001       0.878       3.457
+C(profession, Treatment("Writers/Poets"))[T.Musicians/Composers]     0.6639      0.449      1.478      0.139      -0.217       1.544
+C(profession, Treatment("Writers/Poets"))[T.Other Creative]          3.3816      0.778      4.349      0.000       1.857       4.906
+C(profession, Treatment("Writers/Poets"))[T.Theatre/Film]            1.3968      0.522      2.677      0.007       0.374       2.420
+C(profession, Treatment("Writers/Poets"))[T.Visual Artists]          1.1398      0.384      2.967      0.003       0.387       1.893
+C(birth_region, Treatment("Other/Unknown"))[T.Central]              -0.8460      0.471     -1.795      0.073      -1.770       0.078
+C(birth_region, Treatment("Other/Unknown"))[T.Eastern]               0.6121      0.558      1.096      0.273      -0.482       1.707
+C(birth_region, Treatment("Other/Unknown"))[T.Southern]              1.1175      0.766      1.459      0.145      -0.384       2.619
+C(birth_region, Treatment("Other/Unknown"))[T.Western]              -0.6357      0.582     -1.093      0.274      -1.776       0.504
+birth_decade                                                        -0.0451      0.007     -6.837      0.000      -0.058      -0.032
 ==============================================================================
-Omnibus:                      587.492   Durbin-Watson:                   2.002
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):              721.180
-Skew:                          -0.661   Prob(JB):                    2.50e-157
+Omnibus:                      588.127   Durbin-Watson:                   2.003
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              722.097
+Skew:                          -0.662   Prob(JB):                    1.58e-157
 Kurtosis:                       3.503   Cond. No.                     1.64e+05
 ==============================================================================
 

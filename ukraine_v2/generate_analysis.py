@@ -47,12 +47,12 @@ def cliffs_delta(x, y):
 # PATHS
 # ---------------------------------------------------------------------------
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-CSV_PATH     = os.path.join(PROJECT_ROOT, 'esu_creative_workers_v2_3.csv')
-OUT_TXT      = os.path.join(PROJECT_ROOT, 'analysis_v2_3.txt')
+CSV_PATH     = os.path.join(PROJECT_ROOT, 'esu_creative_workers_v2_6.csv')
+OUT_TXT      = os.path.join(PROJECT_ROOT, 'analysis_v2_6.txt')
 CHARTS_DIR   = os.path.join(PROJECT_ROOT, 'charts')
 os.makedirs(CHARTS_DIR, exist_ok=True)
 
-SOURCE_NOTE = ("Source: Encyclopedia of Modern Ukraine (esu.com.ua), V2.3 dataset, "
+SOURCE_NOTE = ("Source: Encyclopedia of Modern Ukraine (esu.com.ua), V2.6 dataset, "
                "Symkin 2026")
 
 # ---------------------------------------------------------------------------
@@ -166,7 +166,7 @@ print(f"  Total rows: {len(raw_rows)}")
 
 def safe_int(val):
     try:
-        v = int(str(val).strip())
+        v = int(float(str(val).strip()))
         return v if v > 0 else None
     except (ValueError, TypeError):
         return None

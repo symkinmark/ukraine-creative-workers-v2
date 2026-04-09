@@ -1,0 +1,204 @@
+
+============================================================
+STEP B1: Applying hardcoded patches (8 specific entries)
+============================================================
+  Patched [349] Керч Оксана: death_year: np.float64(1911.0) → 1991; birth_year: np.float64(nan) → 1911; migration_status: 'excluded_pre_soviet' → 'migrated'; migration_reasoning: 'Died before 1921 (death_year=1911) — pre-Soviet, outside study scope.' → 'B1-patch: Born 1911 Przemysl; left Ukraine 1944 to Austria then France, Argentina, USA; died Philadelphia 1991. Birth year was incorrectly stored as death year.'
+  Patched [15] Антонович Катерина  Михайлівна: death_year: np.float64(1884.0) → 1975; birth_year: np.float64(nan) → 1884; migration_status: 'excluded_pre_soviet' → 'migrated'; migration_reasoning: 'Died before 1921 (death_year=1884) — pre-Soviet, outside study scope.' → 'B1-patch: Born 1884 Kharkiv; emigrated; died Winnipeg, Canada 22 Feb 1975. Birth year was incorrectly stored as death year.'
+  Patched [584] Містраль Ґабрієла: migration_status: 'excluded_pre_soviet' → 'excluded_non_ukrainian'; migration_reasoning: 'Died before 1921 (death_year=1889) — pre-Soviet, outside study scope.' → 'B1-patch: Gabriela Mistral (1889–1957) is the Chilean Nobel laureate; no Ukrainian residence or connection. Wrongly included in ESU dataset.'
+  Patched [652] Петровичева Людмила-Ванда  Миколаївна: death_year: np.float64(1882.0) → 1971; migration_status: 'excluded_pre_soviet' → 'non_migrated'; migration_reasoning: 'Died before 1921 (death_year=1882) — pre-Soviet, outside study scope.' → 'B1-patch: Died 1971 (not 1882 as stored). Birth year was stored as death year. No emigration evidence; classified non_migrated.'
+  Patched [699] Черняхівська Вероніка Олександрівна: death_year: np.float64(1900.0) → 1938; migration_status: 'excluded_pre_soviet' → 'non_migrated'; migration_reasoning: 'Died before 1921 (death_year=1900) — pre-Soviet, outside study scope.' → 'B1-patch: Veronika Cherniakhivska died 1938 (within Soviet period, not pre-Soviet). Birth year was stored as death year. No emigration evidence; non_migrated.'
+  Patched [77] Бойченко Микола Романович: migration_status: 'excluded_pre_soviet' → 'excluded_bad_dates'; migration_reasoning: 'Died before 1921 (death_year=1896) — pre-Soviet, outside study scope.' → 'B1-patch: Conflicting death records (Kyiv 1946 vs Budapest 1947); dates unreliable. Birth year (1896) was stored as death year.'
+  Patched [10165] Кудравець Анатоль Павлович: migration_status: 'non_migrated' → 'excluded_non_ukrainian'; migration_reasoning: 'Born in Mogilev region (Belarus), died in Minsk — spent entire life and career within Belarus/Soviet space with no deportation, diaspora, or emigration signals.' → 'B1-patch: Anatol Kudravets born Mogilev region, Belarus; entire career in Belarus (Minsk). No Ukrainian connection. Should be excluded_non_ukrainian.'
+  Patched [8097] Кейс Віталій: migration_status: 'unknown' → 'migrated'; migration_reasoning: '[sonnet-retry] No location of death, no diaspora signals, no deportation signals, and no geographic clues found in the available biographical data.' → 'B1-patch: Bio confirms "1951 родина емігрувала до США". Taught at Long Island University and Rutgers (NJ) 1970–2005. Correct status is migrated, not unknown.'
+B1 complete: 8 entries patched
+
+============================================================
+STEP B2: Re-fetching ESU articles for birth-year-as-death-year suspects
+============================================================
+Found 97 suspects to re-fetch
+  [1/97] Барвінський Василь Олександрович: death_year 1888.0→1963, reclassified to unknown
+  [2/97] Барвінський Павло  Якович: death_year 1862.0→1908 (still pre-Soviet)
+  [3/97] Барка Василь: death_year 1908.0→2003, reclassified to unknown
+  [4/97] Березін Юхим Йосипович: death_year 1919.0→2004, reclassified to unknown
+  [5/97] Бойченко Павло: death_year 1878.0→1906 (still pre-Soviet)
+  [6/97] Борисюк Костянтин Іванович: death_year 1915.0→1915 (still pre-Soviet)
+  [7/97] Борковський Пантелеймон: death_year 1824.0→1911 (still pre-Soviet)
+  [8/97] Бостунич Григорій  Васильович: death_year 1883.0→1945, reclassified to unknown
+  [9/97] Бразоль Юлія  Миколаївна: death_year 1856.0→1919 (still pre-Soviet)
+  [10/97] Бурчак Леонід: death_year 1920.0→1920 (still pre-Soviet)
+  Progress saved (10/97)
+  [11/97] Вавилін Іван Михайлович: death_year 1911.0→1975, reclassified to unknown
+  [12/97] Валевахін Олександр Петрович: death_year 1920.0→1907 (still pre-Soviet)
+  [13/97] Вей Емілій Бенедиктович: death_year 1914.0→1909 (still pre-Soviet)
+  [14/97] Верес Зоська: death_year 1892.0→1991, reclassified to unknown
+  [15/97] Волошка Людмила: death_year 1887.0→1952, reclassified to unknown
+  [16/97] Вороньківський Іван: death_year 1875.0→1925, reclassified to unknown
+  [17/97] Гаврилюк Ілько  Дмитрович: death_year 1874.0→1947, reclassified to unknown
+  [18/97] Гартл Антонін: death_year 1885.0→1944, reclassified to unknown
+  [19/97] Гарун Алесь: death_year 1887.0→1920 (still pre-Soviet)
+  [20/97] Глушаниця Павло: death_year 1916.0→1945, reclassified to unknown
+  Progress saved (20/97)
+  [21/97] Голинська Галина Яківна: death_year 1902.0→1976, reclassified to unknown
+  [22/97] Гошовська Ірина  Арсенівна: death_year 1915.0→1934, reclassified to unknown
+  [23/97] Грималюк Василь Іванович: death_year 1920.0→1998, reclassified to unknown
+  [24/97] Гринець Дмитро Митрофанович: death_year 1905.0→1993, reclassified to unknown
+  [25/97] Грицай Остап: death_year 1881.0→1954, reclassified to unknown
+  [26/97] Давид Марія  Олександрівна: death_year 1901.0→1988, reclassified to unknown
+  [27/97] Долина Павло Трохимович: death_year 1888.0→1955, reclassified to unknown
+  [28/97] Домазар Сергій: death_year 1900.0→1987, reclassified to unknown
+  [29/97] Єлінек Ґустав  Карлович: death_year 1912.0→1912 (still pre-Soviet)
+  [30/97] Єременко Сергій: death_year 1912.0→1997, reclassified to unknown
+  Progress saved (30/97)
+  [31/97] Єрмоленко-Южина Наталія Степанівна: death_year 1881.0→1948, reclassified to unknown
+  [32/97] Захаров Іван  Данилович: death_year 1915.0→1936, reclassified to unknown
+  [33/97] Збіржховська Антоніна: death_year 1872.0→1930, reclassified to unknown
+  [34/97] Злоцький Феодосій Антонович: death_year 1846.0→1926, reclassified to unknown
+  [35/97] Іванов Сергій Дмитрович: death_year 1872.0→2011, reclassified to unknown
+  [36/97] Івлєв Трохим  Васильович: death_year 1878.0→1933, reclassified to unknown
+  [37/97] Камінський Віктор: death_year 1854.0→1929, reclassified to unknown
+  [38/97] Кель Микола: could not extract death year from HTML
+  [39/97] Киреєнко Кастусь: death_year 1918.0→1988, reclassified to unknown
+  [40/97] Клішевська Кароліна: death_year 1864.0→1927, reclassified to unknown
+  Progress saved (40/97)
+  [41/97] Кобець Григорій Якович: death_year 1900.0→1990, reclassified to unknown
+  [42/97] Кобилянський Володимир Олександрович: death_year 1895.0→1919 (still pre-Soviet)
+  [43/97] Конрад Джозеф: death_year 1857.0→1924, reclassified to unknown
+  [44/97] Корольова Олена Олексіївна: death_year 1919.0→1919 (still pre-Soviet)
+  [45/97] Кортасар Хуліо: death_year 1914.0→1984, reclassified to unknown
+  [46/97] Кравченко Василь Олексійович: death_year 1865.0→1924, reclassified to unknown
+  [47/97] Кресеску Віктор: death_year 1850.0→1917 (still pre-Soviet)
+  [48/97] Кузнецова Марія Миколаївна: death_year 1880.0→1966, reclassified to unknown
+  [49/97] Лагуті Абулкасем: death_year 1887.0→1957, reclassified to unknown
+  [50/97] Ласовська-Крук Мирослава  Семенівна: death_year 1919.0→1937, reclassified to unknown
+  Progress saved (50/97)
+  [51/97] Левіна Розіна Яківна: death_year 1880.0→1976, reclassified to unknown
+  [52/97] Левітон Любов Давидівна: death_year 1830.0→1904 (still pre-Soviet)
+  [53/97] Левщенко Леонід Іванович: death_year 1882.0→1954, reclassified to unknown
+  [54/97] Ленський Семен Давидович: death_year 1875.0→1917 (still pre-Soviet)
+  [55/97] Липовецька Млада: death_year 1897.0→1963, reclassified to unknown
+  [56/97] Лисогір Марія: death_year 1917.0→2004, reclassified to unknown
+  [57/97] Личко Іван Дмитрович: death_year 1882.0→1937, reclassified to unknown
+  [58/97] Лібкіс Діна Нохумівна: death_year 1900.0→1962, reclassified to unknown
+  [59/97] Лівицька Марія Варфоломіївна: death_year 1879.0→1971, reclassified to unknown
+  [60/97] Лубковська Марія Мечиславівна: death_year 1858.0→1934, reclassified to unknown
+  Progress saved (60/97)
+  [61/97] Мак Ольга: death_year 1913.0→1998, reclassified to unknown
+  [62/97] Макдіармід Г’ю: death_year 1892.0→1978, reclassified to unknown
+  [63/97] Мариняк Марія Іллівна: death_year 1907.0→1982, reclassified to unknown
+  [64/97] Маруненко-Недоля Амвросій Павлович: death_year 1886.0→1968, reclassified to unknown
+  [65/97] Матеєвич Олексій: death_year 1888.0→1917 (still pre-Soviet)
+  [66/97] Меліссанті: death_year 1907.0→1990, reclassified to unknown
+  [67/97] Мозалевський Іван Іванович: death_year 1890.0→1975, reclassified to unknown
+  [68/97] Монтґомері Джордж: death_year 1916.0→2000, reclassified to unknown
+  [69/97] Нагірна Стефанія Іванівна: death_year 1898.0→1993, reclassified to unknown
+  [70/97] Надіїн Дмитро Пимонович: death_year 1907.0→1942, reclassified to unknown
+  Progress saved (70/97)
+  [71/97] Незабудько Панько: death_year 1919.0→2001, reclassified to unknown
+  [72/97] Нейгауз Наталія Ґуставівна: death_year 1884.0→1960, reclassified to unknown
+  [73/97] Неруда Пабло: death_year 1904.0→1973, reclassified to unknown
+  [74/97] Нікольсон Сілія-Анна: death_year 1874.0→1936, reclassified to unknown
+  [75/97] Німців Любов-Ірина: death_year 1908.0→1984, reclassified to unknown
+  [76/97] Павловська Євгенія: death_year 1913.0→1965, reclassified to unknown
+  [77/97] Полевська Людмила: death_year 1893.0→1975, reclassified to unknown
+  [78/97] Ржепецька Олена: death_year 1885.0→1948, reclassified to unknown
+  [79/97] Сельська Марґіт Ісаківна: death_year 1900.0→1980, reclassified to unknown
+  [80/97] Тимошенко Юрій Трохимович: death_year 1919.0→1986, reclassified to unknown
+  Progress saved (80/97)
+  [81/97] Фуклев Микола Петрович: death_year 1905.0→1938, reclassified to unknown
+  [82/97] Цуканова Марія Михайлівна: death_year 1905.0→1998, reclassified to unknown
+  [83/97] Шопінський Василь Мартинович: death_year 1887.0→1967, reclassified to unknown
+  [84/97] Юрченко Валентина Тимофіївна: death_year 1910.0→2001, reclassified to unknown
+  [85/97] Ауслендер Роза: death_year 1901.0→1988, reclassified to unknown
+  [86/97] Бердичевський Миха-Йосеф: death_year 1865.0→1921, reclassified to unknown
+  [87/97] Галич Олександр Аркадійович: death_year 1918.0→1977, reclassified to unknown
+  [88/97] Ґінцберг Ашер-Гірш: death_year 1856.0→1927, reclassified to unknown
+  [89/97] Ґрінберґ Урі-Цві: death_year 1896.0→1981, reclassified to unknown
+  [90/97] Долинов Анатолій Іванович: death_year 1869.0→1945, reclassified to unknown
+  Progress saved (90/97)
+  [91/97] Єлагін Іван: death_year 1918.0→1987, reclassified to unknown
+  [92/97] Кауфман Бел: death_year 1911.0→1922, reclassified to unknown
+  [93/97] Каценельсон Лев Ізраїльович: death_year 1846.0→1917 (still pre-Soviet)
+  [94/97] Кон Нафтоле-Герц: death_year 1910.0→1971, reclassified to unknown
+  [95/97] Корн Рахіль: death_year 1898.0→1982, reclassified to unknown
+  [96/97] Кушніров Арон: death_year 1890.0→1949, reclassified to unknown
+  [97/97] Лефлер Чарльз-Мартін: death_year 1861.0→1935, reclassified to unknown
+B2 complete: 17 date-corrected (still pre-Soviet), 79 reclassified, 1 failed/skipped
+
+============================================================
+STEP B3: Reclassifying API-error unknowns via Claude
+============================================================
+Found 57 API-error entries to reclassify
+  [1/57] Кримський Андрій Іванович: → unknown
+  [2/57] Кріпченко Віктор Іванович: → unknown
+  [3/57] Круглов Олексій Миколайович: → unknown
+  [4/57] Кузневич Григорій Микитович: → unknown
+  [5/57] Кулябка Сергій Миколайович: → unknown
+  [6/57] Курдюмов Всеволод Валеріанович: → unknown
+  [7/57] Куриленко Василь Прокопович: → unknown
+  [8/57] Кушнір Мирослав Андрійович: → unknown
+  [9/57] Ландесман Надія Борисівна: → unknown
+  [10/57] Левітська Вікторія Сергіївна: → unknown
+  Progress saved (10/57)
+  [11/57] Левченко Гаврило: → unknown
+  [12/57] Лещук Осип Микитович: → unknown
+  [13/57] Лижичко Руслана Степанівна: → unknown
+  [14/57] Літневський Геннадій Євгенович: → unknown
+  [15/57] Лозовський Лесь: → unknown
+  [16/57] Лотоцький Казимир: → unknown
+  [17/57] Лужанін Максим: → unknown
+  [18/57] Лур’є Ноте: → unknown
+  [19/57] Луців Володимир Гаврилович: → unknown
+  [20/57] Любин Яків Мойсейович: → unknown
+  Progress saved (20/57)
+  [21/57] Любительський Людвиг Олександрович: → unknown
+  [22/57] Майроніс: → unknown
+  [23/57] Макара Марія Степанівна: → unknown
+  [24/57] Маренков Олексій Васильович: → unknown
+  [25/57] Мареш Віктор Францович: → unknown
+  [26/57] Маригодов Костянтин Лукич: → unknown
+  [27/57] Меїнов Джелял: → unknown
+  [28/57] Мєрний Віктор Михайлович: → unknown
+  [29/57] Митницький Едуард Маркович: → unknown
+  [30/57] Михайлюк Климентій Іванович: → unknown
+  Progress saved (30/57)
+  [31/57] Мицик Федір Олексійович: → unknown
+  [32/57] Міллер Андрій: → unknown
+  [33/57] Міллер Леонід Олександрович: → unknown
+  [34/57] Молінарі Марк Людвигович: → unknown
+  [35/57] Моруга Василь  Васильович: → unknown
+  [36/57] Мушник Сергій Михайлович: → unknown
+  [37/57] Непорожня Надія Олександрівна: → unknown
+  [38/57] Нитченко Дмитро Васильович: → unknown
+  [39/57] Німчук Дмитро: → unknown
+  [40/57] Нурмухаммедов Марат: → unknown
+  Progress saved (40/57)
+  [41/57] Пастух Богдан Васильович: → unknown
+  [42/57] Паші Ібраїм Куртемирович: → unknown
+  [43/57] Пекар Володимир Павлович: → unknown
+  [44/57] Перейма-Клим Ака Андріївна: → unknown
+  [45/57] Пестременко Андрій: → unknown
+  [46/57] Пікор Стефан: → unknown
+  [47/57] Плаксін Євген Фролович: → unknown
+  [48/57] Подолянко Богдан Степанович: → unknown
+  [49/57] Познанський Борис Станіславович: → unknown
+  [50/57] Покришкін Петро Петрович: → unknown
+  Progress saved (50/57)
+  [51/57] Портенко Андрій Панасович: → unknown
+  [52/57] Сабат-Свірська Марія Володимирівна: → unknown
+  [53/57] Селезінка Василь Михайлович: → unknown
+  [54/57] Субчак Мар’ян Петрович: → unknown
+  [55/57] Абжолтовська Властиміла: → unknown
+  [56/57] Ільїн М.: → unknown
+  [57/57] Казас Михайло Мойсейович: → unknown
+B3 complete: 57 reclassified, 0 failed
+
+============================================================
+STEP B4: Auditing is_ukrainian / flag_non_ukrainian conflicts
+============================================================
+  Entries in analysis groups with flag_non_ukrainian=True: 0
+
+============================================================
+STEP B5: Attempting to resolve genuine unknowns
+============================================================
+Found 140 genuine unknowns (non-API-error)
+B5 complete: 0 resolved, 140 remain unknown
