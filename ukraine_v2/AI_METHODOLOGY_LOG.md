@@ -939,13 +939,13 @@ Schoenfeld PH test: deported p<0.0001 (violated), migrated p=0.011 (violated), i
 
 | Age band | HR | p | Interpretation |
 |----------|----|---|----------------|
-| 20–30 | 1.10 | 0.35 | No excess mortality in youth |
-| 30–40 | 1.51 | <0.001 | Killing begins — early Terror |
-| **40–50** | **1.89** | **<0.001** | **PEAK — Great Terror / Gulag** |
-| 50–60 | 1.61 | 0.001 | Elevated but declining |
-| 60–70 | 1.50 | 0.018 | Fading |
-| 70–80 | 1.21 | 0.36 | Not significant |
-| 80–90 | 0.95 | 0.86 | Null — survivors converge |
+| 20–30 | 1.09 | 0.36 | No excess mortality in youth |
+| 30–40 | 1.50 | <0.001 | Killing begins — early Terror |
+| **40–50** | **1.86** | **<0.001** | **PEAK — Great Terror / Gulag** |
+| 50–60 | 1.57 | 0.001 | Elevated but declining |
+| 60–70 | 1.40 | 0.037 | Fading |
+| 70–80 | 1.19 | 0.37 | Not significant |
+| 80–90 | 0.89 | 0.66 | Null — survivors converge |
 
 **Historical interpretation:** Workers born ~1890–1910 (Executed Renaissance generation) were in their 30s–40s during the 1937–38 Great Terror — exactly the peak band. The overall HR=4.646 is a lifetime average that compresses this concentrated event into one number. The landmark analysis restores the temporal structure.
 

@@ -20,7 +20,7 @@
 | 2.4 | 2026-04-06 | Peer-review batch 2 (7 major weaknesses): Cox PH (§4.10, Fig 24), PSM (+3.35 yrs matched), argument restructure (deportee leads), figures distributed into narrative, nationality circularity note, post-1991 caveat, Table 6 small-n fix |
 | 2.5 | 2026-04-06 | Right-censored Cox PH extension (§4.10 supplement): N=15,218 extended dataset, Schoenfeld PH test, informative censoring sensitivity analysis, Fig 25 (censoring pattern), Fig 26 (KM with censored data) |
 | 2.6 | 2026-04-07 | V2.4 right-censored rework: living cohort classified via AI pipeline (6,314 properly distributed); Cox N=15,053; migrated HR=0.832 adjusted; §8.11–8.12 sensitivity analyses; fig24–27 regenerated |
-| 2.7 | 2026-04-07 | Stage 8: time-varying landmark Cox by age band (§8.13); peak HR=1.89 at age 40–50; fig28/28b; §4.10 updated with Table A-Cox-TV |
+| 2.7 | 2026-04-07 | Stage 8: time-varying landmark Cox by age band (§8.13); peak HR=1.86 at age 40–50; fig28/28b; §4.10 updated with Table A-Cox-TV |
 | 2.8 | 2026-04-07 | Stage 9: emigration wave disaggregation attempted (§8.14); classifier built and run; manual review of 50-entry sample confirmed death year / birth year recovery rather than departure year; findings retracted; §5.1 replaced with methodology limitation; defined as V3 deliverable |
 | 2.9 | 2026-04-07 | Stage 10: missing figures bias bounding (§8.15); 7 confirmed absent repressed non-migrants documented; sensitivity table shows 4.04y gap is conservative lower bound; fig30 |
 | 2.10 | 2026-04-07 | Doc version 1.8: §8.14 rewritten to document Stage 9 failure mode and retraction; SCIENTIFIC_METHODOLOGY and AI_METHODOLOGY_LOG updated to reflect that wave figures are not reported findings |
@@ -852,15 +852,15 @@ AI classification validated at 3.2% error rate (V2.1 Phase 5b, n=62 review). Boo
 
 | Age band | n at risk | Dep events | HR | 95% CI | p |
 |----------|-----------|------------|----|--------|---|
-| 20–30 | 15,046 | 10 | 1.10 | [0.90, 1.34] | 0.35 |
-| 30–40 | 14,969 | 40 | 1.51 | [1.23, 1.84] | <0.001 |
-| **40–50** | **14,665** | **48** | **1.89** | **[1.50, 2.38]** | **<0.001** |
-| 50–60 | 13,786 | 26 | 1.61 | [1.21, 2.15] | 0.001 |
-| 60–70 | 12,051 | 19 | 1.50 | [1.07, 2.10] | 0.018 |
-| 70–80 | 8,546 | 11 | 1.21 | [0.80, 1.84] | 0.36 |
-| 80–90 | 4,035 | 5 | 0.95 | [0.53, 1.70] | 0.86 |
+| 20–30 | 14,994 | 10 | 1.09 | [0.90, 1.33] | 0.36 |
+| 30–40 | 14,921 | 42 | 1.50 | [1.23, 1.82] | <0.001 |
+| **40–50** | **14,619** | **50** | **1.86** | **[1.49, 2.33]** | **<0.001** |
+| 50–60 | 13,771 | 27 | 1.57 | [1.19, 2.06] | 0.001 |
+| 60–70 | 12,060 | 19 | 1.40 | [1.02, 1.93] | 0.037 |
+| 70–80 | 8,580 | 13 | 1.19 | [0.82, 1.73] | 0.37 |
+| 80–90 | 4,061 | 6 | 0.89 | [0.54, 1.48] | 0.66 |
 
-**Key summary:** Peak HR 1.89 at age 40–50; collapses to near-null (HR=0.95) by age 80–90. Workers born ~1890–1910 (Executed Renaissance generation) were in their 30s–40s during the 1937–38 Terror — exactly the peak band.
+**Key summary:** Peak HR 1.86 at age 40–50; collapses to near-null (HR=0.89) by age 80–90. Workers born ~1890–1910 (Executed Renaissance generation) were in their 30s–40s during the 1937–38 Terror — exactly the peak band.
 
 **Interpretation:** The single HR=4.646 in §8.11 is a lifetime average compressing a concentrated event. The landmark analysis shows the actual temporal structure: Soviet state killing was concentrated in a specific historical window (Terror + Gulag years), not a steady-state risk. Survivors who cleared that window converged back to baseline mortality by their 70s.
 
@@ -1288,7 +1288,7 @@ A replicating researcher who has successfully reproduced the dataset and analysi
 | 1937 deported deaths | **65 (35.5% of deported group, n=183)** |
 | 1937 non-migrated deaths | 24 |
 | 1937 combined creative deaths | **89** |
-| Mean age at death, 1937 deported | 42.4 yrs |
+| Mean age at death, 1937 deported | 42.7 yrs |
 | Deported with repression-cause death | ~90% |
 
 **Date recovery (V2.2 fix — unchanged in V2.3):**

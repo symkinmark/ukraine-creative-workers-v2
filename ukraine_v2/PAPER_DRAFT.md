@@ -10,7 +10,7 @@
 
 This study examines whether Ukrainian creative workers who emigrated from Soviet-controlled Ukraine lived longer than those who remained, using biographical data from the Encyclopedia of Modern Ukraine (ESU). The dataset covers 16,215 entries scraped from esu.com.ua, of which 8,590 deceased individuals with complete birth and death years form the analysable cohort. Workers are classified into four groups: *migrated* (left Soviet territory permanently; n=1,324), *non-migrated* (remained in Soviet Ukraine; n=5,960), *internal transfer* (moved within the USSR; n=1,111), and *deported* (forcibly relocated by the Soviet state; n=195).
 
-Migrants died on average **3.98 years** later than non-migrants (75.42 yrs vs 71.44 yrs; Cohen's d=0.292; Cliff's δ=0.18; p<0.001). This gap persists across birth cohorts, professions, and genders, and survives propensity-score matching (3.14 yrs; 95% CI: 2.07–4.21). The primary finding is robust to a 10% AI classification error rate.
+Migrants died on average **3.98 years** later than non-migrants (75.42 yrs vs 71.44 yrs; Cohen's d=0.292; Cliff's δ=0.18; p<0.001). This gap persists across birth cohorts, professions, and genders, and survives propensity-score matching (3.43 yrs; 95% CI: 2.38–4.51). The primary finding is robust to a 10% AI classification error rate.
 
 The strongest signal is among deported workers, who died 22.05 years earlier than non-migrants (mean age 49.39 yrs; Cohen's d=1.613; p<0.001), with peak excess mortality at ages 40–50 (time-varying Cox hazard ratio: 1.86). The internal transfer group shows no significant difference from non-migrants (+0.35 yrs, p=0.271), functioning as a within-Soviet control condition. This null result supports the interpretation that geographic movement per se does not explain the migrant advantage — only exit from Soviet control does.
 
@@ -62,7 +62,7 @@ V3.0 incorporates a systematic five-stage database quality pipeline:
 | Validated error rate | Not assessed | 3.2% (n=200 reviewed; complete) |
 | Primary gap | +5.4 yrs | +3.98 yrs |
 | Cox PH | Not performed | HR=0.759 [0.713, 0.809] |
-| PSM | Not performed | +3.14 yrs [2.07, 4.21] |
+| PSM | Not performed | +3.43 yrs [2.38, 4.51] |
 
 The gap narrowing from V1 (+5.4 yrs) to V3.0 (+3.98 yrs) is expected, not a weakness. V1's small size and non-systematic sampling over-represented the most extreme cases. The present estimate is more conservative and more defensible precisely because it covers the full ESU population with a validated error rate.
 
@@ -271,15 +271,15 @@ OLS regression of age at death (**Figure 23**):
 | Variable | β (Model 1) | β (Model 2) | SE (M2) | p (M2) |
 |---|---|---|---|---|
 | Intercept (non-migrated) | 71.44 | — | — | — |
-| Migrated | +3.98 | +3.33 | 0.45 | <0.001 |
+| Migrated | +3.98 | +2.71 | 0.45 | <0.001 |
 | Internal transfer | −0.35 | −1.43 | 0.46 | 0.002 |
 | Deported | −22.05 | −23.44 | 1.05 | <0.001 |
 
-Model 2 (R²=0.077, F=55.23, p<0.001) includes birth decade, profession, and region controls. The migrated coefficient falls from +3.98 to +3.33, indicating that approximately 0.65 years of the raw gap is explained by observable selection covariates. The residual 3.33-year adjusted gap remains highly significant (p<0.001).
+Model 2 (R²=0.086, F=61.97, p<0.001) includes birth decade, profession, and region controls. The migrated coefficient falls from +3.98 to +2.71, indicating that approximately 1.27 years of the raw gap is explained by observable selection covariates. The residual 2.71-year adjusted gap remains highly significant (p<0.001).
 
 ### 4.12 Propensity Score Matching
 
-After 1:1 nearest-neighbour PSM on birth decade, profession, and birth region, the gap narrows to **+3.14 years** (bootstrap 95% CI: 2.07–4.21), a 21.1% attenuation from the unadjusted estimate. The PSM gap is substantially positive and statistically significant, confirming the migrant advantage cannot be explained by the measured selection covariates.
+After 1:1 nearest-neighbour PSM on birth decade, profession, and birth region, the gap narrows to **+3.43 years** (bootstrap 95% CI: 2.38–4.51), a 13.8% attenuation from the unadjusted estimate. The PSM gap is substantially positive and statistically significant, confirming the migrant advantage cannot be explained by the measured selection covariates.
 
 ### 4.13 Cox Proportional Hazards
 
@@ -335,7 +335,7 @@ The PH assumption is violated for the deported group (Schoenfeld residual test p
 
 **The internal transfer null result is the crucial control.** Non-migrated and internally transferred workers have essentially identical life expectancies (+0.35 yrs, p=0.271). Geographic movement within the Soviet system — even movement that displaced workers from their home republic — did not confer the survival advantage seen among those who exited Soviet control entirely. The migrant advantage is specifically associated with exiting the Soviet political system, not merely moving elsewhere.
 
-**Consistency across cohorts and professions argues against a simple compositional explanation.** The regression-adjusted gap (3.33 yrs) and PSM gap (3.14 yrs) show that after controlling for birth cohort, profession, and region, a substantial gap remains. The gap holds in every profession category tested (Table 2). This pattern is inconsistent with a story where the gap is entirely explained by one or two professions or cohorts being differently represented in the migrated group.
+**Consistency across cohorts and professions argues against a simple compositional explanation.** The regression-adjusted gap (2.71 yrs) and PSM gap (3.43 yrs) show that after controlling for birth cohort, profession, and region, a substantial gap remains. The gap holds in every profession category tested (Table 2). This pattern is inconsistent with a story where the gap is entirely explained by one or two professions or cohorts being differently represented in the migrated group.
 
 ### 5.2 The Migration Gap: Association, Not Causation
 

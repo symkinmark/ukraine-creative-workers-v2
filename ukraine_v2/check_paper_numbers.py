@@ -600,5 +600,5 @@ if fails > 0:
     print(f"\n{RED}{BOLD}ACTION REQUIRED: {fails} paper claim(s) do not match computed values.{RESET}")
     sys.exit(1)
 else:
-    print(f"\n{GREEN}{BOLD}All numeric claims verified against the V2.3 dataset.{RESET}")
+    print(f"\n{GREEN}{BOLD}All numeric claims verified against the V2.6 dataset.{RESET}")
     sys.exit(0)
