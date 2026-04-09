@@ -1070,3 +1070,225 @@ Mean age at death (named cases): 39.0 years (32 years below non-migrant mean of 
 | `docs/index.html` | Rebuilt |
 
 *This log phase completed: 2026-04-07*
+
+---
+
+## Stage 11 — Data Audit Report
+
+**Purpose:** Systematic pre-fix audit of all known data quality issues before beginning the repair pipeline.
+
+**Script:** `stage11_data_audit.py`
+**Input:** `esu_creative_workers_v2_3.csv`
+**Output:** `data_audit_report.md`
+
+**Issues catalogued:**
+- Birth year stored as death year: ~102 entries (ESU scraper stored single year in wrong field)
+- API-credit-error unknowns: 58 entries (billing error messages stored in migration_reasoning)
+- Specific validation errors: 7 named entries from manual review
+- Validation status: 82 of 200 entries reviewed at time of audit
+- Confirmed missing ESU figures: 7 (see Stage 10)
+
+No AI model calls made in this stage — pure data inspection.
+
+### Files Created in Stage 11
+
+| File | Action |
+|------|--------|
+| `stage11_data_audit.py` | Created |
+| `data_audit_report.md` | Created |
+
+*Stage 11 completed: 2026-04-08*
+
+---
+
+## Stage 12 — Database Quality Pipeline (esu_creative_workers_v2_6.csv)
+
+**Purpose:** Apply all identified fixes in a single structured pipeline, producing the clean V2.6 dataset.
+
+**Script:** `stage12_fix_database.py` (sub-stages B1–B5)
+**Input:** `esu_creative_workers_v2_3.csv`
+**Output:** `esu_creative_workers_v2_6.csv`
+
+### B1 — Hardcoded Validation Patches (8 entries)
+
+No API calls. Direct field overrides by article_url.
+
+Key corrections applied:
+- Керч Оксана: death_year 1911→1991; excluded_pre_soviet→migrated
+- Антонович Катерина: death_year 1884→1975; excluded_pre_soviet→migrated
+- Містраль Ґабрієла: excluded_pre_soviet→excluded_non_ukrainian (Chilean poet)
+- Петровичева Людмила-Ванда: death_year 1882→1971; excluded_pre_soviet→non_migrated
+- Кудравець Анатоль: non_migrated→excluded_non_ukrainian (Belarusian writer)
+
+### B2 — Birth-Year-as-Death-Year Corrections (~97 entries)
+
+**Model:** claude-haiku-4-5-20251001 (reclassification only where corrected death_year ≥ 1921)
+**Method:** Re-fetch article HTML from esu.com.ua; parse "Дата смерті:" and "Дата народження:" fields; apply corrected years; reclassify if now in scope.
+**Rate limiting:** 2 req/sec to ESU; 0.5 req/sec to Claude API.
+
+### B3 — API-Credit-Error Reclassification (57 entries)
+
+**Model:** claude-haiku-4-5-20251001
+**Prompt:** Same 2-step migration classification protocol as Stage 4
+**Trigger:** migration_reasoning contains "credit balance is too low"
+**Result:** All 57 resolved to valid classification
+
+### B4 — Non-Ukrainian Audit
+
+Checked all analysis-group entries with flag_non_ukrainian=True. Zero confirmed non-Ukrainians found in analysis groups.
+
+### B5 — Residual Unknown Resolution
+
+Checked remaining unknown entries for bio availability. Applied Haiku classifications where bio text was sufficient (>30 chars).
+
+### Files Created in Stage 12
+
+| File | Action |
+|------|--------|
+| `stage12_fix_database.py` | Created |
+| `esu_creative_workers_v2_6.csv` | Created (clean V2.6 dataset) |
+
+*Stage 12 completed: 2026-04-08*
+
+---
+
+## Stage 13 — Validation Review Corrections
+
+**Purpose:** Apply corrections from the completed first-phase manual validation review (82 entries reviewed).
+
+**Script:** `stage13_apply_validation_fixes.py`
+**Input/Output:** `esu_creative_workers_v2_6.csv` (in-place update)
+
+**Corrections applied (8 entries, human-identified — no AI model calls):**
+
+| Entry | Old status | New status | Evidence |
+|---|---|---|---|
+| Черняхівська Вероніка | excluded_pre_soviet | migrated | Bio confirms emigrated, died 1966 |
+| Бойченко Микола | non_migrated | excluded_bad_dates | Irreconcilable dates |
+| Кейс Віталій | unknown | migrated | Bio confirms emigration to USA 1951 |
+| + 5 additional boundary-case entries | various | various | Per reviewer notes |
+
+### Files Created in Stage 13
+
+| File | Action |
+|------|--------|
+| `stage13_apply_validation_fixes.py` | Created |
+| `esu_creative_workers_v2_6.csv` | Updated |
+| `generate_analysis.py` | Re-run → all charts regenerated |
+
+*Stage 13 completed: 2026-04-08*
+
+---
+
+## Stage 14 — API Authentication Failure Reclassification (135 entries)
+
+**Purpose:** Re-classify 135 entries that had "Could not resolve authentication" errors in migration_reasoning — a different failure mode from Stage 12 B3's "credit balance" failures.
+
+**Script:** `stage14_reclassify_api_failures.py`
+**Model:** claude-haiku-4-5-20251001
+**Input/Output:** `esu_creative_workers_v2_6.csv` (in-place update)
+
+**Classification prompt:** Identical 2-step protocol to Stage 4 (check forced displacement first, then assign status).
+
+**Bio fetch:** Live HTTP GET to esu.com.ua for each entry. Extracted via `<div itemprop="articleBody">` to `</article>`. Fallback: `<meta name="citation_abstract">`.
+
+**Rate limiting:** 0.3 sec/entry (Claude API) + 0.1 sec/entry (ESU fetch).
+
+**Results:**
+- 135 entries processed → all resolved to valid status
+- Stored in migration_reasoning with prefix "S14-reclassified:"
+- Stored in fix_applied: "S14: API-fail reclassified → {status}"
+
+**Stage 14 validation review:** All 135 S14-reclassified entries reviewed by the researcher in `validation/stage14_reviewer.html` (built by `stage15_build_s14_reviewer.py`). Results: 125 correct, 8 wrong, 1 skip, 1 unseen. 6 corrections required (applied in Stage 15).
+
+### Reviewer HTML — stage15_build_s14_reviewer.py
+
+Fetches live ESU bios for all 135 S14 entries. Embeds Haiku reasoning alongside full bio text. Same UI as main reviewer. localStorage keys: `ukraine_s14_decisions`, `ukraine_s14_notes`. Export button downloads `stage14_validation_results.json`.
+
+### Files Created in Stage 14
+
+| File | Action |
+|------|--------|
+| `stage14_reclassify_api_failures.py` | Created |
+| `stage15_build_s14_reviewer.py` | Created |
+| `validation/stage14_reviewer.html` | Created (135-entry reviewer) |
+| `esu_creative_workers_v2_6.csv` | Updated |
+
+*Stage 14 completed: 2026-04-09*
+
+---
+
+## Stage 15 — Stage-14-Review Corrections + Final Verification
+
+**Purpose:** Apply 6 corrections from the manual Stage 14 reviewer. Verify all paper statistics. Complete paper rewrite.
+
+**Script:** `stage15_apply_s14_fixes.py`
+**Input/Output:** `esu_creative_workers_v2_6.csv` (in-place update)
+
+No AI model calls. All corrections are human-identified.
+
+**Corrections applied:**
+
+| Entry | Article URL | Old status | New status | Reason |
+|---|---|---|---|---|
+| Глушаниця Павло | article-30518 | migrated | excluded_bad_dates | Unknown death date, bad data |
+| Збіржховська Антоніна | article-16491 | migrated | excluded_galicia_pre_annexation | Galicia, died before 1939 Soviet annexation |
+| Злоцький Феодосій | article-16344 | non_migrated | excluded_galicia_pre_annexation | Galicia, died before 1939 Soviet annexation |
+| Камінський Віктор | article-10895 | non_migrated | excluded_galicia_pre_annexation | Galicia, died before 1939 Soviet annexation |
+| Конрад Джозеф (Joseph Conrad) | article-4547 | migrated | excluded_pre_soviet | Emigrated pre-Soviet era, died 1924 |
+| Лефлер Чарльз-Мартін (Charles Martin Loeffler) | article-54491 | migrated | excluded_non_ukrainian | Not Ukrainian |
+
+**Note on Galicia pre-annexation:** Workers from western Ukraine (Galicia) who died before Soviet annexation (1939) did so under Polish/Austrian administration. Soviet demographic conditions did not apply. This is an exposure question, not a nationality question.
+
+### Final Dataset State After Stage 15
+
+| Metric | Value |
+|---|---|
+| Total scraped | 16,215 |
+| Analysable dead cohort | **8,590** |
+| Migrated | **1,324** |
+| Non-migrated | **5,960** |
+| Internal transfer | **1,111** |
+| Deported | **195** |
+| Primary gap (mig vs nm) | **3.98 years** |
+| Cohen's d | **0.292** |
+| Cliff's δ | **0.18** |
+| Validation: reviewed | **200 / 200** (complete) |
+| Validated error rate | **3.2%** |
+| check_paper_numbers.py | **177 / 177 PASS** |
+
+### Chart Registry (Post-Stage-15 Final)
+
+All charts regenerated on V2.6 dataset. 33 static PNGs + 31 interactive Plotly HTMLs.
+
+| Figure | File | Notes |
+|---|---|---|
+| Fig 01 | fig01_primary_le_comparison.png + _interactive.html | Primary result |
+| Fig 02 | fig02_kaplan_meier.png + _interactive.html | KM curves |
+| Fig 03 | fig03_version_comparison.png + _interactive.html | V1 vs V3.0 |
+| Fig 04–06 | box_plots, violin_plots | Distribution shapes |
+| Fig 07, 07b | death_year_histogram, deported_death_years | 1937 spike visible |
+| Fig 08–09 | deported_deaths_by_year, nonmigrant_deaths_by_period | Period analysis |
+| Fig 10–12 | birth_cohort_le, profession_grouped_bar, geographic | Breakdown charts |
+| Fig 13–15b | birth_year_distribution, sensitivity, it_null, all_groups | Analysis |
+| Fig 16–18 | consort_flowchart, gender_by_group, le_by_gender | Descriptive |
+| Fig 19–22 | context comparisons | Population baseline |
+| Fig 23–26 | regression, cox, censoring, km_censored | Models |
+| Fig 27–28b | sensitivity_summary, timevarying, schoenfeld | Robustness |
+| Fig 30 | sensitivity_gap | Missing-worker bias |
+
+### Files Created/Modified in Stage 15
+
+| File | Action |
+|------|--------|
+| `stage15_apply_s14_fixes.py` | Created |
+| `esu_creative_workers_v2_6.csv` | **Final dataset** |
+| `check_paper_numbers.py` | Updated — 177/177 PASS |
+| `PAPER_DRAFT.md` | **Complete rewrite as V3.0** |
+| `SCIENTIFIC_METHODOLOGY.md` | Updated to v1.9, §8.16–8.20 added |
+| `AI_METHODOLOGY_LOG.md` | Updated (Stages 11–15) |
+| `charts/fig01–fig30` | All regenerated |
+| `paper_preview.html` | Rebuilt |
+| `docs/index.html` | Rebuilt and pushed |
+
+*Stage 15 completed: 2026-04-09*

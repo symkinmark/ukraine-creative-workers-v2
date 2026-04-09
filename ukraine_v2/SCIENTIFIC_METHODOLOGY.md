@@ -5,7 +5,7 @@
 **Author:** Mark Symkin
 **Study completed:** 2026
 **Data source:** Encyclopedia of Modern Ukraine (esu.com.ua)
-**This document version:** 1.8 — revised 2026-04-07 following Stage 9 retraction: wave disaggregation findings withdrawn after manual review confirmed classifier recovered death/birth year rather than departure year (§8.14); §8.14 updated to document failure mode and V3 fix; Stage 10 missing figures bias bounding retained (§8.15)
+**This document version:** 1.9 — revised 2026-04-09 following Stages 11–15 database quality pipeline: 97 birth-year-as-death-year corrections, 57 API-error retries (Stage 12), 8 manual validation patches (Stage 13), 135 authentication-error reclassifications (Stage 14), 6 Stage-14-review corrections (Stage 15); all 200 validation entries reviewed (3.2% error rate confirmed); dataset finalised at N=8,590; paper rewritten as V3.0 with all statistics verified (177/177 checks pass)
 
 
 ## Version History
@@ -24,9 +24,11 @@
 | 2.8 | 2026-04-07 | Stage 9: emigration wave disaggregation attempted (§8.14); classifier built and run; manual review of 50-entry sample confirmed death year / birth year recovery rather than departure year; findings retracted; §5.1 replaced with methodology limitation; defined as V3 deliverable |
 | 2.9 | 2026-04-07 | Stage 10: missing figures bias bounding (§8.15); 7 confirmed absent repressed non-migrants documented; sensitivity table shows 4.04y gap is conservative lower bound; fig30 |
 | 2.10 | 2026-04-07 | Doc version 1.8: §8.14 rewritten to document Stage 9 failure mode and retraction; SCIENTIFIC_METHODOLOGY and AI_METHODOLOGY_LOG updated to reflect that wave figures are not reported findings |
+| 2.11 | 2026-04-08 | Stage 11: data audit report (§8.16); Stage 12: full database quality pipeline B1–B5 → esu_creative_workers_v2_6.csv (§8.17); Stage 13: validation review corrections applied (§8.18) |
+| 2.12 | 2026-04-09 | Stage 14: 135 API-fail entries reclassified via Haiku (§8.19); Stage 15: 6 Stage-14-review corrections (§8.20); 200/200 validation complete; paper rewritten as V3.0; 177/177 checks pass; N=8,590 final |
 
 ---
-> **V2.5 CURRENT.** Primary dataset: `esu_creative_workers_v2_3.csv` (dead cohort) + `data/esu_extended_for_cox.csv` (extended with classified living individuals). Primary OLS analysable: **n=8,643**. Right-censored Cox: **N=15,053**. See AI_METHODOLOGY_LOG.md Phase V2.4 for full log.
+> **V3.0 CURRENT.** Primary dataset: `esu_creative_workers_v2_6.csv`. Analysable dead cohort: **N=8,590** (migrated=1,324 | non_migrated=5,960 | internal_transfer=1,111 | deported=195). Primary gap: **3.98 years** (Cohen's d=0.292). All 177 numeric claims verified. See AI_METHODOLOGY_LOG.md Stages 11–15 for full log.
 
 ---
 
@@ -1390,6 +1392,135 @@ Mean age at death (named cases): 39.0 years.
 | 200 | +5.10 | +4.94 | +4.72 |
 | 500 | +6.58 | +6.20 | +5.66 |
 
-**Conclusion:** Current estimate of 4.04 years is a conservative lower bound. No plausible (M, Ā) combination narrows or reverses the gap.
+**Conclusion:** Current estimate of 3.98 years (V3.0) is a conservative lower bound. No plausible (M, Ā) combination narrows or reverses the gap.
 
 **Output files:** `named_missing_figures.csv`, `charts/fig30_sensitivity_gap.png`, `charts/fig30_interactive.html`
+
+---
+
+## §8.16 — Stage 11: Data Audit (V2.6 Pre-Fix)
+
+**Purpose:** Systematic audit of all known data quality issues in `esu_creative_workers_v2_3.csv` before applying fixes, producing a structured report for the paper appendix.
+
+**Script:** `stage11_data_audit.py` → `data_audit_report.md`
+
+**Issues catalogued:**
+1. Birth year stored as death year (ESU scraper stored single year in wrong field): ~102 entries
+2. API-credit-error unknowns (billing error messages instead of classifications): 58 entries
+3. Specific validation errors (7 named from manual review)
+4. Non-Ukrainian inclusions: audited
+5. Unknown group: residual unresolvable entries
+6. Incomplete validation (118 of 200 not yet reviewed at time of audit)
+7. Missing high-profile figures (Executed Renaissance): 7 confirmed absent
+
+---
+
+## §8.17 — Stage 12: Database Quality Pipeline (V2.6)
+
+**Purpose:** Apply all identified fixes to produce the clean `esu_creative_workers_v2_6.csv` dataset.
+
+**Script:** `stage12_fix_database.py` (B1–B5 sub-stages)
+
+### B1 — Specific Validation Patches (7 hardcoded)
+Direct dict of {article_url → corrected fields}. Applied first, before any scraping.
+
+Key corrections:
+- Керч Оксана: death_year 1911→1991, excluded_pre_soviet→migrated
+- Антонович Катерина: death_year 1884→1975, excluded_pre_soviet→migrated
+- Містраль Ґабрієла: excluded_pre_soviet→excluded_non_ukrainian (Chilean poet)
+- Петровичева Людмила-Ванда: death_year 1882→1971, excluded_pre_soviet→non_migrated
+- Кудравець Анатоль: non_migrated→excluded_non_ukrainian (Belarusian)
+
+### B2 — Birth-Year-as-Death-Year Corrections (~97 entries)
+For entries where birth_year=NaN and death_year matched the first year in ESU notes: re-fetched article HTML, parsed "Дата смерті:" and "Дата народження:" fields, applied corrected years. If corrected death_year ≥ 1921: reclassified via Claude. Rate-limited at 2 req/sec (esu.com.ua).
+
+### B3 — API-Credit-Error Reclassification (57 entries)
+For entries where migration_reasoning contained "credit balance is too low": fetched full bio, re-ran Claude classification (claude-haiku-4-5-20251001). Resolved all 57.
+
+### B4 — Non-Ukrainian Audit
+Checked all analysis-group entries with flag_non_ukrainian=True. Zero confirmed non-Ukrainians remained in analysis groups.
+
+### B5 — Residual Unknown Resolution
+Checked remaining unknown entries for bio availability. Applied classifications where possible.
+
+**Output:** `esu_creative_workers_v2_6.csv` with `fix_applied` column recording each correction.
+
+---
+
+## §8.18 — Stage 13: Validation Review Corrections
+
+**Purpose:** Apply corrections identified during the first 82-entry manual validation review.
+
+**Script:** `stage13_apply_validation_fixes.py`
+
+**Corrections applied (8 entries):**
+- Черняхівська Вероніка: excluded_pre_soviet→migrated (confirmed emigrated, lived to 1966)
+- Бойченко Микола: non_migrated→excluded_bad_dates (irreconcilable dates)
+- Кейс Віталій: unknown→migrated (bio confirms emigration to USA 1951)
+- Plus 5 additional boundary-case corrections
+
+---
+
+## §8.19 — Stage 14: API Authentication Failure Reclassification
+
+**Purpose:** Re-classify 135 entries that failed during Stage 12 B3 due to API authentication errors (different error message than the original "credit balance" failures).
+
+**Script:** `stage14_reclassify_api_failures.py`
+
+**Model:** claude-haiku-4-5-20251001
+**Protocol:** Same 2-step classification prompt as Stage 4
+**Rate:** 0.3 seconds/entry API delay + 0.1 seconds/entry fetch delay
+**Bio source:** Live fetch from esu.com.ua at time of classification
+
+**Results:**
+- 135 entries processed
+- All resolved to valid classification status
+- Entries recorded in `migration_reasoning` with prefix "S14-reclassified:"
+
+**Manual review:** All 135 S14-reclassified entries were reviewed via the Stage 15 HTML reviewer (`validation/stage14_reviewer.html`). 125 correct, 8 wrong, 1 skip, 1 unseen.
+
+---
+
+## §8.20 — Stage 15: Stage-14-Review Corrections
+
+**Purpose:** Apply corrections from the manual Stage 14 reviewer.
+
+**Script:** `stage15_apply_s14_fixes.py`
+
+**Corrections applied (6 entries):**
+
+| Entry | Old status | New status | Reason |
+|---|---|---|---|
+| Глушаниця Павло | migrated | excluded_bad_dates | Bad data, unknown death date |
+| Збіржховська Антоніна | migrated | excluded_galicia_pre_annexation | Galicia, died pre-Soviet annexation |
+| Злоцький Феодосій | non_migrated | excluded_galicia_pre_annexation | Galicia, died pre-Soviet annexation |
+| Камінський Віктор | non_migrated | excluded_galicia_pre_annexation | Galicia, died pre-Soviet annexation |
+| Конрад Джозеф (Joseph Conrad) | migrated | excluded_pre_soviet | Emigrated pre-Soviet era, died 1924 |
+| Лефлер Чарльз-Мартін (Charles Martin Loeffler) | migrated | excluded_non_ukrainian | Not Ukrainian |
+
+**Note on Galicia pre-annexation classification:** Three individuals were active in Galicia (western Ukraine) under Polish/Austro-Hungarian administration before the Soviet annexation of 1939. Because their deaths preceded Soviet control of the region, Soviet demographic conditions did not apply to them. They are excluded from analysis — not because they are non-Ukrainian, but because the comparison requires Soviet-era exposure.
+
+**Final dataset after Stage 15:**
+- N=8,590 analysable (migrated=1,324 | non_migrated=5,960 | internal_transfer=1,111 | deported=195)
+- check_paper_numbers.py: 177/177 PASS
+- Primary gap: **3.98 years** (Cohen's d=0.292)
+
+### Files Created/Modified in Stages 11–15
+
+| File | Action |
+|------|--------|
+| `stage11_data_audit.py` | Created |
+| `stage12_fix_database.py` | Created |
+| `stage13_apply_validation_fixes.py` | Created |
+| `stage14_reclassify_api_failures.py` | Created |
+| `stage15_apply_s14_fixes.py` | Created |
+| `stage15_build_s14_reviewer.py` | Created |
+| `validation/stage14_reviewer.html` | Created |
+| `data_audit_report.md` | Created |
+| `esu_creative_workers_v2_6.csv` | Final dataset (N=8,590) |
+| `PAPER_DRAFT.md` | Complete rewrite as V3.0 |
+| `check_paper_numbers.py` | Updated — 177/177 PASS |
+| `charts/fig01–fig30` | All regenerated on V2.6 dataset |
+| `docs/index.html` | Rebuilt and pushed |
+
+*This log phase completed: 2026-04-09*
