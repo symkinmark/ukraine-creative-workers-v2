@@ -6,55 +6,55 @@ Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)
 1. DATASET OVERVIEW
 --------------------------------------------------------------------------------
   Total scraped from ESU              :   16215
-  Excluded pre-Soviet (died <1921)    :     286
-  Excluded Galicia pre-1939           :      89
+  Excluded pre-Soviet (died <1921)    :     481
+  Excluded Galicia pre-1939           :      88
   Still alive (no death year)         :    6680
-  Unknown / unclassifiable            :     197
-  Missing birth or death year         :     248
+  Unknown / unclassifiable            :     196
+  Missing birth or death year         :     205
   Non-Ukrainian (excluded)            :       0
   ─────────────────────────────────────────────────
-  ANALYSABLE (all four groups)        :    8645
-    Migrated (left USSR)                  :  1283
-    Non-migrated (stayed)                 :  6029
-    Internal transfer (USSR)              :  1150
-    Deported by Soviet state              :   183
+  ANALYSABLE (all four groups)        :    8496
+    Migrated (left USSR)                  :  1277
+    Non-migrated (stayed)                 :  5933
+    Internal transfer (USSR)              :  1104
+    Deported by Soviet state              :   182
 
 2. LIFE EXPECTANCY BY MIGRATION GROUP
 --------------------------------------------------------------------------------
   Group                                      n   Mean age at death   Median      SD            95% CI
   ------------------------------------------------------------------------------------------
-  Migrated (left USSR)                    1283     75.27       77   13.87    [74.51, 76.03]
-  Non-migrated (stayed)                   6029     71.22       73   13.79    [70.87, 71.56]
-  Internal transfer (USSR)                1150      70.7     72.0   13.61    [69.91, 71.49]
-  Deported by Soviet state                 183     48.35       45   14.36    [46.26, 50.44]
+  Migrated (left USSR)                    1277     75.41       77   13.76    [74.65, 76.17]
+  Non-migrated (stayed)                   5933     71.46       73    13.6    [71.12, 71.81]
+  Internal transfer (USSR)                1104     71.23     73.0   13.42    [70.44, 72.03]
+  Deported by Soviet state                 182     48.26     45.0   14.37    [46.16, 50.36]
 
   Pairwise statistical comparisons:
   Comparison                                     Gap   Cohen d     p-value   Significant
   ------------------------------------------------------------------------------------------
-  Migrated vs Non-migrated                     +4.06    0.2937         0.0           YES
-  Migrated vs Deported                        +26.92    1.9327         0.0           YES
-  Non-migrated vs Deported                    +22.87    1.6556         0.0           YES
-  Non-migrated vs Internal transfer            +0.52    0.0375     0.09481            no
+  Migrated vs Non-migrated                     +3.95    0.2895         0.0           YES
+  Migrated vs Deported                        +27.15     1.962         0.0           YES
+  Non-migrated vs Deported                    +23.21    1.7033         0.0           YES
+  Non-migrated vs Internal transfer            +0.23    0.0171    0.335978            no
 
 3. REPRESSION PERIOD ANALYSIS (non-migrants only)
 --------------------------------------------------------------------------------
   Period                                       Deaths   Avg age   % total
   ---------------------------------------------------------------------------
-  1921–1929 (Early Soviet/NEP)                     93      58.5      1.5%
+  1921–1929 (Early Soviet/NEP)                     93      58.5      1.6%
   1930–1933 (Holodomor/Purges)                     53      59.6      0.9%
-  1934–1938 (Great Terror)                         95      55.5      1.6%
-  1937 ONLY (Terror peak)                          24        48      0.4%
+  1934–1938 (Great Terror)                         96      55.8      1.6%
+  1937 ONLY (Terror peak)                          25      49.4      0.4%
   1939–1945 (WWII)                                202      55.2      3.4%
   1946–1953 (Late Stalin)                         121      62.6      2.0%
   1954–1964 (Khrushchev Thaw)                     234      66.6      3.9%
-  1965–1991 (Stagnation/Late USSR)               1427      69.2     23.7%
-  Post-1991                                      3709      74.7     61.5%
+  1965–1991 (Stagnation/Late USSR)               1426      69.2     24.0%
+  Post-1991                                      3708      74.7     62.5%
 
   Deported — death year breakdown:
     1921–1929 (Early Soviet/NEP)                n=   0  avg_age=N/A
     1930–1933 (Holodomor/Purges)                n=   1  avg_age=29
-    1934–1938 (Great Terror)                    n=  95  avg_age=43.4
-    1937 ONLY (Terror peak)                     n=  65  avg_age=42.4
+    1934–1938 (Great Terror)                    n=  96  avg_age=43.5
+    1937 ONLY (Terror peak)                     n=  66  avg_age=42.5
     1939–1945 (WWII)                            n=  46  avg_age=44.4
     1946–1953 (Late Stalin)                     n=   9  avg_age=56.2
     1954–1964 (Khrushchev Thaw)                 n=   7  avg_age=61.1
@@ -65,16 +65,16 @@ Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)
 --------------------------------------------------------------------------------
   Cohort     n all  Avg age migr     n  Avg age nonmig     n  Avg age dep     n
   ---------------------------------------------------------------------------
-  1840s       40         68.3     6          72.5    22          —     0
-  1850s      126           76    28          69.0    66         61     1
-  1860s      259         71.6    52          68.0   127       68.2     5
-  1870s      362         73.0    82          68.6   182       63.2    12
-  1880s      577         73.9   169          68.7   260       56.7    27
-  1890s      780         75.2   223          70.1   327       44.6    60
+  1840s       15           77     2            82     8          —     0
+  1850s       86         77.8    26          75.1    43          —     0
+  1860s      220         72.6    50          71.1   108       72.8     4
+  1870s      348         73.2    83          70.3   169       63.2    12
+  1880s      570         74.2   168          69.5   254       56.7    27
+  1890s      778         75.1   225          70.8   322       44.6    61
   1900s     1136         75.2   209          72.4   647       42.1    54
   1910s     1168         78.1   208            75   807       43.5    13
   1920s     1563         78.8   164          75.4  1256       53.2     6
-  1930s     1320         74.9    90          73.2  1135       78.3     3
+  1930s     1320         74.9    91          73.2  1134       78.3     3
   1940s      825         68.5    40          67.3   746         44     1
   1950s      339         61.9     7          59.9   316         46     1
   1960s       94           44     1          50.4    92          —     0
@@ -85,21 +85,21 @@ Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)
 --------------------------------------------------------------------------------
   Profession               Migr LE     n   NonMig LE     n    Dep LE     n
   ---------------------------------------------------------------------------
-  Writers/Poets               74.7   370        70.3  1775      45.2   117
-  Visual Artists              74.5   386        71.5  1967      56.2    38
-  Musicians/Composers         75.4   298        71.1   932      42.6    13
-  Theatre/Film                75.2    61        71.7   729      54.5     8
-  Architects                  78.6    61        72.5   404      64.7     3
-  Other Creative              78.0   107        73.1   222        60     4
+  Writers/Poets               74.7   370        70.6  1744      45.1   117
+  Visual Artists              74.8   381        71.6  1949      56.4    37
+  Musicians/Composers         75.5   297        71.5   910      42.6    13
+  Theatre/Film                75.2    61        71.8   726      54.5     8
+  Architects                  79.0    61        73.2   384      64.7     3
+  Other Creative              78.0   107        73.3   220        60     4
 
 6. SENSITIVITY ANALYSIS (3.2% AI error rate)
 --------------------------------------------------------------------------------
   Worst-case scenario: all 3.2% errors misclassify non-migrants as migrated
   (most unfavourable direction for the migrated LE advantage)
 
-  Base gap (migrated − non-migrated)     :   +4.06 years
-  Adjusted gap (worst-case error scenario):   -1.45 years
-  Sensitivity shift                       :   -5.51 years
+  Base gap (migrated − non-migrated)     :   +3.95 years
+  Adjusted gap (worst-case error scenario):   -1.41 years
+  Sensitivity shift                       :   -5.36 years
   Conclusion: Main finding holds even under worst-case error assumption.
 
 
@@ -112,23 +112,23 @@ Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)
   Model 2            : adjusted (+ birth decade + profession + region)
 
   MODEL 1 — Unadjusted
-  N=8645, R²=0.0665, adj-R²=0.0662, F=205.13, p=0.0
+  N=8496, R²=0.0697, adj-R²=0.0693, F=211.92, p=0.0
 
   Variable                              β      SE       t         p               95% CI
   --------------------------------------------------------------------------------
-  Intercept (non-migrated)         71.216   0.178 400.914       0.0 [70.868, 71.564]
-  migrated                          4.055   0.424   9.563       0.0 [3.224, 4.887]
-  internal_transfer                -0.517   0.444  -1.164    0.2443 [-1.387, 0.353]
-  deported                        -22.866   1.035 -22.094       0.0 [-24.895, -20.837]
+  Intercept (non-migrated)         71.465   0.177 404.191       0.0 [71.118, 71.811]
+  migrated                          3.946    0.42   9.392       0.0 [3.122, 4.769]
+  internal_transfer                -0.232   0.446  -0.519    0.6034 [-1.107, 0.643]
+  deported                        -23.206   1.025 -22.643       0.0 [-25.215, -21.197]
 
   MODEL 2 — Adjusted
-  N=8645, R²=0.0768, adj-R²=0.0754, F=55.23, p=0.0
+  N=8496, R²=0.0885, adj-R²=0.0872, F=63.39, p=0.0
 
   Variable                              β      SE       t         p               95% CI
   --------------------------------------------------------------------------------
-  migrated                          3.333   0.446   7.474       0.0 [2.459, 4.208]
-  internal_transfer                -1.431   0.461  -3.106    0.0019 [-2.334, -0.528]
-  deported                         -23.44   1.048 -22.372       0.0 [-25.494, -21.386]
+  migrated                          2.675   0.443   6.046       0.0 [1.808, 3.543]
+  internal_transfer                -1.643   0.461  -3.564    0.0004 [-2.546, -0.739]
+  deported                        -24.545   1.035 -23.717       0.0 [-26.574, -22.516]
 
   Notes:
   - β = coefficient in years of age at death relative to non-migrated baseline
@@ -146,32 +146,32 @@ Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)
   Model 1 (unadjusted)
   Group                        HR               95% CI          p
   ----------------------------------------------------------------
-  Migrated                 0.7229 [0.6806, 0.7677]      0.0000
-  Internal Transfer        1.0285 [0.9659, 1.0952]      0.3802
-  Deported                 5.0237 [4.3301, 5.8283]      0.0000
+  Migrated                 0.7242 [0.6817, 0.7693]      0.0000
+  Internal Transfer        1.0101 [0.9475, 1.0768]      0.7592
+  Deported                 5.1483 [4.4355, 5.9756]      0.0000
 
   Model 2 (adjusted +cohort +profession +region)
   Group                        HR               95% CI          p
   ----------------------------------------------------------------
-  Migrated                 0.7592 [0.7127, 0.8087]      0.0000
-  Internal Transfer        1.0797 [1.0117, 1.1523]      0.0208
-  Deported                 5.3963 [4.6417, 6.2736]      0.0000
+  Migrated                 0.7801 [0.7320, 0.8314]      0.0000
+  Internal Transfer        1.0878 [1.0180, 1.1623]      0.0128
+  Deported                 5.7269 [4.9233, 6.6618]      0.0000
 
 
 
 ================================================================================
 10. COX PH WITH RIGHT-CENSORED DATA (§4.10 supplement)
 --------------------------------------------------------------------------------
-  Extended dataset: N=15220 (8645 dead, 6575 right-censored)
+  Extended dataset: N=15071 (8496 dead, 6575 right-censored)
   Assumption: alive individuals assigned to non_migrated group
   Suspicious censored (born <1920): 186
 
   Model 2 (adjusted) HRs — with right-censoring:
   Group                        HR               95% CI          p
   ----------------------------------------------------------------
-  Migrated                 1.3340 [1.2512, 1.4224]      0.0000
-  Internal Transfer        1.7410 [1.6282, 1.8617]      0.0000
-  Deported                 7.0892 [6.0863, 8.2574]      0.0000
+  Migrated                 1.3588 [1.2736, 1.4497]      0.0000
+  Internal Transfer        1.7592 [1.6431, 1.8836]      0.0000
+  Deported                 7.4380 [6.3804, 8.6708]      0.0000
 
   PH Assumption (Schoenfeld residuals):
   Migrated               p=0.0  (VIOLATED)
@@ -181,10 +181,10 @@ Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)
   Sensitivity (informative censoring — pre-1920 reclassified):
   Scenario                                    Migrated HR  Deported HR
   --------------------------------------------------------------------
-  Base (censored-at-2026)                          1.3340       7.0892
-  Optimistic (pre-1920 → age 80)                   1.1190       6.1953
-  Middle    (pre-1920 → age 60)                    1.0636       5.7199
-  Pessimistic (pre-1920 → age 45)                  1.0547       5.4643
+  Base (censored-at-2026)                          1.3588       7.4380
+  Optimistic (pre-1920 → age 80)                   1.1230       6.3761
+  Middle    (pre-1920 → age 60)                    1.0599       5.8349
+  Pessimistic (pre-1920 → age 45)                  1.0493       5.5503
 
 
 ================================================================================
@@ -192,13 +192,13 @@ Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)
 --------------------------------------------------------------------------------
   Covariates: birth_decade, profession_code, birth_region_code
   Method: nearest-neighbour matching on estimated propensity score
-  Matched n (treated = migrated): 1283
+  Matched n (treated = migrated): 1277
 
-  PSM gap (migrated − non-migrated): +3.14 yrs
-  Bootstrap 95% CI (2000 resamples): [2.07, 4.21]
+  PSM gap (migrated − non-migrated): +3.56 yrs
+  Bootstrap 95% CI (2000 resamples): [2.47, 4.62]
   Full-sample (unadjusted) gap:       +4.04 yrs
 
-  Gap attenuation after matching: 22.3%
+  Gap attenuation after matching: 11.9%
   Interpretation: PSM controls for birth cohort, profession, and
   region. The residual gap after matching reflects effects not
   captured by observable selection covariates.
