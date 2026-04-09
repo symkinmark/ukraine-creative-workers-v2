@@ -110,11 +110,11 @@ The ESU does not provide an official API or bulk data download. Data were collec
 
 - **Total ESU entries scraped:** approximately 70,000
 - **Entries matching creative worker profession keywords:** 16,215
-- **Entries usable for primary age-at-death analysis (birth date + death date + determinable migration status + confirmed Ukrainian nationality):** 8,643 (V2.3)
-- **Of which non-migrants:** 6,030
-- **Of which migrants:** 1,280
-- **Of which internal transfers:** 1,150
-- **Of which deported:** 183
+- **Entries usable for primary age-at-death analysis (birth date + death date + determinable migration status + confirmed Ukrainian nationality):** 8,590 (V3.0 / V2.6)
+- **Of which non-migrants:** 5,960
+- **Of which migrants:** 1,324
+- **Of which internal transfers:** 1,111
+- **Of which deported:** 195
 - **Entries excluded due to living status (no death date):** the majority of the excluded entries
 - **Entries excluded due to non-Ukrainian nationality:** 1,218 (after Claude review)
 - **Entries excluded due to indeterminate migration status:** several hundred
@@ -744,7 +744,7 @@ For each of the six profession categories, average life expectancy was calculate
 
 **Python library:** `lifelines` (already used for Kaplan-Meier). Class: `CoxPHFitter(penalizer=0.01)`.
 
-**Sample:** n = 8,643 (identical to OLS). All observations have `event_observed = 1` (confirmed deaths only; living individuals excluded, not right-censored — matches OLS sample).
+**Sample:** n = 8,590 (V3.0 dead cohort, identical to OLS). All observations have `event_observed = 1` (confirmed deaths only; living individuals excluded, not right-censored — matches OLS sample).
 
 **Models:**
 - Model 1 (unadjusted): migration dummies only (reference = non_migrated)
@@ -760,15 +760,15 @@ For each of the six profession categories, average life expectancy was calculate
 
 **Purpose:** Partially address healthy-migrant selection effects on the migrated/non-migrated gap.
 
-**Sample:** migrated (n=1,280) + non_migrated (n=6,030); internal transfer and deported excluded.
+**Sample:** migrated (n=1,324) + non_migrated (n=5,960); internal transfer and deported excluded.
 
 **Covariates:** birth_decade (continuous), profession_code (categorical integer), birth_region_code (categorical integer). Standardised before logistic regression.
 
-**Method:** Estimate propensity score (P(migrated) given covariates) for each individual. Greedy nearest-neighbour matching: each migrated worker matched to the closest non-migrated worker by propensity score distance (no replacement). Matched n = 1,280 pairs.
+**Method:** Estimate propensity score (P(migrated) given covariates) for each individual. Greedy nearest-neighbour matching: each migrated worker matched to the closest non-migrated worker by propensity score distance (no replacement). Matched n = 1,324 pairs.
 
 **Uncertainty:** 95% CI estimated by bootstrap (2,000 resamples, random seed=42) of the matched-sample mean gap.
 
-**Result:** PSM gap = +3.35 yrs (bootstrap 95% CI: [2.26, 4.45]). Full-sample gap for reference: +4.04 yrs. Gap attenuation after matching: 17%. Residual gap after matching is not explained by observable birth-cohort, profession, or region differences.
+**Result:** PSM gap = +3.43 yrs (bootstrap 95% CI: [2.38, 4.51]). Full-sample gap for reference: +3.98 yrs. Gap attenuation after matching: 13.8%. Residual gap after matching is not explained by observable birth-cohort, profession, or region differences.
 
 ### 8.11 Right-Censored Cox PH Analysis — V2.4 (Supersedes V2.3/V2.5 approach)
 
@@ -948,7 +948,7 @@ The birth cohort analysis provides some evidence against a pure selection explan
 ### 10.4 What This Study Can and Cannot Claim
 
 **CAN claim:**
-- There was a statistically robust and practically meaningful mean age at death gap of 4.04 years between Ukrainian creative workers who emigrated from the Soviet Union and those who remained, in a dataset of 8,643 individuals (V2.3).
+- There was a statistically robust and practically meaningful mean age at death gap of 3.98 years between Ukrainian creative workers who emigrated from the Soviet Union and those who remained, in a dataset of 8,590 individuals (V3.0 / V2.6).
 - This gap is larger in cohorts born before 1910 (the Executed Renaissance generation) than in those born after 1920.
 - Average age at death among non-migrant Ukrainian creative workers was anomalously low during the Great Terror (1934–1938) and World War II (1939–1945), consistent with mass political violence.
 - Migration rates among Ukrainian creative workers were substantially higher in western Ukrainian cities than in eastern Ukrainian cities.
@@ -963,15 +963,16 @@ The birth cohort analysis provides some evidence against a pure selection explan
 
 ## 11. Data Availability
 
-### 11.1 Primary Data File (V2.3)
+### 11.1 Primary Data File (V3.0 / V2.6)
 
-**Filename:** `esu_creative_workers_v2_3.csv`
-**Location:** `ukraine_v2/esu_creative_workers_v2_3.csv` (project git repository)
+**Filename:** `esu_creative_workers_v2_6.csv`
+**Location:** `ukraine_v2/esu_creative_workers_v2_6.csv` (project git repository)
 **Format:** CSV, UTF-8 encoded, comma-separated
 **Rows:** 16,215 — one row per individual in the initial dataset
-**Analysable rows:** 8,643 (migration_status in: migrated, non_migrated, internal_transfer, deported, AND valid birth/death years with age 10–110)
+**Analysable rows:** 8,590 (migration_status in: migrated, non_migrated, internal_transfer, deported, AND valid birth/death years with age 10–110)
 
 **Previous versions archived:**
+- V2.3: `esu_creative_workers_v2_3.csv` (8,643 analysable — see Appendix A for V2.3 verification numbers)
 - V2.2: `esu_creative_workers_v2_2.csv` (8,830 analysable — unchanged reference dataset; 19 impossible-age entries not yet excluded)
 - V2.1: `archive/v2_1/esu_creative_workers_v2_1.csv` (6,106 analysable — contains date parsing errors)
 - Raw scrape: `esu_creative_workers_raw.csv` (no classification, no date recovery)
@@ -1239,55 +1240,55 @@ A sample check of profession category assignments should be performed:
 
 ---
 
-## Appendix A: Summary of Key Numbers for Verification (V2.3)
+## Appendix A: Summary of Key Numbers for Verification
 
 A replicating researcher who has successfully reproduced the dataset and analysis should obtain the following numbers. Significant deviation from these figures indicates an error in the replication.
 
 **Dataset scale:**
-| Metric | V2.1 (superseded) | V2.2 (reference) | V2.3 (current) |
-|--------|-------------------|------------------|----------------|
-| Total ESU entries | 16,215 | 16,215 | 16,215 |
-| Analysable entries | 6,106 | 8,830 | **8,643** |
-| Migrated | 927 | 1,273 | **1,280** |
-| Non-migrated | 4,625 | 6,000 | **6,030** |
-| Internal transfer | 479 | 1,155 | **1,150** |
-| Deported | 75 | 178 | **183** |
-| Excluded (alive/unknown/bad dates) | ~10,109 | ~7,385 | **~7,572** |
+| Metric | V2.1 (superseded) | V2.2 (reference) | V2.3 (archived) | **V3.0 (current)** |
+|--------|-------------------|------------------|-----------------|-------------------|
+| Total ESU entries | 16,215 | 16,215 | 16,215 | **16,215** |
+| Analysable entries | 6,106 | 8,830 | 8,643 | **8,590** |
+| Migrated | 927 | 1,273 | 1,280 | **1,324** |
+| Non-migrated | 4,625 | 6,000 | 6,030 | **5,960** |
+| Internal transfer | 479 | 1,155 | 1,150 | **1,111** |
+| Deported | 75 | 178 | 183 | **195** |
+| Excluded (alive/unknown/bad dates) | ~10,109 | ~7,385 | ~7,572 | **~7,625** |
 
-**Primary life expectancy statistics (V2.3):**
+**Primary life expectancy statistics — V3.0 (current):**
 | Metric | Value |
 |--------|-------|
-| Migrated mean LE | **75.25 yrs** |
+| Migrated mean LE | **75.42 yrs** |
 | Migrated median LE | 77 |
-| Migrated SD | 13.89 |
-| Migrated 95% CI | [74.49, 76.01] |
-| Non-migrated mean LE | **71.22 yrs** |
+| Migrated SD | 13.84 |
+| Migrated 95% CI | [74.68, 76.17] |
+| Non-migrated mean LE | **71.44 yrs** |
 | Non-migrated median LE | 73 |
-| Non-migrated SD | 13.81 |
-| Non-migrated 95% CI | [70.86, 71.57] |
-| Internal transfer mean LE | 70.70 yrs |
-| Deported mean LE | **48.35 yrs** |
-| Deported median LE | 45 |
-| **LE gap (migrated − non-migrated)** | **+4.04 yrs** |
+| Non-migrated SD | 13.61 |
+| Non-migrated 95% CI | [71.09, 71.78] |
+| Internal transfer mean LE | 71.09 yrs |
+| Deported mean LE | **49.39 yrs** |
+| Deported median LE | 46 |
+| **LE gap (migrated − non-migrated)** | **+3.98 yrs** |
 | Mann-Whitney U p-value | < 0.001 (≈0.0) |
 | **Cohen's d** | **0.292** |
-| Deported vs non-migrated gap | −22.87 yrs |
-| Deported Cohen's d | 1.656 |
+| Deported vs non-migrated gap | −22.04 yrs |
+| Deported Cohen's d | 1.613 |
 
-**Two-group conservative framing (V2.3):**
+**Historical reference — V2.3 primary LE statistics:**
 | Metric | Value |
 |--------|-------|
-| Migrated n | 1,280 |
-| Stayed (all others) n | 7,362 |
-| Gap | +4.68 yrs |
-| Cohen's d | 0.330 |
+| Migrated mean LE | 75.25 yrs |
+| Non-migrated mean LE | 71.22 yrs |
+| LE gap | +4.04 yrs |
+| Deported mean LE | 48.35 yrs |
 
-**Repression data (V2.3):**
+**Repression data (V3.0):**
 | Metric | Value |
 |--------|-------|
-| 1937 deported deaths | **65 (35.5% of deported group, n=183)** |
-| 1937 non-migrated deaths | 24 |
-| 1937 combined creative deaths | **89** |
+| 1937 deported deaths | **67 (34.4% of deported group, n=195)** |
+| 1937 non-migrated deaths | 25 |
+| 1937 combined nm+dep deaths | **92** |
 | Mean age at death, 1937 deported | 42.7 yrs |
 | Deported with repression-cause death | ~90% |
 
