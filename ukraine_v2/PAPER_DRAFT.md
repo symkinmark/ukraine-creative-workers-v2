@@ -12,7 +12,7 @@ This study examines whether Ukrainian creative workers who emigrated from Soviet
 
 Migrants died on average **3.98 years** later than non-migrants (75.42 yrs vs 71.44 yrs; Cohen's d=0.292; Cliff's δ=0.18; p<0.001). This gap persists across birth cohorts, professions, and genders, and survives propensity-score matching (3.14 yrs; 95% CI: 2.07–4.21). The primary finding is robust to a 10% AI classification error rate.
 
-The strongest signal is among deported workers, who died 22.05 years earlier than non-migrants (mean age 49.39 yrs; Cohen's d=1.613; p<0.001), with peak excess mortality at ages 40–50 (time-varying Cox hazard ratio: 1.89). The internal transfer group shows no significant difference from non-migrants (+0.35 yrs, p=0.271), functioning as a within-Soviet control condition. This null result supports the interpretation that geographic movement per se does not explain the migrant advantage — only exit from Soviet control does.
+The strongest signal is among deported workers, who died 22.05 years earlier than non-migrants (mean age 49.39 yrs; Cohen's d=1.613; p<0.001), with peak excess mortality at ages 40–50 (time-varying Cox hazard ratio: 1.86). The internal transfer group shows no significant difference from non-migrants (+0.35 yrs, p=0.271), functioning as a within-Soviet control condition. This null result supports the interpretation that geographic movement per se does not explain the migrant advantage — only exit from Soviet control does.
 
 Cox proportional hazards modelling yields an adjusted hazard ratio of 0.759 (95% CI: 0.713–0.809) for migrants relative to non-migrants, meaning migrants had approximately 24% lower instantaneous mortality risk at any given age. AI classification quality was validated against a complete 200-entry stratified review, confirming an error rate of 3.2%. The ESU's known coverage bias (favouring culturally prominent figures) means the current 3.98-year estimate is a conservative lower bound.
 
@@ -311,15 +311,15 @@ The PH assumption is violated for the deported group (Schoenfeld residual test p
 
 | Age band | n at risk | Deported events | HR | p |
 |---|---|---|---|---|
-| 20–30 | 15,046 | 10 | 1.10 | 0.348 (NS) |
-| 30–40 | 14,969 | 40 | 1.51 | <0.001 |
-| 40–50 | 14,665 | 48 | **1.89** | <0.001 |
-| 50–60 | 13,786 | 26 | 1.61 | 0.001 |
-| 60–70 | 12,051 | 19 | 1.50 | 0.018 |
-| 70–80 | 8,546 | 11 | 1.21 | 0.361 (NS) |
-| 80–90 | 4,035 | 5 | 0.95 | 0.859 (NS) |
+| 20–30 | 14,994 | 10 | 1.09 | 0.361 (NS) |
+| 30–40 | 14,921 | 42 | 1.50 | <0.001 |
+| 40–50 | 14,619 | 50 | **1.86** | <0.001 |
+| 50–60 | 13,771 | 27 | 1.57 | 0.001 |
+| 60–70 | 12,060 | 19 | 1.40 | 0.037 |
+| 70–80 | 8,580 | 13 | 1.19 | 0.371 (NS) |
+| 80–90 | 4,061 | 6 | 0.89 | 0.657 (NS) |
 
-**Peak HR=1.89 at age 40–50** — the Terror-period execution window. By ages 70–80, deportee survivors show mortality hazard indistinguishable from non-migrants, consistent with survivor selection: those who survived the terror and camp system tended to be unusually resilient. **Figures 28–28b** show the time-varying profile and Schoenfeld residuals.
+**Peak HR=1.86 at age 40–50** — the Terror-period execution window. By ages 70–80, deportee survivors show mortality hazard indistinguishable from non-migrants, consistent with survivor selection: those who survived the terror and camp system tended to be unusually resilient. **Figures 28–28b** show the time-varying profile and Schoenfeld residuals.
 
 ### 4.16 Contextual Comparisons
 
@@ -477,7 +477,7 @@ Future priorities for V3: (1) collect explicit emigration dates to enable reliab
 
 **Figure 27** — *Sensitivity analysis summary.* Multi-panel summary of Scenarios A (duration assumption), B (post-Soviet emigrant handling), and C (bootstrap misclassification).
 
-**Figure 28** — *Deported hazard ratio by age band.* Time-varying (landmark) Cox analysis of the deported group across age bands 20–90. Shows peak HR=1.89 at age 40–50 and convergence toward 1.0 at older ages.
+**Figure 28** — *Deported hazard ratio by age band.* Time-varying (landmark) Cox analysis of the deported group across age bands 20–90. Shows peak HR=1.86 at age 40–50 and convergence toward 1.0 at older ages.
 
 **Figure 28b** — *Schoenfeld residuals (smoothed).* Smoothed Schoenfeld residual plot for the deported group, confirming the time-varying hazard and the PH violation.
 

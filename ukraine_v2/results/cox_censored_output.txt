@@ -1,6 +1,6 @@
 ======================================================================
-Cox PH Model — Right-Censored (N=15,053)
-Events: 8,739  Censored: 6,314
+Cox PH Model — Right-Censored (N=15,000)
+Events: 8,686  Censored: 6,314
 Reference group: non_migrated
 ======================================================================
 
@@ -8,19 +8,19 @@ MODEL 1 — Unadjusted
 --------------------------------------------------
   Group                          HR   95% CI Lower   95% CI Upper         p
   ------------------------------------------------------------------------
-  mig_migrated                1.088          1.028          1.151    0.0033
-  mig_internal_transfer       1.541          1.451          1.637    0.0000
-  mig_deported                4.964          4.267          5.773    0.0000
+  mig_migrated                1.097          1.038          1.159    0.0011
+  mig_internal_transfer       1.518          1.428          1.614    0.0000
+  mig_deported                4.492          3.883          5.197    0.0000
   Concordance: 0.545
 
 MODEL 2 — Adjusted (birth decade + profession + region)
 --------------------------------------------------
   Group                          HR   95% CI Lower   95% CI Upper         p
   ------------------------------------------------------------------------
-  mig_migrated                0.832          0.778          0.889    0.0000
-  mig_internal_transfer       1.105          1.033          1.182    0.0038
-  mig_deported                4.646          3.908          5.524    0.0000
-  Concordance: 0.724
+  mig_migrated                0.832          0.779          0.889    0.0000
+  mig_internal_transfer       1.108          1.035          1.186    0.0034
+  mig_deported                4.029          3.406          4.766    0.0000
+  Concordance: 0.720
 
 SCHOENFELD RESIDUALS TEST — Migration Variables (from Model 2 prior run)
 --------------------------------------------------
