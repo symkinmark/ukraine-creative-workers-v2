@@ -11,7 +11,7 @@ Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)
   Still alive (no death year)         :    6680
   Unknown / unclassifiable            :      61
   Missing birth or death year         :     206
-  Non-Ukrainian (excluded)            :       0
+  Non-Ukrainian (excluded)            :      23
   ─────────────────────────────────────────────────
   ANALYSABLE (all four groups)        :    8590
     Migrated (left USSR)                  :  1324
@@ -196,9 +196,9 @@ Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)
 
   PSM gap (migrated − non-migrated): +3.43 yrs
   Bootstrap 95% CI (2000 resamples): [2.38, 4.51]
-  Full-sample (unadjusted) gap:       +4.04 yrs
+  Full-sample (unadjusted) gap:       +3.98 yrs
 
-  Gap attenuation after matching: 15.1%
+  Gap attenuation after matching: 13.8%
   Interpretation: PSM controls for birth cohort, profession, and
   region. The residual gap after matching reflects effects not
   captured by observable selection covariates.

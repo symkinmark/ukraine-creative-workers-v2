@@ -260,6 +260,8 @@ The most striking difference is at the upper tail: migrants are more than twice 
 
 Lviv and Ternopil show migration rates three to four times higher than Kyiv, consistent with geographic proximity to western borders and Habsburg/Polish emigration networks. The Donetsk 0.0% reflects the complete absence of emigration from this heavily Russified industrial city.
 
+The strong west-to-east gradient in migration rates — from Lviv's 44.8% to Donetsk's 0% — is not merely a demographic curiosity. Western Ukraine's Galician and Bukovinian regions were under Austro-Hungarian rule until 1918, developed a distinct civic and cultural tradition, and maintained stronger connections to Central European and Western intellectual life. This made emigration to Vienna, Prague, Paris, and ultimately North America both more conceivable and more practically feasible for western Ukrainian creative workers. Eastern and southern Ukrainian creative workers were longer-embedded in Soviet institutions, faced steeper barriers to emigration (both practical and ideological), and were more likely to have professional identities intertwined with Soviet cultural organisations. The Donetsk 0% should be interpreted cautiously given the small sample (n=14), but is broadly consistent with this pattern.
+
 ### 4.10 Gender Breakdown
 
 **Figure 17** shows gender composition. Male workers dominate all groups (migrants: 84.8% male; deported: 95.6% male). **Figure 18** shows life expectancy by gender and group. Female migrants live notably longer than male migrants (78.1 vs 74.6 yrs). The migrant survival advantage holds for both genders.
@@ -331,7 +333,17 @@ The PH assumption is violated for the deported group (Schoenfeld residual test p
 
 ### 5.1 What This Data Establishes With Confidence
 
-**The deportee finding is the strongest causal signal.** The 22.05-year mortality deficit (Cohen's d=1.613) is a large effect by any standard in social science. The mechanism is direct and historically documented: deportation meant arrest, brutal transit, labour camp confinement, summary execution, or death in special settlements. The ESU biographical texts for deported individuals frequently state "arrested," "shot," or "died in camp." This is not an inferred effect — it is the direct mortality signature of state-organised violence, concentrated in 1937 (67 of 195 deported workers died in that year alone; combined non-migrated + deported count in 1937: 92 deaths at a blended average age of 44.5 years).
+The 3.98-year gap in mean age at death between migrant and non-migrant Ukrainian creative workers is statistically robust, methodologically defensible, and consistent across all analytical disaggregations. The additional finding of a 22.05-year gap between non-migrants and deportees (Cohen's d=1.613) is arguably the study's most dramatic result. Neither finding is a simple measure of the mortality differential associated with Soviet rule for any individual — both are population-level summary statistics that aggregate across highly heterogeneous individual experiences.
+
+The gap reflects, we argue, primarily four mechanisms:
+
+**Direct political mortality.** The most evident mechanism is execution, imprisonment, and Gulag death. The 92 non-migrated and deported deaths concentrated in 1937 alone (average age ~44.5 for those two groups, versus migrants who died that year of largely natural causes), the deported group's overwhelmingly repression-cause mortality (executed, Gulag, exile, and other state-violence causes dominate the biographical record), and the near-total destruction of the 1890s deported cohort (mean age at death 44.6 years) all point to substantial excess mortality from direct state violence that had no equivalent in migrant communities.
+
+**Indirect mortality from Soviet conditions.** Beyond direct political violence, Soviet conditions — poor nutrition, restricted medical care, psychological stress from constant surveillance and self-censorship, the health consequences of Gulag survival, and enforced poverty — likely contributed to excess mortality among non-migrants across the entire Soviet period. This mechanism is not directly measurable from our data but is consistent with the lower average age at death in every Soviet-era period compared to the post-1991 period (see Table 3).
+
+**Selection effects in emigration.** Not all emigration is equivalent in its effect on subsequent mortality. Those who emigrated during the first wave (pre-1922) typically did so from positions of some privilege — they had resources, connections, and the ability to plan. Those who fled during the second wave (1939–45) often did so under extremely dangerous conditions, with significant mortality risk during flight. It is plausible that the migrant group is positively selected for resourcefulness, social capital, and health relative to the non-migrant group, which would mean that some portion of the mean age at death gap reflects pre-migration differences rather than the causal effect of Soviet conditions.
+
+**Period effects and cohort differences.** As the birth cohort analysis shows, the gap is concentrated in the 1880s and 1890s cohorts — the Executed Renaissance generation — and is substantially smaller in the 1920s cohort (+1.7 yrs). This cohort patterning argues against a simple interpretation of the gap as reflecting baseline differences between migrants and non-migrants; if the gap were primarily driven by selection effects, we would expect it to be more uniform across cohorts.
 
 **The internal transfer null result is the crucial control.** Non-migrated and internally transferred workers have essentially identical life expectancies (+0.35 yrs, p=0.271). Geographic movement within the Soviet system — even movement that displaced workers from their home republic — did not confer the survival advantage seen among those who exited Soviet control entirely. The migrant advantage is specifically associated with exiting the Soviet political system, not merely moving elsewhere.
 
@@ -359,7 +371,17 @@ The late-cohort analysis also reveals convergence: workers born after 1940 show 
 
 ### 5.4 Comparison to Prior Research
 
-The V3.0 gap (+3.98 yrs) is smaller than V1's (+5.4 yrs). As discussed in Section 2.3, this narrowing is expected given improved sampling methodology. The V3.0 estimate is derived from the full ESU population with a complete validated error rate (200/200 entries reviewed) and should be treated as more reliable than V1.
+The reduction in the measured gap from V1 (+5.4 yrs) to V3.0 (+3.98 yrs) deserves careful interpretation. It does not represent a finding that Soviet repression was less lethal than previously estimated. Rather, V1's sample was not systematically drawn and leaned heavily toward writers from the Executed Renaissance cohort — precisely the group most likely to have been killed young in the non-migrated category. The full ESU population includes a large cohort of non-migrants who survived the Soviet period and lived into old age in independent Ukraine. Their inclusion naturally raises the non-migrant mean and narrows the observed gap.
+
+The V1 finding was real within its analytical scope. V3.0 does not contradict it; it extends the analysis to a more complete and representative population. The methodological lesson is clear: future studies of Soviet-era mortality should not restrict to curated or prominent-individual samples, as doing so systematically excludes the longest-lived members of the "stayed" cohort and artificially inflates the measured mortality differential. The V3.0 estimate is more conservative and more defensible precisely because it covers the full ESU population with a validated error rate.
+
+### 5.5 Comparisons to Related Research
+
+Our findings are broadly consistent with existing historical scholarship on Soviet repression and with the limited quantitative literature on mortality in Soviet-era populations. Studies of Gulag mortality document catastrophic death rates in Soviet labour camps, reaching 20–25% annually during 1942–1943, and systematic mass executions during 1937–1938. These documented mortality patterns are broadly consistent with our deported group's average age at death of 43.4 years during 1934–1938 and 44.4 years during 1939–1945.
+
+Comparative demography of Soviet versus Western European general populations documents a Soviet mortality penalty that grew from approximately 3 years in the mid-1960s to over 10 years by the early 1990s, depending on country and sex. Andreev et al.'s demographic reconstruction for the 1927–1959 period directly covers our Great Terror and wartime years. Our finding of a 3.98-year migrant advantage is consistent with the lower end of the East-West divergence range, though our dataset's focus on a group subject to targeted repression means our estimate captures both the general Soviet mortality penalty and the profession-specific repression effect — not general population mortality alone.
+
+**Figure 19** shows ESU group means overlaid on Ukrainian SSR general population estimates. **Figure 21** contextualises creative workers' mean age at death against published estimates for comparable Soviet-era republic populations. **Figure 22** compares non-migrant creative workers against an estimated educated-urban baseline, showing that non-migrants during repression periods fall below even the general population estimate — suggesting excess mortality over and above what socioeconomic composition alone would predict.
 
 ---
 
@@ -411,7 +433,13 @@ The **internal transfer null result** (+0.35 yrs, p=0.271) is as informative as 
 
 The current dataset provides a conservative lower bound. Adding the confirmed 8 missing figures only widens the gap to ~4.1 years. The most severely repressed workers are the least likely to appear in the ESU — meaning the true mortality differential is larger than the 3.98 years observed here.
 
+These findings are consistent with what Ukrainian historians have documented through archival and testimonial evidence: that Soviet cultural policy was associated with substantial mortality differentials among the creative workers who remained under Soviet rule, concentrated particularly in the generation that came of age between the Revolution and the Great Terror. The numbers do not tell the full story — they cannot capture the individual lives, the works that were never written, the music that was never composed, the theatres that went dark — but they provide a quantitative description of mortality patterns that complements the existing archival and testimonial record.
+
+We make no claim that this analysis is definitive. The ESU-based dataset is not a complete census of Ukrainian creative workers; our migration classification system makes simplifications that the historical record does not always support; and the selection effects inherent in emigration preclude clean causal inference. Future research should seek to replicate and extend these findings using alternative data sources — particularly Soviet-era repression records, diaspora archives, and memorial databases — and should apply methods capable of addressing the selection problem more rigorously.
+
 Future priorities for V3: (1) collect explicit emigration dates to enable reliable wave disaggregation; (2) extend the analysis to non-creative professional categories; (3) develop a method to estimate the number and characteristics of ESU-absent repressed workers; (4) attempt independent replication using the VIVO biographical database.
+
+**The Executed Renaissance is not merely a literary metaphor — it describes a historical demographic event whose mortality signature, this study suggests, is quantitatively detectable at scale among the documented figures of Ukrainian cultural life.**
 
 ---
 

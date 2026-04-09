@@ -104,7 +104,7 @@ def main():
     # ── MODEL 1 (Unadjusted) ─────────────────────────────────────────────
     print("Fitting Model 1 (unadjusted)...", flush=True)
     m1_cols = ['duration', 'event_observed'] + mig_vars
-    cph1 = CoxPHFitter(penalizer=0.1)
+    cph1 = CoxPHFitter(penalizer=0.01)
     cph1.fit(d[m1_cols].dropna(), duration_col='duration', event_col='event_observed')
 
     lines.append("MODEL 1 — Unadjusted")
@@ -116,7 +116,7 @@ def main():
     # ── MODEL 2 (Adjusted) ───────────────────────────────────────────────
     print("Fitting Model 2 (adjusted)...", flush=True)
     m2_cols = ['duration', 'event_observed'] + mig_vars + bd_cols + prof_cols + reg_cols
-    cph2 = CoxPHFitter(penalizer=0.1)
+    cph2 = CoxPHFitter(penalizer=0.01)
     cph2.fit(d[m2_cols].dropna(), duration_col='duration', event_col='event_observed')
 
     lines.append("MODEL 2 — Adjusted (birth decade + profession + region)")
@@ -125,19 +125,36 @@ def main():
     lines.append(f"  Concordance: {cph2.concordance_index_:.3f}")
     lines.append("")
 
-    # ── PH ASSUMPTION TEST ───────────────────────────────────────────────
-    # Note: Full Schoenfeld test results from prior run (migration vars only):
-    lines.append("SCHOENFELD RESIDUALS TEST — Migration Variables (from Model 2 prior run)")
+    # ── PH ASSUMPTION TEST (computed live) ───────────────────────────────
+    print("Computing Schoenfeld residuals test...", flush=True)
+    lines.append("SCHOENFELD RESIDUALS TEST — Migration Variables (Model 2, computed live)")
     lines.append("-" * 50)
     lines.append("  Variable               test_stat        p       violation?")
     lines.append("  " + "-" * 60)
-    lines.append("  mig_deported             109.727   <0.0001   *** VIOLATED")
-    lines.append("  mig_migrated               6.504    0.0108   *** VIOLATED")
-    lines.append("  mig_internal_transfer      3.374    0.0662   OK")
-    lines.append("")
-    lines.append("  *** PH violated for deported and migrated groups.")
-    lines.append("  Interpretation: HRs are average effects over follow-up period.")
-    lines.append("  Stratified Cox or time-varying coefs recommended as robustness check.")
+    try:
+        ph_test = proportional_hazard_test(cph2, d[m2_cols].dropna(), time_transform='rank')
+        for v in mig_vars:
+            if v not in ph_test.summary.index:
+                continue
+            ts  = ph_test.summary.loc[v, 'test_statistic']
+            pv  = ph_test.summary.loc[v, 'p']
+            p_str = f"<0.0001" if pv < 0.0001 else f"{pv:.4f}"
+            flag  = "*** VIOLATED" if pv < 0.05 else "OK"
+            lines.append(f"  {v:<25} {ts:>9.3f}   {p_str:<8}   {flag}")
+        lines.append("")
+        # Determine violations
+        violated = [v for v in mig_vars
+                    if v in ph_test.summary.index
+                    and ph_test.summary.loc[v, 'p'] < 0.05]
+        if violated:
+            lines.append(f"  *** PH violated for: {', '.join(violated)}.")
+            lines.append("  Interpretation: HRs are average effects over follow-up period.")
+            lines.append("  Stratified Cox or time-varying coefs recommended as robustness check.")
+        else:
+            lines.append("  PH assumption holds for all migration variables.")
+    except Exception as _eph:
+        lines.append(f"  Schoenfeld test failed: {_eph}")
+        lines.append("  Interpret HRs as average effects; time-varying analysis in stage8.")
 
     lines.append("")
     lines.append("=" * 70)

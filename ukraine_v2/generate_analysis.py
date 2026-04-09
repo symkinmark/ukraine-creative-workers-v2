@@ -195,10 +195,10 @@ excluded_galicia    = [r for r in raw_rows if r['_ms'] == 'excluded_galicia_pre_
 still_alive         = [r for r in raw_rows if r['_ms'] == 'alive']
 # Unknown / unclassifiable
 unknown_status      = [r for r in raw_rows if r['_ms'] == 'unknown']
-# Non-Ukrainian (flagged non-Ukrainian and confirmed non-Ukrainian after review)
-non_ukrainian       = [r for r in raw_rows
-                       if r.get('flag_non_ukrainian', '').strip().upper() == 'YES'
-                       or r.get('is_ukrainian', '').strip().upper() == 'NO']
+# Non-Ukrainian (excluded_non_ukrainian migration_status in V2.6+)
+non_ukrainian       = [r for r in raw_rows if r['_ms'] == 'excluded_non_ukrainian']
+# Excluded: implausible / inconsistent dates
+excluded_bad_dates  = [r for r in raw_rows if r['_ms'] == 'excluded_bad_dates']
 
 # Analysable: has birth + death + one of the four valid migration statuses
 VALID_MS = set(ALL_GROUPS)
@@ -1303,12 +1303,13 @@ cx, cw, ch = 0.50, 0.50, 0.055  # centre, width, height of main boxes
 
 BOX_COORDS = [
     (cx, 0.95, f"ESU.com.ua — all entries scraped\nn = {total_scraped:,}"),
-    (cx, 0.82, f"Filtered: creative profession keywords\nn ≈ {len(raw_rows):,} creative workers"),
-    (cx, 0.69, f"Exclud. pre-Soviet deaths (died <1921)\n− {len(excluded_pre_soviet):,}  and Galicia pre-1939 − {len(excluded_galicia):,}"),
-    (cx, 0.56, f"Exclud. non-Ukrainian (confirmed)\n− {len(non_ukrainian):,}"),
-    (cx, 0.43, f"Exclud. still alive / unknown status\n− {len(still_alive):,} alive  − {len(unknown_status):,} unknown"),
-    (cx, 0.30, f"Exclud. missing birth or death year\n− {len(missing_dates):,}"),
-    (cx, 0.17, (
+    (cx, 0.84, f"Filtered: creative profession keywords\nn ≈ {len(raw_rows):,} creative workers"),
+    (cx, 0.73, f"Exclud. pre-Soviet deaths (died <1921)\n− {len(excluded_pre_soviet):,}  and Galicia pre-1939 − {len(excluded_galicia):,}"),
+    (cx, 0.62, f"Exclud. non-Ukrainian (confirmed)\n− {len(non_ukrainian):,}"),
+    (cx, 0.51, f"Exclud. still alive / unknown status\n− {len(still_alive):,} alive  − {len(unknown_status):,} unknown"),
+    (cx, 0.40, f"Exclud. implausible / bad dates\n− {len(excluded_bad_dates):,}"),
+    (cx, 0.29, f"Exclud. missing birth or death year\n− {len(missing_dates):,}"),
+    (cx, 0.16, (
         f"FINAL ANALYSABLE DATASET\nn = {len(analysable):,}\n"
         f"Migrated: {len(migrated):,}  |  Non-migrated: {len(non_migrated):,}\n"
         f"Internal transfer: {len(internal_transfer):,}  |  Deported: {len(deported):,}"
@@ -4195,7 +4196,8 @@ try:
     print(f"  PSM matched n = {_psm_n} treated (migrated)")
     print(f"  PSM gap (migrated − non-migrated): {_psm_gap_r:+.2f} yrs  "
           f"95% CI [{_psm_ci_lo}, {_psm_ci_hi}]")
-    print(f"  Full-sample gap for reference:  +4.04 yrs")
+    _full_gap = round(float(base_gap), 2) if base_gap else 3.98
+    print(f"  Full-sample gap for reference:  {_full_gap:+.2f} yrs")
 
     # Write PSM results to text report
     with open(OUT_TXT, 'a', encoding='utf-8') as _f:
@@ -4208,8 +4210,8 @@ try:
         _f.write(f'  Matched n (treated = migrated): {_psm_n}\n\n')
         _f.write(f'  PSM gap (migrated − non-migrated): {_psm_gap_r:+.2f} yrs\n')
         _f.write(f'  Bootstrap 95% CI (2000 resamples): [{_psm_ci_lo}, {_psm_ci_hi}]\n')
-        _f.write(f'  Full-sample (unadjusted) gap:       +4.04 yrs\n\n')
-        _attenuation = round(((4.04 - _psm_gap_r) / 4.04) * 100, 1)
+        _f.write(f'  Full-sample (unadjusted) gap:       {_full_gap:+.2f} yrs\n\n')
+        _attenuation = round(((_full_gap - _psm_gap_r) / _full_gap) * 100, 1) if _full_gap else 0
         _f.write(f'  Gap attenuation after matching: {_attenuation:.1f}%\n')
         _f.write(f'  Interpretation: PSM controls for birth cohort, profession, and\n')
         _f.write(f'  region. The residual gap after matching reflects effects not\n')
