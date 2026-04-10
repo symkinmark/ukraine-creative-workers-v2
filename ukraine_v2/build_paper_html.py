@@ -37,7 +37,8 @@ FIGURE_MAP = {
     '13':  'fig14_sensitivity_analysis.png',         # was Fig 14
     '14':  'fig30_sensitivity_gap.png',              # was Fig 30
     '15':  'fig19_ssr_population_context.png',       # was Fig 19
-    # ── Appendix A figures (A1–A18) ──
+    '16':  'fig19b_simplified_death_rate.png',      # was Fig 19b / A16, promoted to main body
+    # ── Appendix A figures (A1–A17) ──
     'A1':  'fig04_box_plots.png',                    # was Fig 4
     'A2':  'fig05_deported_age_histogram.png',       # was Fig 5
     'A3':  'fig06_violin_plots.png',                 # was Fig 6
@@ -53,7 +54,7 @@ FIGURE_MAP = {
     'A13': 'fig15b_all_groups_le_box.png',           # was Fig 15b
     'A14': 'fig13_birth_year_distribution.png',      # was Fig 13
     'A15': 'fig20_two_group_conservative.png',       # was Fig 20
-    'A16': 'fig19b_simplified_death_rate.png',       # was Fig 19b
+    # A16 removed — promoted to main body as Figure 16
     'A17': 'fig27_sensitivity_summary.png',          # was Fig 27
     'A18': 'fig28b_schoenfeld_smooth.png',           # was Fig 28b
     # fig29/29b/29c retracted — wave disaggregation classifier unreliable (§8.7)

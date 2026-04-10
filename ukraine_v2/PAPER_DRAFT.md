@@ -404,7 +404,7 @@ Our findings are broadly consistent with existing historical scholarship on Sovi
 
 Comparative demography of Soviet versus Western European general populations documents a Soviet mortality penalty that grew from approximately 3 years in the mid-1960s to over 10 years by the early 1990s, depending on country and sex. Andreev et al.'s demographic reconstruction for the 1927–1959 period directly covers our Great Terror and wartime years. Our finding of a 3.98-year migrant advantage is consistent with the lower end of the East-West divergence range, though our dataset's focus on a group subject to targeted repression means our estimate captures both the general Soviet mortality penalty and the profession-specific repression effect — not general population mortality alone.
 
-**Figure 15** shows ESU group means overlaid on Ukrainian SSR general population estimates. Appendix A, Figures A9–A10 provide additional contextual comparisons against Soviet republic benchmarks and educated-urban baselines, showing that non-migrants during repression periods fall below even the general population estimate — suggesting excess mortality over and above what socioeconomic composition alone would predict.
+**Figure 15** shows ESU group means overlaid on Ukrainian SSR general population estimates. **Figure 16** provides a simplified view of the same data using annual death rates normalised by group size, making the WWII-era mortality spike and the relative proportions of death across groups clearly visible. Together, these two figures contextualise the creative worker mortality patterns against the broader Ukrainian demographic record. Appendix A, Figures A9–A10 provide additional contextual comparisons against Soviet republic benchmarks and educated-urban baselines, showing that non-migrants during repression periods fall below even the general population estimate — suggesting excess mortality over and above what socioeconomic composition alone would predict.
 
 ---
 
@@ -496,6 +496,8 @@ Future priorities for V3: (1) collect explicit emigration dates to enable reliab
 
 **Figure 15** — *Soviet-era population context.* ESU group means overlaid on Ukrainian SSR general population life expectancy estimates (Meslé & Vallin 2003; UN WPP 2022). Contextualises findings against period life expectancy.
 
+**Figure 16** — *Simplified death rate comparison.* Annual death rate by migration group 1921–1992, normalised by group size (% of each group dying per year). Shows the WWII mortality spike, the Great Terror concentration, and the relative proportions of death across groups in a single view.
+
 Additional figures (box plots, violin plots, gender breakdowns, geographic detail, birth year distributions, Soviet republic comparisons, educated-urban baseline, censoring patterns, Schoenfeld residuals, and multi-scenario sensitivity summaries) are provided in **Appendix A**.
 
 ---
@@ -585,7 +587,6 @@ United Nations Population Division. (2022). *World Population Prospects 2022 Rev
 
 **Figure A15** — *Two-group conservative comparison.* Restricted analysis using only unambiguously classified migrants and non-migrants, as an additional robustness check.
 
-**Figure A16** — *Simplified death rate comparison.* Alternative contextualisation using crude death rates.
 
 **Figure A17** — *Sensitivity analysis summary.* Multi-panel summary of Scenarios A (duration assumption), B (post-Soviet emigrant handling), and C (bootstrap misclassification). The finding persists across all three scenarios.
 
