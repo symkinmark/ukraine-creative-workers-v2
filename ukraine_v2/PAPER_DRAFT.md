@@ -14,7 +14,7 @@ Migrants died on average **3.98 years** later than non-migrants (75.42 yrs vs 71
 
 The strongest signal is among deported workers, who died 22.05 years earlier than non-migrants (mean age 49.39 yrs; Cohen's d=1.613; p<0.001), with peak excess mortality at ages 40–50 (time-varying Cox hazard ratio: 1.86). The internal transfer group shows no significant difference from non-migrants (+0.35 yrs, p=0.271), functioning as a within-Soviet control condition. This null result supports the interpretation that geographic movement per se does not explain the migrant advantage — only exit from Soviet control does.
 
-Cox proportional hazards modelling yields an adjusted hazard ratio of 0.759 (95% CI: 0.713–0.809) for migrants relative to non-migrants, meaning migrants had approximately 24% lower instantaneous mortality risk at any given age. AI classification quality was validated against a complete 200-entry stratified review, confirming an error rate of 3.2%. The ESU's known coverage bias (favouring culturally prominent figures) means the current 3.98-year estimate is a conservative lower bound.
+Cox proportional hazards modelling yields an adjusted hazard ratio of 0.778 (95% CI: 0.731–0.828) for migrants relative to non-migrants, meaning migrants had approximately 22% lower instantaneous mortality risk at any given age. AI classification quality was validated against a complete 200-entry stratified review, confirming an error rate of 3.2%. The ESU's known coverage bias (favouring culturally prominent figures) means the current 3.98-year estimate is a conservative lower bound.
 
 ---
 
@@ -77,7 +77,7 @@ V3.0 incorporates a systematic five-stage database quality pipeline:
 | Groups | 2 (migrated / non-migrated) | 4 (+internal transfer + deported) |
 | Validated error rate | Not assessed | 3.2% (n=200 reviewed; complete) |
 | Primary gap | +9.0 yrs (with pre-1991 cutoff) | +3.98 yrs (no cutoff) |
-| Cox PH | Not performed | HR=0.759 [0.713, 0.809] |
+| Cox PH | Not performed | HR=0.778 [0.731, 0.828] |
 | PSM | Not performed | +3.43 yrs [2.38, 4.51] |
 
 The gap narrowing from V1 (+9.0 yrs) to V3.0 (+3.98 yrs) is expected, not a weakness. V1's pre-1991 death cutoff excluded long-lived non-migrants who survived into Ukrainian independence, artificially depressing the non-migrant mean. V1's small size and non-systematic sampling also over-represented the most extreme cases. The present estimate is more conservative and more defensible precisely because it includes all post-Soviet deaths and covers the full ESU population with a validated error rate.
@@ -99,12 +99,13 @@ A complete scrape of the ESU was performed in late 2025 (17,527 entries retrieve
 **Included:** Any individual with (a) a recognised Ukrainian connection (birth, primary activity, or formative career in territory that became the Ukrainian SSR), (b) a creative profession (broadly defined: writer, poet, visual artist, musician, composer, theatre practitioner, filmmaker, architect, photographer, cultural organiser),[^1] (c) birth year ≥ 1840, and (d) documented death during or after the Soviet period (death year ≥ 1921).
 
 **Excluded:**
-- *Excluded pre-Soviet* (n=286): Died before 1921 — outside the Soviet-period study scope.
-- *Excluded Galicia pre-annexation* (n=89): Active in Galicia before 1939 Soviet annexation; Galician institutions operated under Polish/Austro-Hungarian administration during most of these individuals' active careers. Soviet demographic conditions did not apply.
-- *Excluded non-Ukrainian* (n=7): Confirmed non-Ukrainians with no substantive Ukrainian connection (e.g., Gabriela Mistral, Joseph Conrad, Charles Martin Loeffler — figures included in the ESU for comparative biographical entries).
-- *Excluded bad dates* (n=63): Conflicting or irreconcilable birth/death year records.
-- *Still alive* (n=6,680): No death year recorded — treated as right-censored in the Cox supplementary analysis but excluded from the primary life-expectancy comparison.
-- *Unknown* (n=197): Insufficient biographical information to classify migration status despite full bio review.
+- *Excluded pre-Soviet* (n=490): Died before 1921 — outside the Soviet-period study scope.
+- *Excluded Galicia pre-annexation* (n=91): Active in Galicia before 1939 Soviet annexation; Galician institutions operated under Polish/Austro-Hungarian administration during most of these individuals' active careers. Soviet demographic conditions did not apply.
+- *Excluded non-Ukrainian* (n=23): Confirmed non-Ukrainians with no substantive Ukrainian connection (e.g., Gabriela Mistral, Joseph Conrad, Charles Martin Loeffler — figures included in the ESU for comparative biographical entries).
+- *Excluded bad dates* (n=74): Conflicting or irreconcilable birth/death year records.
+- *Still alive* (n=6,680): No death year recorded — treated as right-censored in the Cox supplementary analysis but excluded from the primary mean-age-at-death comparison.
+- *Unknown* (n=61): Insufficient biographical information to classify migration status despite full bio review.
+- *Missing dates* (n=206): Migration status assigned but birth or death year not documented in ESU entry.
 
 The CONSORT-style exclusion flowchart is shown in Figure 4.
 
@@ -214,7 +215,7 @@ If the gap were simply about who chose to leave, we would expect any form of geo
 
 ### 4.3 Moving Within the Soviet System Did Not Help
 
-The internal transfer group — workers who relocated within the USSR but did not exit Soviet jurisdiction — shows no significant life expectancy advantage over non-migrants: +0.35 years, p=0.271 (NS), Cohen's d=0.026. **Figure 7** illustrates this near-zero gap.
+The internal transfer group — workers who relocated within the USSR but did not exit Soviet jurisdiction — shows no significant mean age at death advantage over non-migrants: +0.35 years, p=0.271 (NS), Cohen's d=0.026. **Figure 7** illustrates this near-zero gap.
 
 This null result is as informative as the positive findings. Geographic movement within the Soviet system — even movement that displaced workers from their home republic — did not confer the survival advantage seen among those who exited Soviet control entirely. The migrant advantage is specifically about exiting the Soviet political system, not merely moving elsewhere.
 
@@ -300,8 +301,8 @@ OLS regression of age at death (**Figure 10**):
 |---|---|---|---|---|
 | Intercept (non-migrated) | 71.44 | — | — | — |
 | Migrated | +3.98 | +2.71 | 0.45 | <0.001 |
-| Internal transfer | −0.35 | −1.43 | 0.46 | 0.002 |
-| Deported | −22.05 | −23.44 | 1.05 | <0.001 |
+| Internal transfer | −0.35 | −1.74 | 0.46 | <0.001 |
+| Deported | −22.05 | −23.31 | 1.01 | <0.001 |
 
 Model 2 (R²=0.086, F=61.97, p<0.001) includes birth decade, profession, and region controls. The migrated coefficient falls from +3.98 to +2.71, indicating that approximately 1.27 years of the raw gap is explained by observable selection covariates (differences in when migrants were born, what professions they held, and where they came from). The residual 2.71-year adjusted gap remains highly significant (p<0.001).
 
@@ -315,13 +316,13 @@ After 1:1 nearest-neighbour PSM on birth decade, profession, and birth region, t
 
 | Group | HR | 95% CI | p |
 |---|---|---|---|
-| Migrated | 0.759 | [0.713, 0.809] | <0.001 |
-| Internal transfer | 1.080 | [1.012, 1.152] | 0.021 |
-| Deported | 5.396 | [4.642, 6.274] | <0.001 |
+| Migrated | 0.778 | [0.731, 0.828] | <0.001 |
+| Internal transfer | 1.087 | [1.018, 1.162] | 0.013 |
+| Deported | 4.421 | [3.822, 5.114] | <0.001 |
 
-Migrants had approximately a 24% lower instantaneous mortality risk at any given age. Deported workers had more than 5 times the mortality hazard. The internal transfer HR (1.08) is marginally elevated but orders of magnitude smaller — consistent with the null result in the mean comparison.
+Migrants had approximately a 24% lower instantaneous mortality risk at any given age. Deported workers had more than 4 times the mortality hazard. The internal transfer HR (1.09) is marginally elevated but orders of magnitude smaller — consistent with the null result in the mean comparison.
 
-**Right-censored supplementary analysis** (N=15,220 including right-censored living individuals): Migrated HR=1.334 (95% CI: 1.251–1.422). The reversal relative to the complete-case model reflects the censoring imbalance: ~52% of non-migrants are right-censored while essentially all migrants are deceased. The complete-case model (HR=0.759) is the primary result. Censoring patterns are documented in Appendix A, Figures A11–A12.
+**Right-censored supplementary analysis** (N=15,165 including right-censored living individuals): Migrated HR=1.346 (95% CI: 1.262–1.434). The reversal relative to the complete-case model reflects the censoring imbalance: ~52% of non-migrants are right-censored while essentially all migrants are deceased. The complete-case model (HR=0.778) is the primary result. Censoring patterns are documented in Appendix A, Figures A11–A12.
 
 ### 6.4 Time-Varying Analysis (Deportees)
 
@@ -379,7 +380,7 @@ We do not claim that emigration *caused* longer life in the sense of a clean exp
 
 **Galician survival selection.** Workers from Galicia (Western Ukraine, under Polish/Austrian rule until 1939) were geographically positioned to emigrate westward more easily and had pre-existing North American diaspora networks. They also experienced Soviet control later — their exposure to the worst Stalinist terror years was shorter. Some of the observed advantage may reflect this different exposure history rather than emigration per se.
 
-**Healthy migrant effect.** Workers who survived the emigration journey — often under wartime conditions — were already selected for physical resilience. This selection bias would inflate the observed migrant LE.
+**Healthy migrant effect.** Workers who survived the emigration journey — often under wartime conditions — were already selected for physical resilience. This selection bias would inflate the observed migrant mean age at death.
 
 **Post-Soviet non-migrant composition.** 61.5% of non-migrant deaths occurred after 1991. The non-migrant mean is elevated by a large cohort of workers who lived long into Ukrainian independence. This makes the observed gap conservative: restricting to Soviet-period deaths only would show a larger gap.
 
@@ -439,7 +440,7 @@ An early analysis (Stage 9) attempted to disaggregate migrants by emigration wav
 
 ### 8.8 Living Cohort Assumptions (Right-Censored Cox)
 
-The right-censored supplementary Cox analysis treats living individuals as censored at 2026. This introduces bias because living individuals are concentrated in the non-migrated group (~52% censored). The complete-case Cox (HR=0.759) is the primary model.
+The right-censored supplementary Cox analysis treats living individuals as censored at 2026. This introduces bias because living individuals are concentrated in the non-migrated group (~52% censored). The complete-case Cox (HR=0.778) is the primary model.
 
 ---
 
@@ -485,7 +486,7 @@ Future priorities for V3: (1) collect explicit emigration dates to enable reliab
 
 **Figure 10** — *Regression coefficient plot.* Forest plot of OLS regression coefficients for all variables in Model 2, including birth decade, profession, and region controls.
 
-**Figure 11** — *Cox proportional hazards forest plot.* Hazard ratios and 95% CIs for all four groups from the adjusted Cox model. Migrants HR=0.759; deported HR=5.40.
+**Figure 11** — *Cox proportional hazards forest plot.* Hazard ratios and 95% CIs for all four groups from the adjusted Cox model. Migrants HR=0.778; deported HR=5.40.
 
 **Figure 12** — *Deported hazard ratio by age band.* Time-varying (landmark) Cox analysis of the deported group across age bands 20–90. Shows peak HR=1.86 at age 40–50 and convergence toward 1.0 at older ages.
 
@@ -521,6 +522,14 @@ A stratified random validation sample of 200 entries (100 INCLUDE, 100 EXCLUDE c
 - Stage 15: 6 Stage-14-review corrections
 
 Full classification prompts, model versions, and per-entry reasoning are stored in the `migration_reasoning` column of `esu_creative_workers_v2_6.csv`. Methodology documentation: `AI_METHODOLOGY_LOG.md`. All scripts: `ukraine_v2/` directory.
+
+---
+
+[^1]: The full list of 31 Ukrainian-language profession keywords used for filtering is documented in `SCIENTIFIC_METHODOLOGY.md`, Section 3.4.
+
+[^2]: "Soviet-controlled territory" includes the Ukrainian SSR, other Soviet republics, and Soviet-occupied territories. Workers who emigrated to any non-Soviet destination (Western Europe, North America, Australia, etc.) are classified as migrated.
+
+[^3]: Individuals without documented death years (n=6,680) are treated as right-censored in the supplementary Cox analysis but excluded from the primary mean-age-at-death comparison.
 
 ---
 
