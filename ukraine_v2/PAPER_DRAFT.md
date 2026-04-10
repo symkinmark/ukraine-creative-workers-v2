@@ -154,7 +154,7 @@ Full regression tables and alternative model specifications are provided in Appe
 
 ### 4.1 Migrants Lived 3.98 Years Longer
 
-The complete ESU scrape yielded 16,215 entries. After applying inclusion/exclusion criteria (see §3.2), 8,590 deceased individuals with complete birth and death year data entered the analysis. Group composition: migrated 1,324 (15.4%), non-migrated 5,960 (69.4%), internal transfer 1,111 (12.9%), deported 195 (2.3%). Gender data are complete for all 8,590 entries: 7,208 male (83.9%), 1,382 female (16.1%). Birth years range from 1840 to 1982; the majority were born between 1870 and 1940.
+The complete ESU scrape yielded 16,215 entries. After applying inclusion/exclusion criteria (see §3.2), 8,590 deceased individuals with complete birth and death year data entered the analysis. Group composition: migrated 1,324 (15.4%), non-migrated 5,960 (69.4%), internal transfer 1,111 (12.9%), deported 195 (2.3%). Gender: 7,195 male (84.1%), 1,358 female (15.9%), 37 unknown (0.4%). Birth years range from 1840 to 1982; the majority were born between 1870 and 1940.
 
 **Figure 1** shows the primary result.
 
@@ -254,13 +254,13 @@ Writers/Poets — the group most associated with the Executed Renaissance — sh
 | 1900s | 75.2 | 218 | 72.4 | 650 | 44.2 | 59 | +2.8 |
 | 1910s | 77.6 | 219 | 74.9 | 809 | 46.9 | 14 | +2.7 |
 | 1920s | 78.9 | 167 | 75.4 | 1,260 | 53.2 | 6 | +3.5 |
-| 1930s | 74.9 | 92 | 73.2 | 1,136 | 78.3 | 4 | +1.7 |
+| 1930s | 74.9 | 92 | 73.2 | 1,136 | 77.8 | 4 | +1.7 |
 
 The 1930s birth cohort shows the smallest gap (+1.7 yrs), consistent with the post-Stalinist easing of direct violence. This cohort patterning is important: if the gap were primarily driven by selection effects (healthier or wealthier people emigrating), we would expect it to be roughly uniform across cohorts. Instead, it is concentrated in the cohorts most exposed to Stalinist terror — arguing for a real mortality differential, not merely a compositional artefact.
 
 ### 5.3 The Gap Holds for Both Sexes
 
-Male workers dominate all groups (migrants: 84.8% male; deported: 95.6% male). The deported group's near-total male composition reflects the documented pattern of Soviet security services targeting male cultural figures. Female migrants live notably longer than male migrants (78.1 vs 74.6 yrs). Critically, the migrant survival advantage holds for both genders. Full gender breakdowns are provided in Appendix A, Figures A7–A8.
+Male workers dominate all groups (migrants: 79.3% male; deported: 92.7% male; 37 entries across all groups have unknown gender). The deported group's heavily male composition reflects the documented pattern of Soviet security services targeting male cultural figures. Female migrants live notably longer than male migrants (78.1 vs 74.6 yrs). Critically, the migrant survival advantage holds for both genders. Full gender breakdowns are provided in Appendix A, Figures A7–A8.
 
 ### 5.4 A West-to-East Gradient in Emigration
 
@@ -347,9 +347,9 @@ Three additional robustness scenarios are summarised in Appendix B: duration ass
 
 ### 6.6 Missing-Worker Bias
 
-**Figure 14** quantifies the missing-worker bias. Eight individuals confirmed to meet study inclusion criteria are absent from the ESU (see Section 8.2 for names and details). Their mean age at death is 39.0 years — 32 years below the non-migrant mean.
+**Figure 14** quantifies the missing-worker bias. Eight individuals confirmed to meet study inclusion criteria are absent from the ESU (see Section 8.2 for names and details). Their mean age at death is 43.8 years — 28 years below the non-migrant mean.
 
-Adding these 8 confirmed missing workers adjusts the gap to approximately 4.10 years. Adding 50 plausible missing workers at a conservative assumed mean of 38 years adjusts it to 4.33 years. Under no plausible assumption does adding missing repressed workers *narrow* the gap — the estimate is a conservative lower bound.
+Adding these 8 confirmed missing workers adjusts the gap to approximately 4.02 years. Adding 50 plausible missing workers at a conservative assumed mean of 38 years adjusts it to 4.26 years. Under no plausible assumption does adding missing repressed workers *narrow* the gap — the estimate is a conservative lower bound.
 
 ---
 
@@ -415,7 +415,7 @@ The ESU disproportionately covers culturally prominent individuals. Workers who 
 
 ### 8.2 Missing Repressed Workers
 
-Eight individuals confirmed to meet study inclusion criteria are absent from the ESU: Vasyl Stus (died Perm-36, age 47), Mykola Khvylovy (suicide, age 39), Mykola Zerov (shot Sandarmokh, age 47), Les Kurbas (shot Sandarmokh, age 50), Mykola Kulish (shot Sandarmokh, age 47), Oles Dosvitniy (shot, age 42), Mykola Boychuk (shot, age 52), Hnat Mykhailychenko (shot, age 26). Their mean age at death is 39.0 years. Adding 50 plausible missing workers at a conservative assumed mean of 38 years widens the gap to 4.33 years.
+Eight individuals confirmed to meet study inclusion criteria are absent from the ESU: Vasyl Stus (died Perm-36, age 47), Mykola Khvylovy (suicide, age 39), Mykola Zerov (shot Sandarmokh, age 47), Les Kurbas (shot Sandarmokh, age 50), Mykola Kulish (shot Sandarmokh, age 47), Oles Dosvitniy (shot, age 42), Mykola Boychuk (shot, age 52), Hnat Mykhailychenko (shot, age 26). Their mean age at death is 43.8 years — 28 years below the non-migrant mean. Adding 50 plausible missing workers at a conservative assumed mean of 38 years widens the gap to 4.26 years.
 
 ### 8.3 Classification Quality
 
@@ -451,7 +451,7 @@ The finding that matters most is not the 3.98-year gap but the **22.05-year defi
 
 The **internal transfer null result** (+0.35 yrs, p=0.271) is as informative as the positive findings: workers who moved within the Soviet system lived essentially the same lifespan as those who stayed. The survival advantage was specifically associated with exit from Soviet control, not merely geographic movement.
 
-The current dataset provides a conservative lower bound. Adding the confirmed 8 missing figures only widens the gap to ~4.1 years. The most severely repressed workers are the least likely to appear in the ESU — meaning the true mortality differential is larger than the 3.98 years observed here.
+The current dataset provides a conservative lower bound. Adding the confirmed 8 missing figures only widens the gap to ~4.0 years. The most severely repressed workers are the least likely to appear in the ESU — meaning the true mortality differential is larger than the 3.98 years observed here.
 
 These findings are consistent with what Ukrainian historians have documented through archival and testimonial evidence: that Soviet cultural policy was associated with substantial mortality differentials among the creative workers who remained under Soviet rule, concentrated particularly in the generation that came of age between the Revolution and the Great Terror. The numbers do not tell the full story — they cannot capture the individual lives, the works that were never written, the music that was never composed, the theatres that went dark — but they provide a quantitative description of mortality patterns that complements the existing archival and testimonial record.
 

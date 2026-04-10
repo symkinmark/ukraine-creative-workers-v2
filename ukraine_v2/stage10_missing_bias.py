@@ -57,59 +57,70 @@ NAMED_CASES = [
         'notes':            'Central figure of the Executed Renaissance; pseudonym of Mykola Fitiliov'
     },
     {
-        'name':             'Vasyl Symonenko',
-        'birth_year':       1935,
-        'death_year':       1963,
-        'age_at_death':     28,
-        'death_cause':      'Disputed; suspected injuries sustained during KGB custody',
-        'migration_status': 'non_migrated',
-        'source':           'Kharkiv Human Rights Group; Symonenko family memoirs',
+        'name':             'Mykola Zerov',
+        'birth_year':       1890,
+        'death_year':       1937,
+        'age_at_death':     47,
+        'death_cause':      'Shot at Sandarmokh, November 1937',
+        'migration_status': 'deported',
+        'source':           'Sandarmokh martyrology; Memorial database; SBU declassified files',
         'esu_absent':       True,
-        'notes':            'Shestydesiatnyky generation poet; note: Petro Symonenko in dataset is different person'
+        'notes':            'Neoclassicist poet, translator, literary critic; arrested 1935'
     },
     {
-        'name':             'Mykhailo Semenko',
+        'name':             'Les Kurbas',
+        'birth_year':       1887,
+        'death_year':       1937,
+        'age_at_death':     50,
+        'death_cause':      'Shot at Sandarmokh, November 1937',
+        'migration_status': 'deported',
+        'source':           'Sandarmokh martyrology; Memorial database; SBU declassified files',
+        'esu_absent':       True,
+        'notes':            'Founder of modern Ukrainian theatre (Berezil theatre); arrested 1933'
+    },
+    {
+        'name':             'Mykola Kulish',
         'birth_year':       1892,
         'death_year':       1937,
-        'age_at_death':     45,
-        'death_cause':      'Shot; Great Terror, October 1937',
-        'migration_status': 'non_migrated',
-        'source':           'SBU file 68718; Rehabilitovani istoriieiu Kyiv vol. 3',
+        'age_at_death':     47,
+        'death_cause':      'Shot at Sandarmokh, November 1937',
+        'migration_status': 'deported',
+        'source':           'Sandarmokh martyrology; Memorial database; SBU declassified files',
         'esu_absent':       True,
-        'notes':            'Founder of Ukrainian panfuturism (avant-garde movement)'
+        'notes':            'Playwright; collaborator of Les Kurbas at Berezil; arrested 1934'
     },
     {
-        'name':             'Yevhen Pluzhnyk',
-        'birth_year':       1898,
-        'death_year':       1936,
-        'age_at_death':     38,
-        'death_cause':      'Shot; Solovki execution, February 1936',
-        'migration_status': 'non_migrated',
-        'source':           'Solovki martyrology; Memorial database; Rehabilitovani istoriieiu',
-        'esu_absent':       True,
-        'notes':            'Lyric poet; arrested 1934 as member of alleged "underground" group'
-    },
-    {
-        'name':             'Myroslav Irchan',
-        'birth_year':       1897,
-        'death_year':       1937,
-        'age_at_death':     40,
-        'death_cause':      'Shot; Great Terror, 1937',
-        'migration_status': 'non_migrated',
-        'source':           'Memorial database; Rehabilitovani istoriieiu; SBU declassified files',
-        'esu_absent':       True,
-        'notes':            'Playwright and short story writer; pseudonym of Andrii Babyuk'
-    },
-    {
-        'name':             'Dmytro Falkivsky',
-        'birth_year':       1898,
+        'name':             'Oles Dosvitniy',
+        'birth_year':       1891,
         'death_year':       1934,
-        'age_at_death':     36,
+        'age_at_death':     42,
         'death_cause':      'Shot; NKVD execution, 1934',
         'migration_status': 'non_migrated',
         'source':           'Rehabilitovani istoriieiu; Ukrainian Literary Encyclopedia',
         'esu_absent':       True,
-        'notes':            'Poet; associated with the Pluh literary organisation'
+        'notes':            'Writer and literary organiser; pseudonym of Oleksandr Skrypai'
+    },
+    {
+        'name':             'Mykola Boychuk',
+        'birth_year':       1882,
+        'death_year':       1937,
+        'age_at_death':     52,
+        'death_cause':      'Shot; Great Terror, 1937',
+        'migration_status': 'non_migrated',
+        'source':           'Memorial database; Rehabilitovani istoriieiu; SBU declassified files',
+        'esu_absent':       True,
+        'notes':            'Founder of Boychukism monumental art movement; arrested 1936'
+    },
+    {
+        'name':             'Hnat Mykhailychenko',
+        'birth_year':       1892,
+        'death_year':       1919,
+        'age_at_death':     26,
+        'death_cause':      'Shot by White Army forces during Civil War',
+        'migration_status': 'non_migrated',
+        'source':           'Ukrainian Literary Encyclopedia; historical archives',
+        'esu_absent':       True,
+        'notes':            'Writer and political activist; killed age 26 during Civil War'
     },
 ]
 
