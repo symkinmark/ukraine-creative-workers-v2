@@ -104,7 +104,7 @@ def main():
     # ── MODEL 1 (Unadjusted) ─────────────────────────────────────────────
     print("Fitting Model 1 (unadjusted)...", flush=True)
     m1_cols = ['duration', 'event_observed'] + mig_vars
-    cph1 = CoxPHFitter(penalizer=0.01)
+    cph1 = CoxPHFitter(penalizer=0.1)
     cph1.fit(d[m1_cols].dropna(), duration_col='duration', event_col='event_observed')
 
     lines.append("MODEL 1 — Unadjusted")
@@ -116,7 +116,7 @@ def main():
     # ── MODEL 2 (Adjusted) ───────────────────────────────────────────────
     print("Fitting Model 2 (adjusted)...", flush=True)
     m2_cols = ['duration', 'event_observed'] + mig_vars + bd_cols + prof_cols + reg_cols
-    cph2 = CoxPHFitter(penalizer=0.01)
+    cph2 = CoxPHFitter(penalizer=0.1)
     cph2.fit(d[m2_cols].dropna(), duration_col='duration', event_col='event_observed')
 
     lines.append("MODEL 2 — Adjusted (birth decade + profession + region)")

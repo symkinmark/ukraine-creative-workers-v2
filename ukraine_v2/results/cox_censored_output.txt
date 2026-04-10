@@ -8,27 +8,27 @@ MODEL 1 — Unadjusted
 --------------------------------------------------
   Group                          HR   95% CI Lower   95% CI Upper         p
   ------------------------------------------------------------------------
-  mig_migrated                1.122          1.058          1.190    0.0001
-  mig_internal_transfer       1.601          1.502          1.706    0.0000
-  mig_deported                5.311          4.604          6.127    0.0000
+  mig_migrated                1.097          1.038          1.159    0.0011
+  mig_internal_transfer       1.518          1.428          1.614    0.0000
+  mig_deported                4.492          3.883          5.197    0.0000
   Concordance: 0.545
 
 MODEL 2 — Adjusted (birth decade + profession + region)
 --------------------------------------------------
   Group                          HR   95% CI Lower   95% CI Upper         p
   ------------------------------------------------------------------------
-  mig_migrated                0.737          0.672          0.808    0.0000
-  mig_internal_transfer       1.108          1.010          1.215    0.0300
-  mig_deported               56.498         50.228         63.552    0.0000
-  Concordance: 0.721
+  mig_migrated                0.832          0.779          0.889    0.0000
+  mig_internal_transfer       1.108          1.035          1.186    0.0034
+  mig_deported                4.029          3.406          4.766    0.0000
+  Concordance: 0.720
 
 SCHOENFELD RESIDUALS TEST — Migration Variables (Model 2, computed live)
 --------------------------------------------------
   Variable               test_stat        p       violation?
   ------------------------------------------------------------
-  mig_migrated                  3.233   0.0722     OK
-  mig_internal_transfer        19.410   <0.0001    *** VIOLATED
-  mig_deported                331.828   <0.0001    *** VIOLATED
+  mig_migrated                  2.077   0.1495     OK
+  mig_internal_transfer         5.441   0.0197     *** VIOLATED
+  mig_deported                138.674   <0.0001    *** VIOLATED
 
   *** PH violated for: mig_internal_transfer, mig_deported.
   Interpretation: HRs are average effects over follow-up period.
