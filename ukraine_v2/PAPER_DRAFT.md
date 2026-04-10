@@ -348,7 +348,7 @@ Three additional robustness scenarios are summarised in Appendix B: duration ass
 
 ### 6.6 Missing-Worker Bias
 
-**Figure 14** quantifies the missing-worker bias. Eight individuals confirmed to meet study inclusion criteria are absent from the ESU (see Section 8.2 for names and details). Their mean age at death is 43.8 years — 28 years below the non-migrant mean.
+**Figure 14** quantifies the missing-worker bias. Seven individuals confirmed to meet study inclusion criteria are absent from the ESU (see Section 8.2 for names and details). Their mean age at death is 46.7 years — 25 years below the non-migrant mean.
 
 Adding these 8 confirmed missing workers adjusts the gap to approximately 4.02 years. Adding 50 plausible missing workers at a conservative assumed mean of 38 years adjusts it to 4.26 years. Under no plausible assumption does adding missing repressed workers *narrow* the gap — the estimate is a conservative lower bound.
 
@@ -416,7 +416,7 @@ The ESU disproportionately covers culturally prominent individuals. Workers who 
 
 ### 8.2 Missing Repressed Workers
 
-Eight individuals confirmed to meet study inclusion criteria are absent from the ESU: Vasyl Stus (died Perm-36, age 47), Mykola Khvylovy (suicide, age 39), Mykola Zerov (shot Sandarmokh, age 47), Les Kurbas (shot Sandarmokh, age 50), Mykola Kulish (shot Sandarmokh, age 47), Oles Dosvitniy (shot, age 42), Mykola Boychuk (shot, age 52), Hnat Mykhailychenko (shot, age 26). Their mean age at death is 43.8 years — 28 years below the non-migrant mean. Adding 50 plausible missing workers at a conservative assumed mean of 38 years widens the gap to 4.26 years.
+Seven individuals confirmed to meet study inclusion criteria are absent from the ESU: Vasyl Stus (died Perm-36, age 47), Mykola Khvylovy (suicide, age 40), Mykola Zerov (shot Sandarmokh, age 47), Les Kurbas (shot Sandarmokh, age 50), Mykola Kulish (shot Sandarmokh, age 45), Oles Dosvitniy (shot, age 43), Mykola Boychuk (shot, age 55). Their mean age at death is 46.7 years — 25 years below the non-migrant mean. Ages are calculated as death_year minus birth_year, consistent with the study's primary method. Adding 50 plausible missing workers at a conservative assumed mean of 38 years widens the gap further.
 
 ### 8.3 Classification Quality
 
@@ -452,7 +452,7 @@ The finding that matters most is not the 3.98-year gap but the **22.05-year defi
 
 The **internal transfer null result** (+0.35 yrs, p=0.271) is as informative as the positive findings: workers who moved within the Soviet system lived essentially the same lifespan as those who stayed. The survival advantage was specifically associated with exit from Soviet control, not merely geographic movement.
 
-The current dataset provides a conservative lower bound. Adding the confirmed 8 missing figures only widens the gap to ~4.0 years. The most severely repressed workers are the least likely to appear in the ESU — meaning the true mortality differential is larger than the 3.98 years observed here.
+The current dataset provides a conservative lower bound. Adding the confirmed 7 missing figures only widens the gap to ~4.0 years. The most severely repressed workers are the least likely to appear in the ESU — meaning the true mortality differential is larger than the 3.98 years observed here.
 
 These findings are consistent with what Ukrainian historians have documented through archival and testimonial evidence: that Soviet cultural policy was associated with substantial mortality differentials among the creative workers who remained under Soviet rule, concentrated particularly in the generation that came of age between the Revolution and the Great Terror. The numbers do not tell the full story — they cannot capture the individual lives, the works that were never written, the music that was never composed, the theatres that went dark — but they provide a quantitative description of mortality patterns that complements the existing archival and testimonial record.
 
@@ -543,27 +543,13 @@ Conquest, R. (1968). *The Great Terror: Stalin's Purge of the Thirties*. Macmill
 
 Grabowicz, G. G. (1982). The Ukrainian Literary Revival: Toward a New Understanding. *Harvard Ukrainian Studies*, 6(2), 209–260.
 
-Hrytsak, Y. (2011). *Strasti za natsionalizmom* [Passions for Nationalism]. Krytyka.
-
-Human Mortality Database (2024). University of California, Berkeley, and Max Planck Institute for Demographic Research. www.mortality.org.
-
-Klid, B., & Motyl, A. J. (Eds.). (2012). *The Holodomor Reader: A Sourcebook on the Famine of 1932–1933 in Ukraine*. Canadian Institute of Ukrainian Studies Press.
-
 Meslé, F., & Vallin, J. (2003). Mortality in Eastern Europe and the Former Soviet Union: Long-term trends and recent upturns. *Demographic Research*, Special Collection 2, 45–70.
-
-Motyl, A. J. (2010). *The Turn to the Right: The Ideological Origins and Development of Ukrainian Nationalism, 1919–1929*. East European Monographs.
 
 Shkandrij, M. (2010). *In the Maelstrom: The Artef, Ukrainian Modernism, and Soviet Cultural Policy, 1917–1932*. University of Toronto Press.
 
 Snyder, T. (2010). *Bloodlands: Europe Between Hitler and Stalin*. Basic Books.
 
-Subtelny, O. (2000). *Ukraine: A History* (3rd ed.). University of Toronto Press.
-
 United Nations Population Division. (2022). *World Population Prospects 2022 Revision*. United Nations.
-
-Wheatcroft, S. G. (1996). The Scale and Nature of German and Soviet Repression and Mass Killings, 1930–45. *Europe-Asia Studies*, 48(8), 1319–1353.
-
-Yekelchyk, S. (2007). *Ukraine: Birth of a Modern Nation*. Oxford University Press.
 
 ---
 

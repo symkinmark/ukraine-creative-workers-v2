@@ -567,6 +567,97 @@ dep_wwii_avg = round(statistics.mean(dep_wwii_ages), 1) if dep_wwii_ages else No
 check("Deported 1939–45 avg age 45.0 (§5.5)", dep_wwii_avg, 45.0, 0.15)
 
 # ---------------------------------------------------------------------------
+# COX PH / OLS / PSM — verify paper claims match output files
+# ---------------------------------------------------------------------------
+import re as _re
+
+def _extract_cox_hr(filepath, model_label, group_prefix):
+    """Extract HR from cox_output.txt for a given model and group."""
+    try:
+        with open(filepath) as f:
+            content = f.read()
+        # Find the model section
+        sections = content.split('COX MODEL')
+        for sec in sections:
+            if model_label in sec:
+                for line in sec.split('\n'):
+                    if group_prefix in line:
+                        parts = line.split()
+                        # exp(coef) is the HR
+                        idx = [i for i, p in enumerate(parts) if p == group_prefix][0]
+                        # In cox_output.txt, exp(coef) is the 2nd numeric column
+                        nums = [float(x) for x in parts if _re.match(r'^-?\d+\.\d+$', x)]
+                        if len(nums) >= 2:
+                            return round(nums[1], 3)  # exp(coef)
+    except Exception:
+        pass
+    return None
+
+def _extract_censored_hr(filepath, model_num, group_name):
+    """Extract HR from cox_censored_output.txt."""
+    try:
+        with open(filepath) as f:
+            lines = f.readlines()
+        in_model = False
+        for line in lines:
+            if f'MODEL {model_num}' in line:
+                in_model = True
+            elif 'MODEL' in line and f'MODEL {model_num}' not in line:
+                in_model = False
+            if in_model and group_name in line:
+                nums = _re.findall(r'[\d.]+', line)
+                if len(nums) >= 1:
+                    return float(nums[0])
+    except Exception:
+        pass
+    return None
+
+def _extract_ols_beta(filepath, model_label, variable):
+    """Extract β from analysis_v2_6.txt OLS section."""
+    try:
+        with open(filepath) as f:
+            content = f.read()
+        # Find Model 2 section
+        idx = content.find(model_label)
+        if idx < 0:
+            return None
+        section = content[idx:idx+500]
+        for line in section.split('\n'):
+            if variable in line:
+                nums = _re.findall(r'-?\d+\.\d+', line)
+                if nums:
+                    return float(nums[0])
+    except Exception:
+        pass
+    return None
+
+COX_PATH = os.path.join(HERE, 'cox_output.txt')
+COX_CENS_PATH = os.path.join(HERE, 'results', 'cox_censored_output.txt')
+ANALYSIS_PATH = os.path.join(HERE, 'analysis_v2_6.txt')
+
+# Complete-case Cox Model 2 (adjusted) — paper §6.3
+cox_mig_hr = _extract_cox_hr(COX_PATH, '2 — Adjusted', 'mig_migrated')
+cox_it_hr = _extract_cox_hr(COX_PATH, '2 — Adjusted', 'mig_internal_transfer')
+cox_dep_hr = _extract_cox_hr(COX_PATH, '2 — Adjusted', 'mig_deported')
+
+if cox_mig_hr: check("Cox HR migrated (§6.3)", cox_mig_hr, 0.778, 0.002)
+if cox_it_hr:  check("Cox HR internal transfer (§6.3)", cox_it_hr, 1.087, 0.002)
+if cox_dep_hr: check("Cox HR deported (§6.3)", cox_dep_hr, 4.421, 0.002)
+
+# Right-censored Cox — paper supplementary
+rc_mig_hr = _extract_censored_hr(COX_CENS_PATH, 2, 'mig_migrated')
+if rc_mig_hr: check("Right-censored Cox HR migrated (§6.3 supp)", rc_mig_hr, 0.832, 0.002)
+
+# OLS Model 2 — paper §6.1
+ols_mig = _extract_ols_beta(ANALYSIS_PATH, 'MODEL 2', 'migrated')
+ols_it = _extract_ols_beta(ANALYSIS_PATH, 'MODEL 2', 'internal_transfer')
+ols_dep = _extract_ols_beta(ANALYSIS_PATH, 'MODEL 2', 'deported')
+
+if ols_mig: check("OLS β migrated Model 2 (§6.1)", ols_mig, 2.71, 0.02)
+if ols_it:  check("OLS β internal transfer Model 2 (§6.1)", ols_it, -1.74, 0.02)
+if ols_dep: check("OLS β deported Model 2 (§6.1)", ols_dep, -23.31, 0.02)
+
+# ---------------------------------------------------------------------------
 # PRINT RESULTS
 # ---------------------------------------------------------------------------
 print("\n" + "=" * 70)

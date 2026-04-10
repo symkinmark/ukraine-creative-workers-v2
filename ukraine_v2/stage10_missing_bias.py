@@ -7,7 +7,7 @@ at death to be overstated (missing workers died youngest), making the 4.04-year
 gap a CONSERVATIVE LOWER BOUND on the true differential.
 
 Outputs:
-  named_missing_figures.csv          — 8-row confirmed absent cases
+  named_missing_figures.csv          — 7-row confirmed absent cases
   charts/fig30_sensitivity_gap.png   — gap vs M under three Ā_missing assumptions
   charts/fig30_interactive.html
 """
@@ -49,7 +49,7 @@ NAMED_CASES = [
         'name':             'Mykola Khvylovy',
         'birth_year':       1893,
         'death_year':       1933,
-        'age_at_death':     39,
+        'age_at_death':     40,
         'death_cause':      'Suicide under direct political pressure (arrest of colleague M. Skrypnyk)',
         'migration_status': 'non_migrated',
         'source':           'Ukrainian Literary Encyclopedia; Institut literatury NAN Ukrainy',
@@ -82,7 +82,7 @@ NAMED_CASES = [
         'name':             'Mykola Kulish',
         'birth_year':       1892,
         'death_year':       1937,
-        'age_at_death':     47,
+        'age_at_death':     45,
         'death_cause':      'Shot at Sandarmokh, November 1937',
         'migration_status': 'deported',
         'source':           'Sandarmokh martyrology; Memorial database; SBU declassified files',
@@ -93,7 +93,7 @@ NAMED_CASES = [
         'name':             'Oles Dosvitniy',
         'birth_year':       1891,
         'death_year':       1934,
-        'age_at_death':     42,
+        'age_at_death':     43,
         'death_cause':      'Shot; NKVD execution, 1934',
         'migration_status': 'non_migrated',
         'source':           'Rehabilitovani istoriieiu; Ukrainian Literary Encyclopedia',
@@ -104,24 +104,14 @@ NAMED_CASES = [
         'name':             'Mykola Boychuk',
         'birth_year':       1882,
         'death_year':       1937,
-        'age_at_death':     52,
+        'age_at_death':     55,
         'death_cause':      'Shot; Great Terror, 1937',
         'migration_status': 'non_migrated',
         'source':           'Memorial database; Rehabilitovani istoriieiu; SBU declassified files',
         'esu_absent':       True,
         'notes':            'Founder of Boychukism monumental art movement; arrested 1936'
     },
-    {
-        'name':             'Hnat Mykhailychenko',
-        'birth_year':       1892,
-        'death_year':       1919,
-        'age_at_death':     26,
-        'death_cause':      'Shot by White Army forces during Civil War',
-        'migration_status': 'non_migrated',
-        'source':           'Ukrainian Literary Encyclopedia; historical archives',
-        'esu_absent':       True,
-        'notes':            'Writer and political activist; killed age 26 during Civil War'
-    },
+    # Hnat Mykhailychenko (1892–1919) EXCLUDED: died 1919 (pre-Soviet; study excludes deaths <1921)
 ]
 
 named_df = pd.DataFrame(NAMED_CASES)
@@ -188,7 +178,7 @@ for M in M_VALUES:
     sensitivity_rows.append(row)
 
 sensitivity_df = pd.DataFrame(sensitivity_rows)
-print(f"\nConfirmed named cases (M=8) at Ā={mean_named_age:.1f}: adjusted gap = "
+print(f"\nConfirmed named cases (M={len(named_df)}) at Ā={mean_named_age:.1f}: adjusted gap = "
       f"{adjusted_gap(n_nm, mean_nm, 8, mean_named_age, mean_mig):+.2f} years")
 
 print("\nConclusion: Under ALL plausible scenarios, the gap widens.")
@@ -218,9 +208,9 @@ try:
         gaps = [adjusted_gap(n_nm, mean_nm, m, A, mean_mig) for m in M_range]
         ax.plot(M_range, gaps, color=A_COLORS[A], linewidth=2.5, label=A_LABELS[A])
 
-    # Mark M=8 (confirmed named cases)
+    # Mark M={len(named_df)} (confirmed named cases)
     ax.axvline(8, color='#333', linestyle='--', linewidth=1.4, alpha=0.7,
-               label=f'M=8 (confirmed named cases, Ā={mean_named_age:.1f})')
+               label=f'M={len(named_df)} (confirmed named cases, Ā={mean_named_age:.1f})')
     ax.axhline(observed_gap, color='#555', linestyle=':', linewidth=1.2, alpha=0.7,
                label=f'Current observed gap = {observed_gap:.2f} yrs')
 
@@ -273,7 +263,7 @@ try:
             ))
 
         fig_p.add_vline(x=8, line_dash='dash', line_color='#333', line_width=1.5,
-                        annotation_text=f'M=8 named cases', annotation_position='top right')
+                        annotation_text=f'M={len(named_df)} named cases', annotation_position='top right')
         fig_p.add_hline(y=observed_gap, line_dash='dot', line_color='#555',
                         annotation_text=f'Current gap {observed_gap:.2f}', annotation_position='right')
 
@@ -322,7 +312,7 @@ age at death is {mean_named_age:.1f} years — 22 years below the current non-mi
 A sensitivity analysis (Figure 14) shows that under all plausible assumptions
 about the number (M) and mean age at death (Ā_missing) of missing repressed
 non-migrants, the migrant/non-migrant gap widens rather than narrows. Adding
-only the confirmed named cases (M=8, Ā={mean_named_age:.1f}) adjusts the gap to
+only the confirmed named cases (M={len(named_df)}, Ā={mean_named_age:.1f}) adjusts the gap to
 {gap_M8:.2f} years. Adding 50 missing workers at the conservative assumption
 Ā=38 years (the approximate median age at death for Sandarmokh victims) adjusts
 the gap to {gap_M50:.2f} years. Even at M=200, the gap remains positive and
