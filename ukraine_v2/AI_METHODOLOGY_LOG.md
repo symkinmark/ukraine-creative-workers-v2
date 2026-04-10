@@ -1,10 +1,12 @@
 # AI Methodology Log — Ukrainian Creative Workers Life Expectancy V2
 
-**Paper:** Mortality Differentials Among Ukrainian Creative Industry Workers During the Soviet Occupation
+**Paper:** Observed Age at Death Among Ukrainian Creative Workers Under Soviet Occupation: A Quantitative Study Using the Encyclopedia of Modern Ukraine
 **Author:** Mark Symkin
 **AI used:** Claude Sonnet 4.6 (Anthropic) — primary research & writing AI
 **Cross-check AI:** Claude Sonnet 4.6 (second independent instance, no shared context)
-**Log compiled:** March 2026
+**Log compiled:** March 2026 | **Last updated:** April 2026 (Phase 16: paper restructuring)
+
+> **Note on section/figure references:** Phases 1–15 below reference the paper section and figure numbers that were current at the time of each phase. The paper was restructured on 2026-04-10 (Phase 16); section and figure numbers changed but no data or statistics were modified. See Phase 16 for the mapping.
 
 ---
 
@@ -1260,6 +1262,7 @@ No AI model calls. All corrections are human-identified.
 ### Chart Registry (Post-Stage-15 Final)
 
 All charts regenerated on V2.6 dataset. 33 static PNGs + 31 interactive Plotly HTMLs.
+Chart file names (`fig01_...`, `fig02_...`, etc.) are unchanged on disk. The paper references them by new figure numbers after the Phase 16 restructuring — see the figure renumbering table in Phase 16 above.
 
 | Figure | File | Notes |
 |---|---|---|
@@ -1292,3 +1295,89 @@ All charts regenerated on V2.6 dataset. 33 static PNGs + 31 interactive Plotly H
 | `docs/index.html` | Rebuilt and pushed |
 
 *Stage 15 completed: 2026-04-09*
+
+---
+
+## Phase 16 — Paper Restructuring (AI task)
+
+**Date:** 2026-04-10
+**What Claude did:** Restructured PAPER_DRAFT.md to merge V2.3's narrative-driven architecture with V3.0's verified statistics. No data or statistical changes — restructuring only.
+
+**Motivation:** V3.0 had solid statistics (177/177 checks pass, 3.2% error rate) but structural problems: thin Introduction (no subsections), Results section bloated to 16 subsections (findings dump), and 30 inline figures. V2.3 had tighter narrative architecture but outdated numbers. Research into Harvard, Yale, MIT, and top journal guidelines (Slavic Review, Historical Methods, Demography) confirmed the "progressive revelation" approach as best practice for interdisciplinary quantitative-historical papers.
+
+**Target venue:** Visible Ukraine / IUfU CEU journal article.
+
+**Key structural changes:**
+
+| Aspect | Before | After |
+|---|---|---|
+| Introduction | 14 lines, no subsections | 5 subsections: Soviet cultural policy, gap in scholarship, research question, political sensitivity, roadmap |
+| Results | 1 section (§4), 16 subsections | 3 sections: §4 The Mortality Gap (3 subs), §5 Who/When/Where (5 subs), §6 Statistical Robustness (6 subs) |
+| Main body figures | 30 inline | 15 (argument + method defence) |
+| Supplementary figures | None | 18 in Appendix A (A1–A18, all described) |
+| Appendix B | None | Robustness tables + model specifications |
+| Discussion | 5 subsections | 4 subsections, mirrors Introduction |
+| Bibliography | 13 references | 16 references (added Snyder, Wheatcroft, Andreev) |
+
+**Figure renumbering (old → new):**
+
+| Old Figure | New Location | New Number |
+|---|---|---|
+| Fig 1 (primary LE comparison) | Main body | **Fig 1** |
+| Fig 2 (Kaplan-Meier) | Main body | **Fig 2** |
+| Fig 3 (V1 vs V3) | Main body | **Fig 3** |
+| Fig 4 (box plots) | Appendix A | **Fig A1** |
+| Fig 5 (deportation histogram) | Appendix A | **Fig A2** |
+| Fig 6 (violin plots) | Appendix A | **Fig A3** |
+| Fig 7 (death year histogram) | Appendix A | **Fig A4** |
+| Fig 7b (deported death years) | Main body | **Fig 5** |
+| Fig 8 (deported deaths by year) | Main body | **Fig 6** |
+| Fig 9 (deaths by period) | Appendix A | **Fig A5** |
+| Fig 10 (birth cohort LE) | Main body | **Fig 9** |
+| Fig 11 (profession bar chart) | Main body | **Fig 8** |
+| Fig 12 (geographic rates) | Appendix A | **Fig A6** |
+| Fig 13 (birth year distribution) | Appendix A | **Fig A14** |
+| Fig 14 (sensitivity curve) | Main body | **Fig 13** |
+| Fig 15 (IT null result) | Main body | **Fig 7** |
+| Fig 15b (all-groups overlay) | Appendix A | **Fig A13** |
+| Fig 16 (CONSORT flowchart) | Main body | **Fig 4** |
+| Fig 17 (gender by group) | Appendix A | **Fig A7** |
+| Fig 18 (LE by gender) | Appendix A | **Fig A8** |
+| Fig 19 (population context) | Main body | **Fig 15** |
+| Fig 19b (simplified death rates) | Appendix A | **Fig A16** |
+| Fig 20 (two-group conservative) | Appendix A | **Fig A15** |
+| Fig 21 (Soviet republic) | Appendix A | **Fig A9** |
+| Fig 22 (educated-urban) | Appendix A | **Fig A10** |
+| Fig 23 (regression forest) | Main body | **Fig 10** |
+| Fig 24 (Cox forest) | Main body | **Fig 11** |
+| Fig 25 (censoring pattern) | Appendix A | **Fig A11** |
+| Fig 26 (KM censored) | Appendix A | **Fig A12** |
+| Fig 27 (sensitivity summary) | Appendix A | **Fig A17** |
+| Fig 28 (time-varying HR) | Main body | **Fig 12** |
+| Fig 28b (Schoenfeld) | Appendix A | **Fig A18** |
+| Fig 30 (missing-worker) | Main body | **Fig 14** |
+
+**Restored from V2.3 (git: f2c3b39):**
+- §1.1 Soviet cultural policy and the Executed Renaissance (rich historical context with named figures)
+- §1.2 The gap in scholarship (literature review)
+- §1.4 Political sensitivity and ethical considerations
+
+**New narrative bridges added:**
+- §4.1 → §4.2: "But the most dramatic finding is not the 4-year migrant advantage — it is what happened to those who were forcibly taken."
+- §4.2 → §4.3: "If the gap were simply about who chose to leave, we would expect any form of geographic mobility to confer an advantage. It does not."
+- §4.3 → §5: "The gap is real and specific to Soviet exit. But does it hold across the diverse groups within the dataset?"
+
+**Verification:** 177/177 numeric claims still pass. HTML rebuilt. Backup saved as `PAPER_DRAFT_v3.0_pre_restructure.md`.
+
+**Files modified:**
+
+| File | Change |
+|------|--------|
+| `PAPER_DRAFT.md` | Full structural rewrite |
+| `PAPER_DRAFT_v3.0_pre_restructure.md` | Created (backup) |
+| `SCIENTIFIC_METHODOLOGY.md` | Updated to v2.0, version history entry added, restructuring note |
+| `AI_METHODOLOGY_LOG.md` | Phase 16 added, title updated, chart registry note |
+| `README.md` | Updated structure section, paper structure table added |
+| `docs/index.html` | Rebuilt |
+
+*Phase 16 completed: 2026-04-10*

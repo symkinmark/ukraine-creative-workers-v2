@@ -3,10 +3,10 @@
 **File:** `charts/fig07b_deported_death_year.png`
 
 ## What this chart shows
-Histogram of calendar year of death for the deported group only (n=183), restricted to 1920–1960 where the vast majority of deported deaths occurred. Each bar = 2-year bin. A vertical dashed line marks 1937 (Great Terror peak).
+Histogram of calendar year of death for the deported group only (n=195), restricted to 1920–1960 where the vast majority of deported deaths occurred. Each bar = 2-year bin. A vertical dashed line marks 1937 (Great Terror peak).
 
 ## Key finding
-The 1937 peak contains 65 deaths — 35.5% of all 183 deported deaths in a single calendar year. This is the most concentrated mortality event in the entire dataset. The 1934–1938 period (Great Terror) accounts for 95 of 183 deported deaths (51.9%). Almost no deported workers survived past 1950.
+The 1937 peak contains 65 deaths — 35.5% of all 195 deported deaths in a single calendar year. This is the most concentrated mortality event in the entire dataset. The 1934–1938 period (Great Terror) accounts for 95 of 195 deported deaths (51.9%). Almost no deported workers survived past 1950.
 
 ## What to look for
 - The 1937 spike is visually unmistakable — dwarfs all other years

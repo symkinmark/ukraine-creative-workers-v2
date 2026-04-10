@@ -7,7 +7,7 @@
 
 ## Read the paper
 
-**[→ Full paper with all 30+ figures](https://symkinmark.github.io/ukraine-creative-workers-v2/)**
+**[→ Full paper with all figures](https://symkinmark.github.io/ukraine-creative-workers-v2/)**
 
 ---
 
@@ -35,20 +35,38 @@ Internal transfers (workers who voluntarily moved within the USSR) showed **no s
 
 ```
 ukraine_v2/
-├── PAPER_DRAFT.md              ← Full paper (Markdown source)
-├── SCIENTIFIC_METHODOLOGY.md   ← Detailed methodology documentation
-├── AI_METHODOLOGY_LOG.md       ← AI usage transparency log
+├── PAPER_DRAFT.md              ← Full paper (Markdown source, V3.0 restructured)
+├── SCIENTIFIC_METHODOLOGY.md   ← Detailed methodology & replication guide
+├── AI_METHODOLOGY_LOG.md       ← AI usage transparency log (15 phases)
 ├── generate_analysis.py        ← Statistical analysis + all charts
 ├── build_paper_html.py         ← Builds docs/index.html from paper + charts
 ├── check_paper_numbers.py      ← Verifies all 177 numeric claims against dataset
-├── audit_hardcoded.sh          ← Quick grep for stale hardcoded stats
 ├── esu_creative_workers_v2_6.csv  ← Primary dataset (V2.6)
 ├── charts/                     ← Generated figures (33 static PNGs + 31 interactive Plotly)
-└── chart_docs/                 ← Plain-language description of each figure
+├── chart_docs/                 ← Plain-language description of each figure
+└── validation/                 ← 200-entry validation review interfaces
 docs/
 └── index.html                  ← Built paper (auto-generated, do not edit)
 v1_paper.pdf                    ← V1 paper (Harvard Masterclass, 2025)
 ```
+
+### Paper structure (V3.0)
+
+The paper uses a progressive-revelation structure: each section answers a question raised by the previous one.
+
+| Section | Content |
+|---|---|
+| §1 Introduction | Historical context, Executed Renaissance, research question, political sensitivity |
+| §2 Prior Study | V1→V3.0 expansion, gap narrowing explained |
+| §3 Data and Methods | ESU source, classification protocol, validation |
+| §4 The Mortality Gap | Three core findings: 3.98-year gap, 22-year deportee deficit, internal transfer null |
+| §5 Who, When, Where | Patterns by profession, cohort, gender, geography, period |
+| §6 Statistical Robustness | OLS, PSM, Cox PH, time-varying, sensitivity, missing-worker bias |
+| §7 Discussion | Four mechanisms, causation caveats, historical interpretation |
+| §8 Limitations | 8 documented limitations |
+| §9 Conclusion | Conservative lower bound, future priorities |
+| Appendix A | 18 supplementary figures |
+| Appendix B | Full robustness tables and model specifications |
 
 ---
 

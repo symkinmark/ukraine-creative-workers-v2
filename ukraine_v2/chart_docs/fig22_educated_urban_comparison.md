@@ -7,7 +7,7 @@ Same layout as fig21, but instead of Soviet republic comparisons, this overlays 
 
 The shaded band represents the range: Ukrainian SSR general LE (e₀) + 3 yrs (lower bound) to + 5 yrs (upper bound).
 
-## Key finding (V2.3 — migrated n=1,280, mean age at death 75.25 yrs; non-migrated n=6,030, mean age at death 71.22 yrs)
+## Key finding (V2.3 — migrated n=1,324, mean age at death 75.25 yrs; non-migrated n=5,960, mean age at death 71.22 yrs)
 - The **migrated group** (mean age at death) approaches the upper edge of the educated urban LE (e₀) band by the 1980s (age 77 vs estimated ceiling ~75-78)
 - The **non-migrated group** (mean age at death) sits inside or slightly below the band — meaning they did not fully capture the educated-class survival premium, likely due to Soviet conditions suppressing it
 - The **deported group** is far below the educated-urban baseline in every period (mean age at death 48.35 yrs)

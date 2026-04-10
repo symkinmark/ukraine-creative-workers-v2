@@ -55,7 +55,7 @@ Schoenfeld residuals test (Model 2): PH violated for migrated (p=0.011) and depo
 
 ## Version note
 
-V2.3 fig24 used complete-case only (n=8,643 dead) with HRs: migrated=0.76, internal_transfer=1.08, deported=5.40.
+V2.3 fig24 used complete-case only (n=8,590 dead) with HRs: migrated=0.76, internal_transfer=1.08, deported=5.40.
 V2.4 uses proper right-censored analysis (N=15,053 with 6,314 censored living individuals properly classified).
 
 ---

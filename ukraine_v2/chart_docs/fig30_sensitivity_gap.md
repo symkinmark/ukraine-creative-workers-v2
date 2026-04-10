@@ -11,7 +11,7 @@ The adjusted migrant/non-migrant gap as a continuous function of M (number of mi
 
 ## Key Message
 
-The current observed gap of 4.04 years is a **conservative lower bound** on the true mortality differential. ESU undercoverage of repressed non-migrants biases the non-migrant mean *upward* (because the missing workers died youngest), making the gap appear smaller than it actually is. No realistic assumption about the number or age distribution of missing figures reverses this direction.
+The current observed gap of 3.98 years is a **conservative lower bound** on the true mortality differential. ESU undercoverage of repressed non-migrants biases the non-migrant mean *upward* (because the missing workers died youngest), making the gap appear smaller than it actually is. No realistic assumption about the number or age distribution of missing figures reverses this direction.
 
 ## Named Confirmed Absent Cases (M=7 anchor)
 

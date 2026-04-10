@@ -18,7 +18,7 @@ The 8 periods are:
 ## Key finding (V2.3)
 Across **every period**, migrants who had left the USSR died older than those who stayed. The deported group shows catastrophically low mean ages in repression periods.
 
-**V2.3 non-migrant period data (non-migrated n=6,030 total):**
+**V2.3 non-migrant period data (non-migrated n=5,960 total):**
 | Period | Deaths | Avg age at death |
 |--------|--------|-----------------|
 | 1921–1929 (NEP) | 97 | 56.1 |
@@ -30,7 +30,7 @@ Across **every period**, migrants who had left the USSR died older than those wh
 | 1965–1991 (Stagnation) | 1,421 | 69.3 |
 | Post-1991 | 3,692 | 74.7 |
 
-**V2.3 deported Terror period (1934-38): n≈94, avg age ~43.5** — among the most extreme mortality concentration in the dataset. Deported group now n=183 total; period breakdown shifts marginally vs V2.2.
+**V2.3 deported Terror period (1934-38): n≈94, avg age ~43.5** — among the most extreme mortality concentration in the dataset. Deported group now n=195 total; period breakdown shifts marginally vs V2.2.
 
 ## What to look for
 - **Missing bars** = that group had fewer than 5 deaths in that period (data suppressed for reliability)

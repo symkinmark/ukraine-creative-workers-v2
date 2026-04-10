@@ -10,7 +10,7 @@ The finding remains positive across the entire tested range. Our actual measured
 
 | Simulated error rate | Adjusted gap |
 |---------------------|-------------|
-| 0% (perfect) | +4.04 yrs |
+| 0% (perfect) | +3.98 yrs |
 | 1% | +3.79 yrs |
 | 2% | +3.56 yrs |
 | 3.2% (actual) | **+3.30 yrs** |

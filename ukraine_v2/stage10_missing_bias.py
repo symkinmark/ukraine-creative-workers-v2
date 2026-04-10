@@ -184,7 +184,7 @@ print("\nConclusion: Under ALL plausible scenarios, the gap widens.")
 print(f"Current estimate of {observed_gap:.2f} years is a conservative lower bound.")
 
 # ---------------------------------------------------------------------------
-# Section 4 — Figure 30 — sensitivity gap chart
+# Section 4 — Figure 14 — sensitivity gap chart
 # ---------------------------------------------------------------------------
 
 try:
@@ -230,7 +230,7 @@ try:
     ax.set_xlabel('M — number of missing repressed non-migrants added', fontsize=13)
     ax.set_ylabel('Adjusted migrant/non-migrant gap (years)', fontsize=13)
     ax.set_title(
-        'Figure 30. Sensitivity analysis: adjusted mortality gap as a function of\n'
+        'Figure 14. Sensitivity analysis: adjusted mortality gap as a function of\n'
         'missing non-migrant count, for three assumed mean ages at death',
         fontsize=13, pad=14,
     )
@@ -267,7 +267,7 @@ try:
                         annotation_text=f'Current gap {observed_gap:.2f}', annotation_position='right')
 
         fig_p.update_layout(
-            title='Figure 30. Sensitivity: adjusted gap vs missing repressed non-migrants',
+            title='Figure 14. Sensitivity: adjusted gap vs missing repressed non-migrants',
             xaxis_title='M — number of missing non-migrants',
             yaxis_title='Adjusted gap (years)',
             xaxis=dict(range=[0, 500]),
@@ -283,7 +283,7 @@ try:
         print(f"Plotly fig30 skipped: {e}")
 
 except Exception as e:
-    print(f"Figure 30 skipped: {e}")
+    print(f"Figure 14 skipped: {e}")
 
 # ---------------------------------------------------------------------------
 # Section 5 — Paper-ready text
@@ -308,7 +308,7 @@ including Vasyl Stus (died Perm-36 labour camp, age 47), Mykola Khvylovy
 and Les Kurbas (shot Sandarmokh, age 50). All eight are non-migrants; their mean
 age at death is {mean_named_age:.1f} years — 22 years below the current non-migrant mean.
 
-A sensitivity analysis (Figure 30) shows that under all plausible assumptions
+A sensitivity analysis (Figure 14) shows that under all plausible assumptions
 about the number (M) and mean age at death (Ā_missing) of missing repressed
 non-migrants, the migrant/non-migrant gap widens rather than narrows. Adding
 only the confirmed named cases (M=8, Ā={mean_named_age:.1f}) adjusts the gap to

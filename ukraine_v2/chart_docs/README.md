@@ -1,7 +1,9 @@
 # Chart Documentation Index
-**Ukrainian Creative Workers V2.3 — Berdnyk & Symkin 2026**
+**Ukrainian Creative Workers V3.0 — Symkin 2026**
 
-> **V2.3 CURRENT** — All charts regenerated 2026-04-06. Dataset: n=8,643 analysable (migrated=1,280, non_migrated=6,030, internal_transfer=1,150, deported=183). Primary gap: +4.04 yrs, Cohen's d=0.292, Cliff's δ=0.18.
+> **V3.0 CURRENT** — All charts regenerated on V2.6 dataset. N=8,590 analysable (migrated=1,324, non_migrated=5,960, internal_transfer=1,111, deported=195). Primary gap: +3.98 yrs, Cohen's d=0.292, Cliff's δ=0.18.
+>
+> **Paper restructured 2026-04-10:** Figures renumbered. 15 main-body figures (Fig 1–15) + 18 supplementary figures in Appendix A (Fig A1–A18). Chart **file names on disk** are unchanged (`fig01_...`, `fig02_...`); only the paper's reference numbers changed. See the renumbering table in `AI_METHODOLOGY_LOG.md` Phase 16.
 
 One file per figure. Each explains: what the chart shows, the key finding, what to look for, and any known issues.
 
@@ -20,7 +22,7 @@ One file per figure. Each explains: what the chart shows, the key finding, what 
 | [fig03](fig03_version_comparison.md) | V1 vs V2.1 Version Comparison | Gap narrowed from +9.0→+5.4 yrs as dataset grew 15x |
 | [fig13](fig13_birth_year_distribution.md) | Birth Year Distribution | Confound check — groups are generation-matched |
 | [fig14](fig14_sensitivity_analysis.md) | Sensitivity Analysis | Finding holds until AI error rate >8% (ours is 3.2%) |
-| [fig16](fig16_consort_flowchart.md) | CONSORT Flowchart | How 16,215 entries → 8,643 analysable (V2.3 updated) |
+| [fig16](fig16_consort_flowchart.md) | CONSORT Flowchart | How 16,215 entries → 8,590 analysable (V2.3 updated) |
 
 ## Distribution & Shape
 | File | Chart | What it is |
@@ -73,9 +75,9 @@ One file per figure. Each explains: what the chart shows, the key finding, what 
 5. **fig03** — Version comparison chart image may lag behind; description text updated to V2.3.
 6. **All fig .md files** — Updated to V2.3 terminology and numbers 2026-04-06.
 
-## V2.3 Status (2026-04-06)
-- Charts regenerated from V2.3 data ✅
-- fig16 CONSORT numbers updated (8,643 analysable) ✅
-- fig07b and fig23 added (new figures from peer-review revision) ✅
-- All chart_docs .md files updated: "life expectancy"/"LE" → "mean age at death" throughout ✅
-- repressed_names_for_review.csv regenerated ✅
+## V3.0 Status (2026-04-10)
+- All charts regenerated on V2.6 dataset (Stages 12–15 corrections applied) ✅
+- 33 static PNGs + 31 interactive Plotly HTMLs ✅
+- Paper restructured with new figure numbering (15 main body + 18 appendix) ✅
+- Chart file names on disk unchanged ✅
+- 177/177 numeric claims in paper verified ✅

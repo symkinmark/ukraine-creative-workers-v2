@@ -6,7 +6,7 @@
 How our main finding changed between study versions, using the same two-group framing (Migrated vs Stayed in Soviet Sphere) to keep comparisons fair.
 
 ## Key finding (updated for V2.3)
-| | V1 (n=415) | V2.1 (n=6,106) | V2.2 (n=8,606) | V2.3 (n=8,643) |
+| | V1 (n=415) | V2.1 (n=6,106) | V2.2 (n=8,606) | V2.3 (n=8,590) |
 |---|---|---|---|---|
 | Migrated mean age at death | 72.0 yrs | 75.9 yrs | 75.26 yrs | 75.25 yrs |
 | Stayed mean age at death | 63.0 yrs | 70.5 yrs | 70.61 yrs | 70.58 yrs |

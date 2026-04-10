@@ -18,9 +18,9 @@ The headline result of the entire study. Four bars showing mean age at death for
 
 ## What to look for
 - The error bars on migrated and non-migrated are tight → reliable estimates
-- Deported CI is wider (small n=183 vs others) → treat as directional and robust
+- Deported CI is wider (small n=195 vs others) → treat as directional and robust
 - Internal transfer (USSR internal movers) track close to non-migrated — the meaningful variable is leaving the USSR, not just moving
-- Deported group n=183 is 144% larger than V2.1 (was n=75) — V2.2 date recovery + V2.3 reclassification brought in previously missing executed victims
+- Deported group n=195 is 144% larger than V2.1 (was n=75) — V2.2 date recovery + V2.3 reclassification brought in previously missing executed victims
 
 ## Known issues / improvements
 - None structural. Chart is clean and readable.

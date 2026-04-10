@@ -8,9 +8,9 @@ A focused comparison of the internal transfer group (people who moved within the
 ## Key finding (V2.3)
 **Near-null difference** between internal transfer and non-migrated mean age at death: gap = +0.52 yrs (V2.3), Cohen's d ≈ 0.037. The effect size is negligible — essentially zero. This supports the interpretation that *leaving the Soviet sphere specifically* was what mattered, not just "moving somewhere new."
 
-- Internal transfer mean age at death: 70.70 yrs (n=1,150)
-- Non-migrated mean age at death: 71.22 yrs (n=6,030)
-- Mean age at death gap: +0.52 yrs vs **+4.04 yrs** for migrated vs non-migrated
+- Internal transfer mean age at death: 70.70 yrs (n=1,111)
+- Non-migrated mean age at death: 71.22 yrs (n=5,960)
+- Mean age at death gap: +0.52 yrs vs **+3.98 yrs** for migrated vs non-migrated
 
 Note: gap direction inverted slightly vs V2.2 (+0.96 → +0.52) because internal_transfer mean rose more than non-migrated. Null result conclusion unchanged.
 

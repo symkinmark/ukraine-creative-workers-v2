@@ -4,7 +4,7 @@
 
 ## What this chart shows
 A grouped bar chart comparing OLS regression coefficients for migration status groups from two models:
-- **Model 1 (dark bars):** Unadjusted — migration status only, n=8,643
+- **Model 1 (dark bars):** Unadjusted — migration status only, n=8,590
 - **Model 2 (light hatched bars):** Adjusted — + birth decade + profession + birth region
 
 Reference category is non-migrated (β = 0). Bars show years of mean age at death relative to non-migrants. Error bars = 95% confidence intervals.
@@ -13,7 +13,7 @@ Reference category is non-migrated (β = 0). Bars show years of mean age at deat
 
 | Group (vs non-migrated) | Model 1 β | 95% CI | Model 2 β | 95% CI |
 |---|---|---|---|---|
-| Migrated | +4.04 yrs | [+3.20, +4.87] | +3.31 yrs | [+2.44, +4.19] |
+| Migrated | +3.98 yrs | [+3.20, +4.87] | +3.31 yrs | [+2.44, +4.19] |
 | Internal Transfer | −0.52 yrs | [−1.39, +0.35] | −1.43 yrs | [−2.34, −0.53] |
 | Deported | −22.87 yrs | [−24.90, −20.84] | −23.44 yrs | [−25.49, −21.39] |
 

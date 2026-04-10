@@ -176,7 +176,7 @@ def make_fig28(band_results):
     ax.set_xlabel('Age band (years)', fontsize=11)
     ax.set_ylabel('Hazard ratio for deported workers vs. non-migrants\n(log scale)', fontsize=10)
     ax.set_title(
-        'Figure 28 — Deported Workers: Mortality Hazard by Age Band\n'
+        'Figure 12 — Deported Workers: Mortality Hazard by Age Band\n'
         'Landmark Cox model fitted within each decade of age (reference = non-migrated)\n'
         'Red = p < 0.05  Orange = p ≥ 0.05  n = number of deported deaths in band',
         fontsize=10
@@ -240,7 +240,7 @@ def _fig28_plotly(band_results, labels, hrs, los, his, ns, ps):
     fig.update_yaxes(type='log', title='Hazard ratio (log scale)')
     fig.update_xaxes(title='Age band (years)')
     fig.update_layout(
-        title='Figure 28 — Deported Workers: Mortality Hazard by Age Band<br>'
+        title='Figure 12 — Deported Workers: Mortality Hazard by Age Band<br>'
               '<sup>Landmark Cox model within each decade. Reference = non-migrated. '
               'Red = p < 0.05</sup>',
         template='plotly_white',
@@ -254,7 +254,7 @@ def _fig28_plotly(band_results, labels, hrs, los, his, ns, ps):
 
 def make_fig28b_narrative(band_results):
     """
-    Figure 28b — "When were deported workers most at risk?"
+    Figure A18 — "When were deported workers most at risk?"
     A plain-language area chart for historian readers, not a statistics diagnostic.
     Uses the landmark band HRs already computed — no Schoenfeld residuals.
 
@@ -326,7 +326,7 @@ def make_fig28b_narrative(band_results):
                       '(e.g. 1.89 = dying at 1.89× the rate at that age)',
                       fontsize=11)
         ax.set_title(
-            'Figure 28b — When Were Deported Ukrainian Creative Workers Most at Risk?\n'
+            'Figure A18 — When Were Deported Ukrainian Creative Workers Most at Risk?\n'
             'Mortality hazard by decade of life (reference = workers who stayed in Soviet Ukraine)\n'
             '* p<0.05  ** p<0.01  *** p<0.001  |  n = deported deaths in each age window',
             fontsize=10, pad=14
@@ -394,7 +394,7 @@ def _fig28b_plotly(band_results, midpoints, labels, hrs, los, his, ns, ps):
     fig.update_yaxes(title='Mortality risk relative to non-migrated workers<br>(1.0 = same rate)',
                      rangemode='tozero')
     fig.update_layout(
-        title='Figure 28b — When Were Deported Ukrainian Creative Workers Most at Risk?<br>'
+        title='Figure A18 — When Were Deported Ukrainian Creative Workers Most at Risk?<br>'
               '<sup>Mortality hazard by decade of life. Reference = workers who stayed in Soviet Ukraine.</sup>',
         template='plotly_white',
         height=520,

@@ -123,7 +123,7 @@ def make_fig24():
     ax.axvline(1.0, color='black', linewidth=0.8, linestyle='--', alpha=0.5)
     ax.set_xscale('log')
     ax.set_xlabel('Hazard Ratio (log scale)', fontsize=10)
-    ax.set_title('Figure 24 — Cox PH Hazard Ratios by Migration Group\n'
+    ax.set_title('Figure 11 — Cox PH Hazard Ratios by Migration Group\n'
                  '(Right-censored N=15,053; reference = non-migrated)', fontsize=10)
     ax.set_yticks([(y_pos_m1[i] + y_pos_m2[i]) / 2 for i in range(n_groups)])
     ax.set_yticklabels(group_labels, fontsize=10)
@@ -168,7 +168,7 @@ def _fig24_plotly(models, groups, group_labels):
     fig.add_vline(x=1.0, line_dash='dash', line_color='black', opacity=0.5)
     fig.update_xaxes(type='log', title='Hazard Ratio (log scale)')
     fig.update_layout(
-        title='Figure 24 — Cox PH Hazard Ratios (Right-Censored N=15,053)',
+        title='Figure 11 — Cox PH Hazard Ratios (Right-Censored N=15,053)',
         height=400, template='plotly_white',
     )
     out = os.path.join(CHARTS_DIR, 'fig24_interactive.html')
@@ -215,7 +215,7 @@ def make_fig25(df):
     ax.set_xticklabels([s['label'] for s in stats], fontsize=9)
     ax.set_ylabel('Percentage (%)', fontsize=10)
     ax.set_ylim(0, 115)
-    ax.set_title('Figure 25 — Censoring Pattern by Migration Group\n'
+    ax.set_title('Figure A11 — Censoring Pattern by Migration Group\n'
                  f'Extended dataset N={len(df):,} (dead + right-censored living individuals)', fontsize=10)
     ax.legend(fontsize=9)
     ax.grid(axis='y', alpha=0.3)
@@ -250,7 +250,7 @@ def _fig25_plotly(stats, n_total):
     ))
     fig.update_layout(
         barmode='stack',
-        title=f'Figure 25 — Censoring Pattern by Migration Group (N={n_total:,})',
+        title=f'Figure A11 — Censoring Pattern by Migration Group (N={n_total:,})',
         yaxis_title='Percentage (%)',
         template='plotly_white',
         height=450,
@@ -283,7 +283,7 @@ def make_fig26(df):
 
     ax.set_xlabel('Age (years)', fontsize=11)
     ax.set_ylabel('Survival probability', fontsize=11)
-    ax.set_title('Figure 26 — Kaplan-Meier Survival Curves with Right-Censored Data\n'
+    ax.set_title('Figure A12 — Kaplan-Meier Survival Curves with Right-Censored Data\n'
                  f'N={len(df):,} (tick marks = censoring events)', fontsize=10)
     ax.set_xlim(0, 110)
     ax.legend(fontsize=9, loc='upper right')
@@ -315,7 +315,7 @@ def _fig26_plotly(df, groups):
             line=dict(color=GROUP_COLORS[g]),
         ))
     fig.update_layout(
-        title=f'Figure 26 — KM Survival Curves with Right-Censoring (N={len(df):,})',
+        title=f'Figure A12 — KM Survival Curves with Right-Censoring (N={len(df):,})',
         xaxis_title='Age (years)',
         yaxis_title='Survival probability',
         xaxis=dict(range=[0, 110]),
@@ -393,7 +393,7 @@ def make_fig27():
     ax.set_xticks(x)
     ax.set_xticklabels(labels, fontsize=7.5)
     ax.set_ylabel('Migrated HR vs non-migrated', fontsize=10)
-    ax.set_title('Figure 27 — Sensitivity Analysis: Migrated Hazard Ratio Across Scenarios\n'
+    ax.set_title('Figure A17 — Sensitivity Analysis: Migrated Hazard Ratio Across Scenarios\n'
                  'Dashed = HR=1.0  Dotted = Baseline HR=0.832', fontsize=10)
     ax.grid(axis='y', alpha=0.3)
 
@@ -431,7 +431,7 @@ def _fig27_plotly(points, labels, hrs, los, his, types, color_map):
     fig.add_hline(y=1.0, line_dash='dash', line_color='black', opacity=0.5)
     fig.add_hline(y=0.832, line_dash='dot', line_color='navy', opacity=0.4)
     fig.update_layout(
-        title='Figure 27 — Sensitivity: Migrated HR Across Scenarios',
+        title='Figure A17 — Sensitivity: Migrated HR Across Scenarios',
         yaxis_title='Hazard Ratio',
         template='plotly_white',
         height=450,

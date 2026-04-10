@@ -5,7 +5,7 @@
 **Author:** Mark Symkin
 **Study completed:** 2026
 **Data source:** Encyclopedia of Modern Ukraine (esu.com.ua)
-**This document version:** 1.9 — revised 2026-04-09 following Stages 11–15 database quality pipeline: 97 birth-year-as-death-year corrections, 57 API-error retries (Stage 12), 8 manual validation patches (Stage 13), 135 authentication-error reclassifications (Stage 14), 6 Stage-14-review corrections (Stage 15); all 200 validation entries reviewed (3.2% error rate confirmed); dataset finalised at N=8,590; paper rewritten as V3.0 with all statistics verified (177/177 checks pass)
+**This document version:** 2.0 — revised 2026-04-10 following paper restructuring (V3.0). Paper now uses progressive-revelation architecture: §1 Introduction (5 subsections inc. political sensitivity), §2 Prior Study, §3 Methods, §4 The Mortality Gap (3 core findings), §5 Who/When/Where (patterns), §6 Statistical Robustness, §7 Discussion, §8 Limitations, §9 Conclusion, Appendix A (18 supplementary figures), Appendix B (robustness tables). 15 main-body figures + 18 appendix figures. All 177 numeric checks pass. Dataset unchanged (N=8,590, esu_creative_workers_v2_6.csv)
 
 
 ## Version History
@@ -26,9 +26,12 @@
 | 2.10 | 2026-04-07 | Doc version 1.8: §8.14 rewritten to document Stage 9 failure mode and retraction; SCIENTIFIC_METHODOLOGY and AI_METHODOLOGY_LOG updated to reflect that wave figures are not reported findings |
 | 2.11 | 2026-04-08 | Stage 11: data audit report (§8.16); Stage 12: full database quality pipeline B1–B5 → esu_creative_workers_v2_6.csv (§8.17); Stage 13: validation review corrections applied (§8.18) |
 | 2.12 | 2026-04-09 | Stage 14: 135 API-fail entries reclassified via Haiku (§8.19); Stage 15: 6 Stage-14-review corrections (§8.20); 200/200 validation complete; paper rewritten as V3.0; 177/177 checks pass; N=8,590 final |
+| 2.13 | 2026-04-10 | Paper restructured: V2.3 narrative architecture merged with V3.0 data. Introduction expanded (5 subsections inc. political sensitivity). Results split into §4 (core gap), §5 (patterns), §6 (robustness). 15 main-body figures + 18 in Appendix A. Figures renumbered. Discussion now mirrors Introduction. No data or statistical changes — restructuring only. Section/figure references in version history entries 2.3–2.12 above use pre-restructure numbering |
 
 ---
-> **V3.0 CURRENT.** Primary dataset: `esu_creative_workers_v2_6.csv`. Analysable dead cohort: **N=8,590** (migrated=1,324 | non_migrated=5,960 | internal_transfer=1,111 | deported=195). Primary gap: **3.98 years** (Cohen's d=0.292). All 177 numeric claims verified. See AI_METHODOLOGY_LOG.md Stages 11–15 for full log.
+> **V3.0 CURRENT (restructured 2026-04-10).** Primary dataset: `esu_creative_workers_v2_6.csv`. Analysable dead cohort: **N=8,590** (migrated=1,324 | non_migrated=5,960 | internal_transfer=1,111 | deported=195). Primary gap: **3.98 years** (Cohen's d=0.292). All 177 numeric claims verified. Paper uses progressive-revelation structure: §4 core gap → §5 patterns → §6 robustness. 15 main-body figures + 18 in Appendix A. See AI_METHODOLOGY_LOG.md Stages 11–15 for full log.
+>
+> **Note on section/figure references:** Version history entries 2.3–2.12 and methodology stage logs (§8.11–§8.20) use the pre-restructure paper numbering. The paper was restructured on 2026-04-10; section and figure numbers in the paper changed but no data or statistics were modified.
 
 ---
 

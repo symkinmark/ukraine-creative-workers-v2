@@ -16,51 +16,47 @@ MD_PATH  = os.path.join(PROJECT, 'PAPER_DRAFT.md')
 OUT_PATH = os.path.join(PROJECT, 'paper_preview.html')
 CHARTS   = os.path.join(PROJECT, 'charts')
 
-# Figures that have interactive Plotly versions (figXX_interactive.html)
-# Note: fig29/29b/29c (wave disaggregation) retracted — classifier recovered
-# birth/death years not emigration dates. Excluded from V2.6 paper. See §6.7.
-INTERACTIVE_FIGS = {
-    '1', '2', '3', '4', '5', '6', '7', '7b', '8', '9', '10',
-    '11', '12', '13', '14', '15', '15b', '17', '18', '19', '19b',
-    '20', '21', '22', '23', '24', '25', '26', '28', '28b', '30',
-}
-
-# Map each Figure N to its PNG filename (file number = paper figure number)
+# Map paper figure numbers to PNG filenames on disk.
+# Paper restructured 2026-04-10: figures renumbered.
+# Main body: Figures 1-15.  Appendix A: Figures A1-A18.
+# File names on disk are UNCHANGED — only the paper reference numbers changed.
 FIGURE_MAP = {
+    # ── Main body figures (1–15) ──
     '1':   'fig01_primary_le_comparison.png',
     '2':   'fig02_kaplan_meier.png',
     '3':   'fig03_version_comparison.png',
-    '4':   'fig04_box_plots.png',
-    '5':   'fig05_deported_age_histogram.png',
-    '6':   'fig06_violin_plots.png',
-    '7':   'fig07_death_year_histogram.png',
-    '7b':  'fig07b_deported_death_year.png',
-    '8':   'fig08_deported_deaths_by_year.png',
-    '9':   'fig09_nonmigrant_deaths_by_period.png',
-    '10':  'fig10_birth_cohort_le.png',
-    '11':  'fig11_profession_grouped_bar.png',
-    '12':  'fig12_geographic_migration_rates.png',
-    '13':  'fig13_birth_year_distribution.png',
-    '14':  'fig14_sensitivity_analysis.png',
-    '15':  'fig15_internal_transfer_null.png',
-    '15b': 'fig15b_all_groups_le_box.png',
-    '16':  'fig16_consort_flowchart.png',
-    '17':  'fig17_gender_by_group.png',
-    '18':  'fig18_le_by_gender_group.png',
-    '19':  'fig19_ssr_population_context.png',
-    '19b': 'fig19b_simplified_death_rate.png',
-    '20':  'fig20_two_group_conservative.png',
-    '21':  'fig21_soviet_republic_comparison.png',
-    '22':  'fig22_educated_urban_comparison.png',
-    '23':  'fig23_regression_coef_plot.png',
-    '24':  'fig24_cox_forest_plot.png',
-    '25':  'fig25_censoring_pattern.png',
-    '26':  'fig26_km_censored.png',
-    '27':  'fig27_sensitivity_summary.png',
-    '28':  'fig28_deported_hr_by_age.png',
-    '28b': 'fig28b_schoenfeld_smooth.png',
-    # fig29/29b/29c retracted — wave disaggregation classifier unreliable (§6.7)
-    '30':  'fig30_sensitivity_gap.png',
+    '4':   'fig16_consort_flowchart.png',           # was Fig 16
+    '5':   'fig07b_deported_death_year.png',         # was Fig 7b
+    '6':   'fig08_deported_deaths_by_year.png',      # was Fig 8
+    '7':   'fig15_internal_transfer_null.png',       # was Fig 15
+    '8':   'fig11_profession_grouped_bar.png',       # was Fig 11
+    '9':   'fig10_birth_cohort_le.png',              # was Fig 10
+    '10':  'fig23_regression_coef_plot.png',         # was Fig 23
+    '11':  'fig24_cox_forest_plot.png',              # was Fig 24
+    '12':  'fig28_deported_hr_by_age.png',           # was Fig 28
+    '13':  'fig14_sensitivity_analysis.png',         # was Fig 14
+    '14':  'fig30_sensitivity_gap.png',              # was Fig 30
+    '15':  'fig19_ssr_population_context.png',       # was Fig 19
+    # ── Appendix A figures (A1–A18) ──
+    'A1':  'fig04_box_plots.png',                    # was Fig 4
+    'A2':  'fig05_deported_age_histogram.png',       # was Fig 5
+    'A3':  'fig06_violin_plots.png',                 # was Fig 6
+    'A4':  'fig07_death_year_histogram.png',         # was Fig 7
+    'A5':  'fig09_nonmigrant_deaths_by_period.png',  # was Fig 9
+    'A6':  'fig12_geographic_migration_rates.png',   # was Fig 12
+    'A7':  'fig17_gender_by_group.png',              # was Fig 17
+    'A8':  'fig18_le_by_gender_group.png',           # was Fig 18
+    'A9':  'fig21_soviet_republic_comparison.png',   # was Fig 21
+    'A10': 'fig22_educated_urban_comparison.png',    # was Fig 22
+    'A11': 'fig25_censoring_pattern.png',            # was Fig 25
+    'A12': 'fig26_km_censored.png',                  # was Fig 26
+    'A13': 'fig15b_all_groups_le_box.png',           # was Fig 15b
+    'A14': 'fig13_birth_year_distribution.png',      # was Fig 13
+    'A15': 'fig20_two_group_conservative.png',       # was Fig 20
+    'A16': 'fig19b_simplified_death_rate.png',       # was Fig 19b
+    'A17': 'fig27_sensitivity_summary.png',          # was Fig 27
+    'A18': 'fig28b_schoenfeld_smooth.png',           # was Fig 28b
+    # fig29/29b/29c retracted — wave disaggregation classifier unreliable (§8.7)
 }
 
 def img_b64(filename):
@@ -72,27 +68,30 @@ def img_b64(filename):
     return f'data:image/png;base64,{data}'
 
 def load_interactive(fig_num):
-    """Load the Plotly HTML div for a figure number, or None if not available."""
-    # Handle suffixed numbers like '15b', '19b' — keep suffix, zero-pad numeric prefix
-    import re as _re
-    m = _re.match(r'^(\d+)([a-z]*)$', str(fig_num))
-    if m:
-        num_part = f'{int(m.group(1)):02d}'
-        suffix   = m.group(2)
-    else:
-        num_part = str(fig_num)
-        suffix   = ''
-    path = os.path.join(CHARTS, f'fig{num_part}{suffix}_interactive.html')
+    """Load the Plotly HTML div for a figure, using FIGURE_MAP to find the file.
+    Strips embedded <script> tags that load Plotly CDN — the main page loads it once."""
+    if fig_num not in FIGURE_MAP:
+        return None
+    # Derive interactive filename from PNG filename:
+    # fig01_primary_le_comparison.png → fig01_interactive.html
+    # fig07b_deported_death_year.png  → fig07b_interactive.html
+    png_name = FIGURE_MAP[fig_num]
+    prefix = png_name.split('_')[0]  # 'fig01', 'fig07b', 'fig15b', etc.
+    path = os.path.join(CHARTS, f'{prefix}_interactive.html')
     if os.path.exists(path):
         with open(path, encoding='utf-8') as f:
-            return f.read()
+            content = f.read()
+        # Strip Plotly CDN script tags — the main page loads Plotly once via its own CDN
+        content = re.sub(r'<script[^>]*src="https://cdn\.plot\.ly/[^"]*"[^>]*></script>\s*', '', content)
+        content = re.sub(r'<script>window\.PlotlyConfig\s*=\s*\{[^}]*\};</script>\s*', '', content)
+        return content
     return None
 
 # Pre-encode all images (skip missing files gracefully)
 IMAGES = {k: img_b64(fn) for k, fn in FIGURE_MAP.items() if img_b64(fn)}
 
-# Load interactive HTML for key figures
-INTERACTIVE = {k: load_interactive(k) for k in INTERACTIVE_FIGS}
+# Load interactive HTML for ALL figures that have interactive versions
+INTERACTIVE = {k: load_interactive(k) for k in FIGURE_MAP}
 INTERACTIVE = {k: v for k, v in INTERACTIVE.items() if v is not None}
 
 # ---------------------------------------------------------------------------
@@ -146,6 +145,7 @@ def md_to_html(md_text):
             body_lines.append(line)
 
     lines = body_lines
+    _embedded_figs = set()  # Track which figures have been embedded to avoid duplicates
     i = 0
     while i < len(lines):
         line = lines[i]
@@ -208,23 +208,21 @@ def md_to_html(md_text):
         para = ' '.join(para_lines)
         html_parts.append(f'<p>{md_inline(para)}</p>')
 
-        # Check if this paragraph is a figure caption → inject image
-        fig_m = re.search(r'\*\*Figure\s+(\d+[ab]?)', para)
+        # Check if this paragraph is a figure caption → inject static PNG (once per figure)
+        # Static PNGs are used for all figures — always renders, no CDN dependency.
+        # Interactive Plotly versions remain available as standalone HTML files in charts/.
+        fig_m = re.search(r'\*\*Figure\s+(A?\d+[ab]?)', para)
         if fig_m:
             fig_num = fig_m.group(1)
-            if fig_num in INTERACTIVE:
-                # Interactive Plotly chart — embed div directly
-                html_parts.append(
-                    f'<figure class="interactive-fig">'
-                    f'{INTERACTIVE[fig_num]}'
-                    f'</figure>'
-                )
+            if fig_num in _embedded_figs:
+                pass  # Already embedded — skip duplicate
             elif fig_num in IMAGES:
                 html_parts.append(
                     f'<figure>'
                     f'<img src="{IMAGES[fig_num]}" alt="Figure {fig_num}">'
                     f'</figure>'
                 )
+                _embedded_figs.add(fig_num)
 
     # Footnotes section
     if footnote_defs:
@@ -254,7 +252,7 @@ HTML = f"""<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Life Expectancy of Ukrainian Creative Workers — V2.6</title>
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+<!-- Interactive Plotly versions available as standalone files in charts/ -->
 <style>
   body {{
     font-family: 'Georgia', serif;

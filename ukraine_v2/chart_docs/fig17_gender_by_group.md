@@ -25,6 +25,6 @@ All groups are **male-dominated**, which is expected for this era and domain. Pu
 Men and women have different mean ages at death in every population. If one migration group was predominantly female, that could partially explain mean age at death differences. The gender breakdown shows groups are similarly male-dominated, so this confound is minimal. Fig18 controls for it explicitly.
 
 ## ⚠️ Readability issue
-The non-migrated group (n=6,030) is so much larger than the others that the smaller groups' bars are barely visible at the same Y-axis scale.
+The non-migrated group (n=5,960) is so much larger than the others that the smaller groups' bars are barely visible at the same Y-axis scale.
 
 **Fix before publication:** Switch to **percentage within group** (% male / % female / % unknown) rather than raw counts. This makes all four groups directly comparable regardless of size.
