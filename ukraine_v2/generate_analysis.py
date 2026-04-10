@@ -3695,19 +3695,23 @@ try:
                           xerr=[[hr - lo], [hi - hr]],
                           fmt='o', color=_c1_col, capsize=4, markersize=7,
                           label='Model 1 (unadjusted)' if i == 0 else '')
-            ax24.text(hi + 0.02, _y[row] + _offset, f'HR={hr:.3f}', va='center', fontsize=8, color=_c1_col)
+            ax24.text(hi * 1.05, _y[row] + _offset, f'HR={hr:.3f}', va='center', fontsize=8, color=_c1_col)
         if res2:
             hr, lo, hi, p = res2
             ax24.errorbar(hr, _y[row] - _offset,
                           xerr=[[hr - lo], [hi - hr]],
                           fmt='s', color=_c2_col, capsize=4, markersize=7,
                           label='Model 2 (adjusted)' if i == 0 else '')
-            ax24.text(hi + 0.02, _y[row] - _offset, f'HR={hr:.3f}', va='center', fontsize=8, color=_c2_col)
+            ax24.text(hi * 1.05, _y[row] - _offset, f'HR={hr:.3f}', va='center', fontsize=8, color=_c2_col)
 
     ax24.axvline(1.0, color='black', linestyle='--', linewidth=1.2, label='HR = 1 (null)')
+    ax24.set_xscale('log')
+    ax24.set_xticks([0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0])
+    ax24.get_xaxis().set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:g}'))
+    ax24.set_xlim(0.4, 7)
     ax24.set_yticks(_y)
     ax24.set_yticklabels(_all_labels, fontsize=10)
-    ax24.set_xlabel('Hazard Ratio (HR < 1 = lower mortality hazard = longer survival)', fontsize=10)
+    ax24.set_xlabel('Hazard Ratio — log scale (HR < 1 = lower mortality hazard = longer survival)', fontsize=10)
     ax24.invert_yaxis()
 
     # Deduplicate legend
@@ -3778,7 +3782,7 @@ try:
     _fig_p24.update_layout(
         title=dict(text='Figure 11 — Cox PH Hazard Ratios: Migration Status (reference = non-migrated)',
                    font=dict(size=14)),
-        xaxis_title='Hazard Ratio (HR < 1 = lower hazard of death = longer survival)',
+        xaxis_title='Hazard Ratio — log scale (HR < 1 = lower hazard of death = longer survival)',
         yaxis=dict(
             title='Group',
             categoryorder='array',
@@ -3786,7 +3790,10 @@ try:
         ),
         plot_bgcolor='white', paper_bgcolor='white',
         font=dict(family='Georgia, serif', size=12),
-        xaxis=dict(gridcolor='#eee'),
+        xaxis=dict(type='log', gridcolor='#eee', dtick=None,
+                   tickvals=[0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0],
+                   ticktext=['0.5', '0.75', '1.0', '1.5', '2.0', '3.0', '4.0', '5.0'],
+                   range=[-0.4, 0.85]),  # log10(0.4)≈-0.4, log10(7)≈0.85
         legend=dict(orientation='h', yanchor='top', y=-0.18, xanchor='center', x=0.5),
         margin=dict(t=70, b=120, l=200, r=40),
         height=460,

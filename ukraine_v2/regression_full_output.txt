@@ -6,7 +6,7 @@ Dep. Variable:           age_at_death   R-squared:                       0.067
 Model:                            OLS   Adj. R-squared:                  0.067
 Method:                 Least Squares   F-statistic:                     206.2
 Date:                Fri, 10 Apr 2026   Prob (F-statistic):          3.87e-129
-Time:                        15:03:05   Log-Likelihood:                -34662.
+Time:                        15:45:33   Log-Likelihood:                -34662.
 No. Observations:                8590   AIC:                         6.933e+04
 Df Residuals:                    8586   BIC:                         6.936e+04
 Df Model:                           3                                         
@@ -36,7 +36,7 @@ Dep. Variable:           age_at_death   R-squared:                       0.086
 Model:                            OLS   Adj. R-squared:                  0.084
 Method:                 Least Squares   F-statistic:                     61.97
 Date:                Fri, 10 Apr 2026   Prob (F-statistic):          2.82e-156
-Time:                        15:03:05   Log-Likelihood:                -34575.
+Time:                        15:45:33   Log-Likelihood:                -34575.
 No. Observations:                8590   AIC:                         6.918e+04
 Df Residuals:                    8576   BIC:                         6.928e+04
 Df Model:                          13                                         
