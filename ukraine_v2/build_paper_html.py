@@ -2,9 +2,9 @@
 build_paper_html.py
 Converts PAPER_DRAFT.md → paper_preview.html + docs/index.html (GitHub Pages)
 - Full markdown rendering (tables, bold, footnotes)
-- Key figures (1, 9, 10, 14) rendered as interactive Plotly charts with hover tooltips
-- Remaining figures embedded as base64 inline images
-- Plotly loaded via CDN (requires internet); falls back to PNG if interactive HTML missing
+- All 32 data figures rendered as interactive Plotly charts (hover, zoom, pan)
+- CONSORT flowchart (fig16) rendered as static PNG (no data to interact with)
+- Plotly JS library bundled directly into HTML — no CDN dependency, works offline
 """
 
 import re
@@ -208,14 +208,20 @@ def md_to_html(md_text):
         para = ' '.join(para_lines)
         html_parts.append(f'<p>{md_inline(para)}</p>')
 
-        # Check if this paragraph is a figure caption → inject static PNG (once per figure)
-        # Static PNGs are used for all figures — always renders, no CDN dependency.
-        # Interactive Plotly versions remain available as standalone HTML files in charts/.
+        # Check if this paragraph is a figure caption → inject chart (once per figure)
+        # Interactive Plotly preferred; static PNG fallback for CONSORT flowchart only.
         fig_m = re.search(r'\*\*Figure\s+(A?\d+[ab]?)', para)
         if fig_m:
             fig_num = fig_m.group(1)
             if fig_num in _embedded_figs:
                 pass  # Already embedded — skip duplicate
+            elif fig_num in INTERACTIVE:
+                html_parts.append(
+                    f'<figure class="interactive-fig">'
+                    f'{INTERACTIVE[fig_num]}'
+                    f'</figure>'
+                )
+                _embedded_figs.add(fig_num)
             elif fig_num in IMAGES:
                 html_parts.append(
                     f'<figure>'
@@ -246,13 +252,18 @@ with open(MD_PATH, encoding='utf-8') as f:
 
 body = md_to_html(md)
 
+# Load Plotly JS library for local embedding (no CDN dependency)
+PLOTLY_JS_PATH = os.path.join(PROJECT, 'plotly.min.js')
+with open(PLOTLY_JS_PATH, encoding='utf-8') as f:
+    PLOTLY_JS = f.read()
+
 HTML = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Life Expectancy of Ukrainian Creative Workers — V2.6</title>
-<!-- Interactive Plotly versions available as standalone files in charts/ -->
+<title>Life Expectancy of Ukrainian Creative Workers — V3.0</title>
+<script>{PLOTLY_JS}</script>
 <style>
   body {{
     font-family: 'Georgia', serif;
