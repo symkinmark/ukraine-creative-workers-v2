@@ -1,5 +1,5 @@
 """
-generate_analysis.py — V2.1 Full Analysis & Chart Suite
+generate_analysis.py — V3.0 Full Analysis & Chart Suite
 Mortality Differentials Among Ukrainian Creative Workers During Soviet Occupation
 Symkin 2026
 
@@ -279,7 +279,7 @@ lines = []
 def h(text=''):   lines.append(text)
 def hr(c='=', w=80): lines.append(c * w)
 
-hr(); h("UKRAINIAN CREATIVE WORKERS V2.1 — EXTENDED STATISTICAL ANALYSIS")
+hr(); h("UKRAINIAN CREATIVE WORKERS V3.0 — EXTENDED STATISTICAL ANALYSIS")
 h("Symkin 2026  |  Source: Encyclopedia of Modern Ukraine (esu.com.ua)")
 hr(); h()
 
@@ -535,25 +535,25 @@ apply_style(ax, 'Figure 2 — Kaplan-Meier Survival Curves by Migration Group',
 ax.legend(fontsize=10)
 ax.axvline(73, color=COLOUR['non_migrated'], linestyle=':', linewidth=1, alpha=0.7)
 ax.text(73.5, 0.88, 'Non-migrated\nmedian (73)', fontsize=7, color=COLOUR['non_migrated'])
-ax.axvline(45, color=COLOUR['deported'], linestyle=':', linewidth=1, alpha=0.7)
-ax.text(45.5, 0.60, 'Deported\nmedian (45)', fontsize=7, color=COLOUR['deported'])
+ax.axvline(46, color=COLOUR['deported'], linestyle=':', linewidth=1, alpha=0.7)
+ax.text(46.5, 0.60, 'Deported\nmedian (46)', fontsize=7, color=COLOUR['deported'])
 plt.tight_layout(rect=[0, 0.04, 1, 1])
 add_source(fig)
 save(fig, 'fig02_kaplan_meier.png')
 
 
 # ===========================================================================
-# FIG 03 — V1 / V2.1 COMPARISON (apples-to-apples)
+# FIG 03 — V1 / V3.0 COMPARISON (apples-to-apples)
 #
 # V1 used a simple two-group system: migrated vs non-migrated (everyone who
 # stayed in the Soviet sphere was "non-migrated").
-# To make V2.1 directly comparable, we use the same two-group framing here:
-#   - "Left USSR" = migrated (V2.1 group)
+# To make V3.0 directly comparable, we use the same two-group framing here:
+#   - "Left USSR" = migrated (V3.0 group)
 #   - "Stayed in Soviet sphere" = non_migrated + deported + internal_transfer
 #     combined (matching V1's definition of "non-migrated")
 # This is the same grouping used in fig20 — the two charts now show consistent
 # numbers and do not contradict each other.
-# The four-group breakdown (fig01) is the primary V2.3 analysis.
+# The four-group breakdown (fig01) is the primary V3.0 analysis.
 # ===========================================================================
 print("  fig03_version_comparison.png")
 
@@ -562,7 +562,7 @@ V1_mig = 72
 V1_nm  = 63
 V1_n   = 415
 
-# V2.3 — using same two-group logic as V1 (and as fig20)
+# V3.0 — using same two-group logic as V1 (and as fig20)
 # "Left USSR" = migrated only
 v23_left_les = le_values(migrated)
 V23_mig      = round(statistics.mean(v23_left_les), 1)
@@ -575,7 +575,7 @@ v23_stayed_les = (le_values(non_migrated) + le_values(internal_transfer)
 V23_nm         = round(statistics.mean(v23_stayed_les), 1)
 V23_nm_n       = len(v23_stayed_les)
 
-labels_v = [f'V1\n(n={V1_n})', f'V2.3\n(n={V23_mig_n + V23_nm_n})']
+labels_v = [f'V1\n(n={V1_n})', f'V3.0\n(n={V23_mig_n + V23_nm_n})']
 mig_vals = [V1_mig, V23_mig]
 nm_vals  = [V1_nm,  V23_nm]
 
@@ -600,14 +600,14 @@ for xi, (mv, nv) in enumerate(zip(mig_vals, nm_vals)):
     ax.text(xi + w/2 + 0.06, mid, f"+{gap:.1f} yrs", va='center',
             fontsize=9, color='#333', fontweight='bold')
 
-apply_style(ax, 'Figure 3 — Mean Age at Death: V1 vs V2.3 (consistent two-group framing)',
+apply_style(ax, 'Figure 3 — Mean Age at Death: V1 vs V3.0 (consistent two-group framing)',
             ylabel='Mean Age at Death (years)')
 ax.set_xticks(x)
 ax.set_xticklabels(labels_v, fontsize=11)
 ax.set_ylim(0, max(mig_vals + nm_vals) * 1.25)
 ax.legend(fontsize=9)
 fig.text(0.5, 0.01,
-    "V2.3 'stayed' = non_migrated + internal_transfer + deported combined "
+    "V3.0 'stayed' = non_migrated + internal_transfer + deported combined "
     "(matches V1 two-group definition and fig20). Four-group breakdown: see fig01. " + SOURCE_NOTE,
     ha='center', fontsize=7, color='grey', style='italic')
 plt.tight_layout(rect=[0, 0.05, 1, 1])
@@ -974,7 +974,7 @@ first_x = min(dec for dec in valid_decs
 ax.set_xlim(first_x - 5, 1985)
 ax.set_ylim(25, 90)
 fig.text(0.5, 0.01,
-    "Source: ESU V2.3 dataset, Symkin 2026. Each point = mean age at death of creative workers "
+    "Source: ESU V2.6 dataset, Symkin 2026. Each point = mean age at death of creative workers "
     "born in that decade (cohort estimate, n≥10). Period LE comparison: see fig21/fig22.",
     ha='center', fontsize=7, color='grey', style='italic')
 plt.tight_layout(rect=[0, 0.05, 1, 1])
@@ -2195,13 +2195,13 @@ if _PLOTLY_AVAIL:
             ),
         ))
 
-    # Reference line at V2.3 non-migrated median (73 yrs)
+    # Reference line at V2.6 non-migrated median (73 yrs)
     fig_p02.add_vline(x=73, line_dash='dot', line_color='grey', line_width=1,
                       annotation_text='Non-migrated median (73 yrs)',
                       annotation_position='top right',
                       annotation_font_size=10, annotation_font_color='grey')
-    fig_p02.add_vline(x=45, line_dash='dot', line_color=_PCOLOUR['deported'], line_width=1,
-                      annotation_text='Deported median (45 yrs)',
+    fig_p02.add_vline(x=46, line_dash='dot', line_color=_PCOLOUR['deported'], line_width=1,
+                      annotation_text='Deported median (46 yrs)',
                       annotation_position='top left',
                       annotation_font_size=10,
                       annotation_font_color=_PCOLOUR['deported'])
@@ -2483,7 +2483,7 @@ if _PLOTLY_AVAIL:
     _save_interactive(fig_p12, 'fig12_interactive.html')
 
     # -----------------------------------------------------------------------
-    # INTERACTIVE FIG 03 — Version comparison (V1 vs V2.3)
+    # INTERACTIVE FIG 03 — Version comparison (V1 vs V3.0)
     # -----------------------------------------------------------------------
     v1_gap   = round(V1_mig  - V1_nm,  1)
     v23_gap  = round(V23_mig - V23_nm, 1)
@@ -2491,7 +2491,7 @@ if _PLOTLY_AVAIL:
     fig_p03 = go.Figure()
     fig_p03.add_trace(go.Bar(
         name='Left USSR (migrated)',
-        x=[f'V1<br>(n={V1_n})', f'V2.3<br>(n={V23_mig_n + V23_nm_n})'],
+        x=[f'V1<br>(n={V1_n})', f'V3.0<br>(n={V23_mig_n + V23_nm_n})'],
         y=mig_vals,
         marker_color=_PCOLOUR['migrated'],
         text=[f'{v:.1f} yrs' for v in mig_vals],
@@ -2506,7 +2506,7 @@ if _PLOTLY_AVAIL:
     ))
     fig_p03.add_trace(go.Bar(
         name='Stayed in Soviet sphere',
-        x=[f'V1<br>(n={V1_n})', f'V2.3<br>(n={V23_mig_n + V23_nm_n})'],
+        x=[f'V1<br>(n={V1_n})', f'V3.0<br>(n={V23_mig_n + V23_nm_n})'],
         y=nm_vals,
         marker_color=_PCOLOUR['non_migrated'],
         text=[f'{v:.1f} yrs' for v in nm_vals],
@@ -2519,7 +2519,7 @@ if _PLOTLY_AVAIL:
         ),
     ))
     fig_p03.update_layout(
-        title=dict(text='Figure 3 — Mean Age at Death: V1 vs V2.3 (Two-Group Framing)',
+        title=dict(text='Figure 3 — Mean Age at Death: V1 vs V3.0 (Two-Group Framing)',
                    font=dict(size=15)),
         yaxis_title='Mean Age at Death (years)',
         barmode='group',

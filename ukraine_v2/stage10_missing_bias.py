@@ -31,7 +31,7 @@ os.makedirs(CHARTS, exist_ok=True)
 # NOTE: Only figures confirmed ABSENT from ESU dataset are included here.
 # Figures present in dataset (Zerov, Kosynka, Pidmohylny, Kurbas, etc.) are
 # already counted in the non-migrant mean and do NOT represent missing bias.
-# Verified absent by checking esu_creative_workers_v2_3.csv — see stage10 script.
+# Verified absent by checking esu_creative_workers_v2_6.csv — see stage10 script.
 
 NAMED_CASES = [
     {

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Stage 7 — Regenerate figures for right-censored analysis (V2.4)
+Stage 7 — Regenerate figures for right-censored analysis (V2.6)
 
 Generates:
   fig24 — Cox forest plot (Model 1 + Model 2 HRs) — UPDATED
@@ -124,7 +124,7 @@ def make_fig24():
     ax.set_xscale('log')
     ax.set_xlabel('Hazard Ratio (log scale)', fontsize=10)
     ax.set_title('Figure 11 — Cox PH Hazard Ratios by Migration Group\n'
-                 '(Right-censored N=15,053; reference = non-migrated)', fontsize=10)
+                 '(Right-censored N=15,000; reference = non-migrated)', fontsize=10)
     ax.set_yticks([(y_pos_m1[i] + y_pos_m2[i]) / 2 for i in range(n_groups)])
     ax.set_yticklabels(group_labels, fontsize=10)
     ax.set_ylim(0, n_groups * 3 + 0.5)
@@ -168,7 +168,7 @@ def _fig24_plotly(models, groups, group_labels):
     fig.add_vline(x=1.0, line_dash='dash', line_color='black', opacity=0.5)
     fig.update_xaxes(type='log', title='Hazard Ratio (log scale)')
     fig.update_layout(
-        title='Figure 11 — Cox PH Hazard Ratios (Right-Censored N=15,053)',
+        title='Figure 11 — Cox PH Hazard Ratios (Right-Censored N=15,000)',
         height=400, template='plotly_white',
     )
     out = os.path.join(CHARTS_DIR, 'fig24_interactive.html')

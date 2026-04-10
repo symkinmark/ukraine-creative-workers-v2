@@ -1,0 +1,220 @@
+id,migration_status,migration_reasoning
+2303,non_migrated,Career entirely within Kyiv and Ukrainian SSR with no indication of emigration.
+2306,non_migrated,Worked and exhibited within Ukrainian SSR/Ukraine throughout career.
+2307,non_migrated,Studied and worked in Ukraine (Kamianets-Podilskyi and Kyiv); no emigration noted.
+2308,non_migrated,Based in Kryvyi Rih with career entirely within Ukrainian SSR.
+2310,non_migrated,Worked in Ukrainian press and Soviet institutions; career confined to Ukraine.
+2312,non_migrated,Studied and worked in Odesa and Kyiv; no emigration indicated.
+2314,non_migrated,Worked in Kyiv art institutions throughout career; no emigration noted.
+2317,non_migrated,Career as literary scholar entirely within Ukraine (Vinnytsia).
+2318,non_migrated,Actor and director who worked in Ukrainian theatres throughout career.
+2322,non_migrated,Studied in Moscow but returned and worked in Ukraine; no emigration to non-Soviet country.
+2323,non_migrated,Poet and literary scholar based in Ukraine; no emigration indicated.
+2324,non_migrated,Performer based in Ukraine; studied in Moscow but returned; no emigration to non-Soviet country.
+2326,non_migrated,Actor who worked in Ukrainian theatres throughout career.
+2328,internal_transfer,Born in Irkutsk (Russia); worked in theatres of Novosibirsk and Lipetsk before settling in Ukraine.
+2329,non_migrated,Writer based in Mykolaiv; no emigration indicated.
+2331,non_migrated,Designer based in Kharkiv; personal exhibitions in Moscow were visits not emigration.
+2332,non_migrated,Born in Kyrgyzstan; studied in Leningrad; chaired Kherson NSHU from 1992 — settled in Ukraine.
+2338,non_migrated,Born in Tula (Russia); studied and settled in Kharkiv; teaching career entirely in Ukraine.
+2345,non_migrated,Studied in Rostov then career entirely in Donetsk art institutions; no emigration.
+2346,non_migrated,Actor who worked in Dnipro and other Ukrainian theatres throughout career.
+2351,non_migrated,Opera singer based in Ukrainian theatres throughout career.
+2352,non_migrated,Actor working in Ukrainian theatres; no emigration noted.
+2353,non_migrated,Born in Russia but worked in Ukraine; graphic artist and pedagogue based in Kyiv.
+2354,non_migrated,Born in Chita (Russia); studied and built career in Kryvyi Rih; settled in Ukraine.
+2355,non_migrated,Graphic artist and design teacher based in Kyiv; no emigration indicated.
+2356,non_migrated,Writer and journalist based in Ukraine; no emigration noted.
+2357,non_migrated,Painter based in Kherson; no emigration indicated.
+2358,non_migrated,Master weaver based in Reshetylivka (Poltava region) throughout career.
+2360,non_migrated,Poet based in Kyiv; works for National Radio Company of Ukraine since 1988.
+2361,non_migrated,Architect based in Kyiv; participated in exhibitions in Belgium and USA but settled in Ukraine.
+2363,non_migrated,Actor working in Zhytomyr theatres; career entirely within Ukraine.
+2364,non_migrated,Prose writer working in Zhytomyr regional press; career entirely within Ukraine.
+2368,non_migrated,Ballet artist and choreographer based in Ukraine; Varna and Paris competition appearances were visits not emigration.
+2369,non_migrated,Writer and literary scholar based in Rivne; no emigration indicated.
+2370,unknown,Born in Russia; studied in Petrograd; bio truncated with insufficient detail on final residence.
+2373,non_migrated,Painter and graphic artist based in Lviv throughout career.
+2374,non_migrated,Writer based in Cherkasy region; no emigration indicated.
+2375,non_migrated,Pianist based in Drohobych; no emigration indicated.
+2376,non_migrated,Art historian based in Lviv; member of NTSh but within Ukraine.
+2377,non_migrated,Decorative arts artist based in Rivne region throughout career.
+2382,non_migrated,Cinematographer based in Kyiv; career at Ukrainian film studios.
+2384,non_migrated,Poet and philology scholar based in Vinnytsia; no emigration indicated.
+2386,migrated,Left Ukraine in 1942; settled abroad (outside Soviet sphere) as member of Organisation of Ukrainian Stage Artists.
+2387,non_migrated,Literary scholar working at Kharkiv University throughout career.
+2391,non_migrated,Art historian based in Kyiv; worked at Ukrainian state institutions.
+2393,non_migrated,Theatre director working in Ukrainian theatres throughout career.
+2395,non_migrated,Painter based in Kyiv; participated in international exhibitions but settled in Ukraine.
+2397,non_migrated,Artist working in Kharkiv and Luhansk; career entirely within Ukraine.
+2402,non_migrated,Actor and director working in Ukrainian theatres; career entirely within Ukraine.
+2404,non_migrated,Violinist based in Kyiv; international competitions were visits not emigration.
+2408,non_migrated,Born in Nizhny Tagil (Russia); studied at Cincinnati art academy (USA) briefly but career based in Kharkiv.
+2409,non_migrated,Born in Russia; studied and settled in Simferopol; literary scholar at Taurida University in Ukraine.
+2410,non_migrated,Graphic artist and set designer based in Kharkiv throughout career.
+2411,non_migrated,Textile designer who studied in Moscow; worked at Kyiv House of Fashion; career settled in Ukraine.
+2412,non_migrated,Film director at Kyiv film studio throughout career; no emigration indicated.
+2413,non_migrated,Born in Russia; studied in Leningrad; settled in Simferopol where she taught and worked.
+2415,non_migrated,Born in Novosibirsk (Russia); studied and settled in Kyiv; worked in Ukrainian theatres.
+2416,non_migrated,Translator based in Kyiv throughout career; no emigration indicated.
+2421,non_migrated,Opera singer based in Kyiv; master class in West Berlin was a visit not emigration.
+2422,non_migrated,Singer based in Ukraine; no emigration indicated.
+2423,unknown,Born in Pochaiv; studied in Warsaw AM (1938); bio truncated — unclear if remained in Poland or returned to Ukraine.
+2426,non_migrated,Writer based in Rivne region; worked in Ukrainian press and institutions.
+2431,non_migrated,Musicologist based in Donetsk throughout career; no emigration indicated.
+2432,non_migrated,Architect based in Kharkiv throughout career; no emigration indicated.
+2434,non_migrated,Poet based in Kyiv region; worked in Ukrainian cultural institutions.
+2435,non_migrated,Born in Vitebsk (Belarus); actor who worked in Ukrainian theatres from 1950s onward; settled in Ukraine.
+2436,non_migrated,Born in Penza (Russia); studied and settled in Kyiv; career in Ukrainian institutions.
+2438,non_migrated,Painter based in Kryvyi Rih and Dnipro; career entirely within Ukraine.
+2442,non_migrated,Graphic artist based in Dnipro; career entirely within Ukraine.
+2444,non_migrated,Pianist based in Donetsk; career entirely within Ukraine.
+2445,migrated,Studied in Lviv and Vienna Conservatory; bio indicates diaspora activity — likely emigrated westward.
+2447,non_migrated,Decorative arts artist based in Crimea/Ukraine; studied in Leningrad but returned to work in Ukraine.
+2448,non_migrated,Singer and choirmaster based in Ukraine; no emigration indicated.
+2450,non_migrated,Literary scholar based in Zvyahel (Zhytomyr region); career at Ukrainian academic institutions.
+2453,non_migrated,Film director at Kyiv film studio; career entirely within Ukraine.
+2456,internal_transfer,Born in Moscow; trained in Kyiv but received RF title (1994) and worked in Russia — transferred back and forth; primarily worked in both Soviet/post-Soviet contexts with no settled non-Soviet emigration.
+2457,non_migrated,Violinist based in Rivne; teaching career entirely within Ukraine.
+2458,non_migrated,Actor working in Ukrainian theatres throughout career.
+2459,non_migrated,Painter based in Ternopil; career entirely within Ukraine.
+2461,non_migrated,Actor working in Zakarpattia and other Ukrainian theatres throughout career.
+2463,non_migrated,Poet and journalist based in Zhytomyr region; no emigration indicated.
+2465,migrated,Received Polish cultural honours (1988; 1993) and USA prize (2000); settled in Poland after working in Ukrainian polygraphy institute.
+2466,migrated,Born in Katowice (Poland); studied in Brazil (Parana school); career evidently abroad in non-Soviet countries.
+2467,non_migrated,Designer based in Chernivtsi; career entirely within Ukraine.
+2472,non_migrated,Poet and diplomat based in Kyiv; NSPУ member; no permanent emigration indicated.
+2473,non_migrated,Art historian based in Luhansk; career entirely within Ukraine.
+2475,non_migrated,Poet based in Kharkiv region; no emigration indicated.
+2477,non_migrated,Graphic artist based in Kyiv; career at Kyiv art institutions.
+2484,non_migrated,Pianist based in Odesa; international competition wins were visits not emigration.
+2485,non_migrated,Painter who worked in Norilsk 1981-88 (Russia) before returning; settled career in Ukraine.
+2486,migrated,Emigrated to Australia in 1949 with parents; studied at Royal Melbourne institute; settled in Australia.
+2492,non_migrated,Sculptor based in Kyiv; career at Kyiv production combine throughout.
+2494,unknown,Born 1861; bio heavily truncated; insufficient information to determine migration.
+2497,non_migrated,Born in Russia; worked in Lviv 1954-64 then career in Ukraine; settled in Ukraine.
+2500,non_migrated,Born in Russia; studied in Krasnodar; received Ukrainian and Russian honours; worked in Ukraine (career based in Ukraine despite Russian title).
+2501,non_migrated,Poet and translator based in Odesa; works for Odesa state TV company.
+2503,non_migrated,Graphic artist based in Ternopil/Lviv region; career entirely within Ukraine.
+2507,non_migrated,Prose writer based in Luhansk region; career in Ukrainian press.
+2508,non_migrated,Actor and singer based in Ukrainian theatres throughout career.
+2509,non_migrated,Painter and graphic artist based in Kharkiv; teaching at Kharkiv art institute.
+2512,unknown,Born in St. Petersburg 1856; worked as Kyiv city architect 1898-1920; bio truncated — unclear if emigrated.
+2513,non_migrated,Born in Kazakhstan; studied in Kyiv; worked at Kyiv art production combine from 1990.
+2514,non_migrated,Painter based in Kryvyi Rih and Kyiv; career entirely within Ukraine.
+2515,non_migrated,Decorative arts artist who studied in Moscow; career settled in Ukraine (Berdiansk/Zaporizhzhia).
+2526,deported,Forcibly resettled from Poland to Ukraine under Operation Vistula (Операція «Вісла») — Polish state ethnic cleansing of Ukrainians.
+2529,non_migrated,Opera singer who studied in Moscow Conservatory but settled career in Ukrainian theatres.
+2531,non_migrated,Singer based in Lviv and Kyiv throughout career; no emigration indicated.
+2535,non_migrated,Painter based in Kyiv; career entirely within Ukraine.
+2536,non_migrated,Theatre artist based in Kyiv; career entirely within Ukraine.
+2541,non_migrated,Painter based in Ukraine (Chernihiv region and Kyiv area); career in Ukrainian institutions.
+2544,non_migrated,Writer who studied in Moscow literary institute but settled career in Lviv publishing.
+2545,non_migrated,Graphic artist born in Kazakhstan; studied and settled in Kyiv; participated in international exhibitions but based in Ukraine.
+2549,non_migrated,Film artist born in Russia; career entirely within Ukrainian film industry (NSHU and NSKinU member).
+2559,non_migrated,Pianist based in Lviv; teaching at Lviv Conservatory throughout career.
+2561,non_migrated,Music pedagogue born in Russia; settled career in Vinnytsia pedagogy institutions.
+2565,non_migrated,Sculptor based in Kyiv; career entirely within Ukraine.
+2566,non_migrated,Painter based in Ivano-Frankivsk; career as restorer entirely within Ukraine.
+2569,unknown,Singer born in Kharkiv (1924); studied there; bio truncated — insufficient detail to determine final migration status.
+2570,non_migrated,Graphic artist based in Khmelnytskyi region; career entirely within Ukraine.
+2571,non_migrated,Born in Kyrgyzstan; studied and settled in Kyiv; choreographer at Ukrainian folk ensembles.
+2573,migrated,Born in Germany (Mittenwald); studied at Manhattan Conservatory (New York); working there as professor since 1993 — settled in USA.
+2574,non_migrated,Painter born in Donetsk; studied and based career in Ukraine despite 2022 displacement; prizes awarded in Ukraine.
+2577,non_migrated,Born in Ashgabat (Turkmenistan); settled career in Uzhhorod/Zakarpattia (Ukraine); NSHU member based in Ukraine.
+2580,non_migrated,Screenwriter and journalist based in Kyiv; career at Ukrainian television.
+2581,non_migrated,Conductor and composer based in Kirovohrad region; career entirely within Ukraine.
+2583,non_migrated,Graphic artist based in Lviv; career entirely within Ukraine.
+2584,migrated,Bio states "Виїхав за..." (emigrated abroad) — emigrated to non-Soviet country (truncated but migration explicitly stated).
+2587,non_migrated,Graphic artist based in Kyiv; career entirely within Ukraine.
+2588,non_migrated,Painter based in Kharkiv; career entirely within Ukraine.
+2595,non_migrated,Graphic artist based in Kyiv; prizes and exhibitions entirely within Ukraine.
+2596,unknown,Born 1886; worked in Kharkiv until 1951; bio truncated — insufficient information on final residence or emigration.
+2598,non_migrated,Prose writer who settled in Ukraine (Cherkasy) from infancy; career as writer and teacher in Ukraine.
+2601,non_migrated,Artist based in Kyiv; career at Kyiv design institutes throughout.
+2602,non_migrated,Born in Russia (Orel); studied in Leningrad; settled in Crimea/Ukraine; NSHU member based in Ukraine.
+2604,migrated,Bio indicates emigration: worked in Moscow publications but career trajectory and context suggest eventual emigration to non-Soviet country (bio truncated but working for Western publications noted).
+2606,non_migrated,Prose writer based in Kaniv (Cherkasy region); career at local Ukrainian newspaper.
+2607,non_migrated,Cultural figure based in Rivne and then Kyiv; career entirely within Ukraine.
+2610,non_migrated,Literary scholar born in Russia; studied and settled in Kyiv; Hero of Ukraine — career entirely within Ukraine.
+2611,non_migrated,Graphic artist based in Kyiv; career entirely within Ukraine.
+2614,non_migrated,Animation director born in Russia; studied in Kyiv and Moscow; career at Kyiv film studio.
+2615,non_migrated,Theatre artist born in Leningrad; career at Crimean theatres; settled in Ukraine.
+2617,non_migrated,Art historian based in Kyiv and Lviv; career entirely within Ukraine.
+2620,internal_transfer,Born in Lviv; received Заслужений діяч мистецтв РФ (2003) — transferred to Russia and built significant career there.
+2621,non_migrated,Theatre director based in Kyiv; teaching at Kyiv theatre institute from 1990.
+2622,non_migrated,Painter and sculptor based in Odesa throughout career.
+2623,non_migrated,Musician and singer based in Dnipro; career entirely within Ukraine.
+2624,non_migrated,Graphic artist born in Belarus; studied in Lviv; career entirely within Ukraine.
+2625,non_migrated,Painter based in Luhansk; career entirely within Ukraine.
+2628,non_migrated,Art historian based in Dnipro; studied at Kyiv art institute; career in Ukraine.
+2629,non_migrated,Poet based in Chernihiv region; career in Ukrainian cultural institutions.
+2630,non_migrated,Film production designer based in Kyiv film studios; career entirely within Ukraine.
+2634,non_migrated,Conductor and cultural figure based in Kyiv; career entirely within Ukraine.
+2635,non_migrated,Ukrainian writer and pedagogue born and living in Serbia; never part of Soviet sphere — diaspora community member in Yugoslavia (non-Soviet country).
+2636,unknown,Born 1869; died 1943; bio truncated — insufficient information to determine migration.
+2639,non_migrated,Designer based in Kyiv; career entirely within Ukraine.
+2640,non_migrated,Graphic artist based in Zhytomyr and Kyiv; career entirely within Ukraine.
+2641,non_migrated,Painter based in Kyiv; teaching at Kyiv art institute.
+2643,non_migrated,Poet based in Korosten (Zhytomyr region); career entirely within Ukraine.
+2645,non_migrated,Graphic artist based in Donetsk; studied in Moscow but career settled in Ukraine.
+2646,non_migrated,Violinist based in Kyiv; career at Ukrainian concert organisations throughout.
+2649,non_migrated,Composer based in Kyiv and Donetsk region; career entirely within Ukraine.
+2650,non_migrated,Composer and flautist who studied in Moscow Conservatory; career based in Ukraine.
+2651,non_migrated,Singer born in Russia (Norilsk); studied and settled in Kyiv; career at Ukrainian theatres.
+2654,unknown,Born 1889; literary scholar; bio truncated with insufficient detail on fate after Soviet era.
+2655,non_migrated,Painter born in Russia; studied and settled in Ukraine (Dnipro area); career in Ukraine.
+2658,non_migrated,Writer born in Russia; studied in Kharkiv; settled career in Vovchansk (Kharkiv region); no emigration.
+2665,non_migrated,Documentary filmmaker born in Russia (Bashkortostan); settled career in Kyiv; Ukrainian honours.
+2667,migrated,Settled in province of Quebec (Canada); studied in Paris; emigrated to Canada — non-Soviet country.
+2668,non_migrated,Graphic artist based in Mykolaiv; studied in Tbilisi but career settled in Ukraine.
+2670,non_migrated,Painter based in Mykolaiv; studied in Sofia briefly; career entirely at Mykolaiv NSHU.
+2675,non_migrated,Architect and designer born in Dresden (Germany); studied and settled in Kyiv; teaching at Kyiv university.
+2676,non_migrated,Writer and actor based in Ukraine; career in Ukrainian theatres and literature.
+2679,non_migrated,Composer and musicologist based in Kharkiv; studied in Moscow but career settled in Ukraine.
+2684,non_migrated,Painter based in Uzhhorod; career entirely within Ukraine.
+2685,non_migrated,Pianist-organist based in Kyiv; teaching at Kyiv Conservatory.
+2687,non_migrated,Decorative arts artist based in Kharkiv; career entirely within Ukraine.
+2688,non_migrated,Painter born in Russia (Kaliningrad region); settled career in Ukraine; Ukrainian honours.
+2691,non_migrated,Graphic artist born in Kazakhstan; studied and settled in Lviv; career entirely within Ukraine.
+2693,migrated,Accompanied Ukrainian diaspora choirs in Austria (1945-49) and subsequently; settled abroad in diaspora context.
+2698,non_migrated,Sculptor from Luhansk region; career in Ukrainian art institutions.
+2704,non_migrated,Poet and literary scholar based in Chernivtsi University throughout career.
+2711,non_migrated,Writer and publisher based in Kyiv; career entirely within Ukraine.
+2714,non_migrated,Publicist and translator based in Khmelnytskyi region; career in Ukrainian institutions.
+2717,non_migrated,Photo artist based in Zaporizhzhia throughout career.
+2719,migrated,Born in Germany (Münster); son of O. Burghardt (diaspora intellectual); studied at Toronto University; worked in Canadian and US universities — settled in North America.
+2721,non_migrated,Sculptor based in Kyiv; career at Kyiv production combine.
+2722,non_migrated,Born in Poland; studied and settled in Lviv; career entirely within Ukraine.
+2724,non_migrated,Painter based in Volyn region; career entirely within Ukraine.
+2725,non_migrated,Decorative arts artist based in Uzhhorod; career entirely within Ukraine.
+2731,non_migrated,Violinist and conductor based in Lviv; career entirely within Ukraine.
+2738,non_migrated,Graphic designer based in Kyiv; career entirely within Ukraine.
+2739,non_migrated,Poet based in Dnipro region; career in Ukrainian press and publishing.
+2747,non_migrated,Pop singer based in Ukraine; career entirely within Ukraine.
+2748,non_migrated,Decorative artist based in Lviv; career at Lviv art production combine.
+2750,non_migrated,Choirmaster based in Ternopil/Lviv region; teaching at Lviv Conservatory.
+2751,non_migrated,Conductor and composer based in Ternopil; career entirely within Ukraine.
+2752,non_migrated,Poet born in Russia (Bashkortostan); moved to Yalta (Crimea/Ukraine) in 1976; settled career in Ukraine.
+2755,non_migrated,Writer based in Kyiv; career in Ukrainian journalism.
+2758,non_migrated,Painter based in Kyiv region; career entirely within Ukraine.
+2760,internal_transfer,Born in Moscow; studied in Moscow theatre institute; worked in theatres of Rostov; Tver; Maikop; Makhachkala before settling in Ukraine — voluntary moves within Soviet sphere.
+2763,non_migrated,Architect based in Kharkiv; teaching at Kharkiv engineering institute throughout career.
+2764,non_migrated,Singer based in Mykolaiv; career at Kyiv Kapelle throughout.
+2765,non_migrated,Painter based in Chernivtsi; career entirely within Ukraine.
+2768,non_migrated,Architect based in Zhytomyr region; career in Ukrainian design institutes.
+2769,non_migrated,Poet born in Russia; moved to Ukraine in 1979; settled career in Zaporizhzhia region.
+2770,non_migrated,Graphic artist based in Lviv; career at Lviv House of Fashion and freelance in Ukraine.
+2771,non_migrated,Poet and publisher based in Dnipro; career entirely within Ukraine.
+2780,non_migrated,Choral conductor based in Odesa Conservatory; career entirely within Ukraine.
+2784,non_migrated,Painter born in Zhytomyr; studied in Moscow; career entirely within Ukraine.
+2792,non_migrated,Poet based in Crimea (Ukraine); medical and literary career within Ukraine.
+2793,non_migrated,Musicologist born in Russia; studied and settled in Kyiv; career at Ukrainian radio and publishing.
+2794,non_migrated,Poet based in Odesa region; career entirely within Ukraine.
+2799,non_migrated,Translator and poet based in Kyiv; career at Ukrainian Radio and cultural institutions.
+2803,non_migrated,Architect based in Donetsk; career entirely within Ukraine.
+2805,non_migrated,Pop singer based in Lviv and Ukraine; career entirely within Ukraine.
+2807,non_migrated,Painter based in Kosiv (Ivano-Frankivsk region); career entirely within Ukraine.
+2810,non_migrated,Rusyn poet and journalist born and living in Yugoslavia/Serbia; never part of Soviet sphere — diaspora community member in non-Soviet country.
+2813,non_migrated,Art historian and geologist based in Kyiv since 1973; career entirely within Ukraine.
+2817,internal_transfer,Born in Perm (Russia); trained there; moved to Ukraine (Cherkasy) for career in Ukrainian folk choir — voluntary move within Soviet sphere.
