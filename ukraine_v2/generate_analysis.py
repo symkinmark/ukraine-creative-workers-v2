@@ -1332,6 +1332,51 @@ ax.set_title('Figure 4 — CONSORT-Style Dataset Exclusion Flowchart',
 fig.text(0.5, 0.01, SOURCE_NOTE, ha='center', fontsize=7, color='grey', style='italic')
 save(fig, 'fig16_consort_flowchart.png')
 
+# --- Interactive Plotly CONSORT flowchart ---
+import plotly.graph_objects as _go_consort
+fig_consort = _go_consort.Figure()
+fig_consort.update_xaxes(visible=False, range=[0, 1])
+fig_consort.update_yaxes(visible=False, range=[0, 1])
+
+_consort_boxes = BOX_COORDS  # reuse the computed data from matplotlib version
+_consort_colors = ['#EBF5FB'] * (len(_consort_boxes) - 1) + ['#D5F5E3']
+_consort_border = ['#1B2A4A'] * (len(_consort_boxes) - 1) + ['#1A5276']
+_bw, _bh = 0.44, 0.045
+
+for i, (bx, by, text) in enumerate(_consort_boxes):
+    # Box shape
+    fig_consort.add_shape(
+        type='rect',
+        x0=bx - _bw/2, y0=by - _bh/2, x1=bx + _bw/2, y1=by + _bh/2,
+        fillcolor=_consort_colors[i],
+        line=dict(color=_consort_border[i], width=2),
+    )
+    # Text annotation
+    fig_consort.add_annotation(
+        x=bx, y=by, text=text.replace('\n', '<br>'),
+        showarrow=False, font=dict(size=11, color=_consort_border[i]),
+        align='center',
+    )
+    # Arrow to next box
+    if i < len(_consort_boxes) - 1:
+        _, ny, _ = _consort_boxes[i + 1]
+        fig_consort.add_annotation(
+            x=bx, y=by - _bh/2 - 0.003, ax=bx, ay=ny + _bh/2 + 0.003,
+            xref='x', yref='y', axref='x', ayref='y',
+            showarrow=True, arrowhead=2, arrowsize=1.5,
+            arrowcolor='#555555', arrowwidth=1.5,
+        )
+
+fig_consort.update_layout(
+    title=dict(text='Figure 4 — CONSORT-Style Dataset Exclusion Flowchart', font=dict(size=14)),
+    width=700, height=900,
+    plot_bgcolor='white', paper_bgcolor='white',
+    margin=dict(t=50, b=30, l=20, r=20),
+)
+fig_consort.write_html(os.path.join(CHARTS_DIR, 'fig16_interactive.html'),
+                       include_plotlyjs='cdn', full_html=False)
+print("  ✓  fig16_interactive.html")
+
 
 # ===========================================================================
 # FIG 19 — YEAR-BY-YEAR NORMALISED DEATH RATE CHART 1921–1992
