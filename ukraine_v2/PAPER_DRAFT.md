@@ -54,7 +54,7 @@ The paper is organised as follows. Section 2 describes the prior study and the p
 
 ### 2.1 Prior Study (V1, n=415)
 
-A prior version of this study (V1, 2025) examined a sample of 415 Ukrainian creative workers drawn from the ESU, classified manually into migrated and non-migrated groups. That study found a gap of approximately 5.4 years (migrants 75.8 yrs vs non-migrants 70.4 yrs), with Mann-Whitney U reaching p<0.001. The V1 sample was not systematically sampled and leaned heavily toward writers from the Executed Renaissance cohort — precisely the group most likely to have been killed young in the non-migrated category and most likely to be well-documented in the diaspora migrated category. This selection likely inflated the gap.
+A prior version of this study (V1, 2025) examined a sample of 415 Ukrainian creative workers drawn from the ESU, classified manually into migrated and non-migrated groups. That study found a gap of approximately 9 years (migrants 72 yrs vs non-migrants 63 yrs). The V1 analysis applied a pre-1991 death cutoff — excluding all workers who died after the dissolution of the Soviet Union — which systematically removed the longest-lived non-migrants and inflated the gap. The V1 sample was also not systematically sampled and leaned heavily toward writers from the Executed Renaissance cohort — precisely the group most likely to have been killed young in the non-migrated category.
 
 ### 2.2 Present Study (V3.0, n=8,590)
 
@@ -76,11 +76,11 @@ V3.0 incorporates a systematic five-stage database quality pipeline:
 | Classification | Manual | AI-assisted (Claude API) + validation |
 | Groups | 2 (migrated / non-migrated) | 4 (+internal transfer + deported) |
 | Validated error rate | Not assessed | 3.2% (n=200 reviewed; complete) |
-| Primary gap | +5.4 yrs | +3.98 yrs |
+| Primary gap | +9.0 yrs (with pre-1991 cutoff) | +3.98 yrs (no cutoff) |
 | Cox PH | Not performed | HR=0.759 [0.713, 0.809] |
 | PSM | Not performed | +3.43 yrs [2.38, 4.51] |
 
-The gap narrowing from V1 (+5.4 yrs) to V3.0 (+3.98 yrs) is expected, not a weakness. V1's small size and non-systematic sampling over-represented the most extreme cases. The present estimate is more conservative and more defensible precisely because it covers the full ESU population with a validated error rate.
+The gap narrowing from V1 (+9.0 yrs) to V3.0 (+3.98 yrs) is expected, not a weakness. V1's pre-1991 death cutoff excluded long-lived non-migrants who survived into Ukrainian independence, artificially depressing the non-migrant mean. V1's small size and non-systematic sampling also over-represented the most extreme cases. The present estimate is more conservative and more defensible precisely because it includes all post-Soviet deaths and covers the full ESU population with a validated error rate.
 
 **Figure 3** shows the V1 vs V3 comparison.
 
@@ -395,7 +395,7 @@ The late-cohort analysis also reveals convergence: workers born after 1940 show 
 
 ### 7.4 Comparison to Prior Research
 
-The reduction in the measured gap from V1 (+5.4 yrs) to V3.0 (+3.98 yrs) deserves careful interpretation. It does not represent a finding that Soviet repression was less lethal than previously estimated. Rather, V1's sample was not systematically drawn and leaned heavily toward writers from the Executed Renaissance cohort — precisely the group most likely to have been killed young in the non-migrated category. The full ESU population includes a large cohort of non-migrants who survived the Soviet period and lived into old age in independent Ukraine. Their inclusion naturally raises the non-migrant mean and narrows the observed gap.
+The reduction in the measured gap from V1 (+9.0 yrs) to V3.0 (+3.98 yrs) deserves careful interpretation. It does not represent a finding that Soviet repression was less lethal than previously estimated. The narrowing is driven by two methodological changes: first, V1's pre-1991 death cutoff systematically excluded the longest-lived non-migrants (those who survived into Ukrainian independence), artificially depressing the non-migrant mean; second, V1's small and non-systematically drawn sample leaned heavily toward writers from the Executed Renaissance cohort. The full ESU population includes a large cohort of non-migrants who survived the Soviet period and lived into old age in independent Ukraine. Their inclusion naturally raises the non-migrant mean and narrows the observed gap.
 
 The V1 finding was real within its analytical scope. V3.0 does not contradict it; it extends the analysis to a more complete and representative population. The methodological lesson is clear: future studies of Soviet-era mortality should not restrict to curated or prominent-individual samples, as doing so systematically excludes the longest-lived members of the "stayed" cohort and artificially inflates the measured mortality differential. The V3.0 estimate is more conservative and more defensible precisely because it covers the full ESU population with a validated error rate.
 
