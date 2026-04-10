@@ -387,19 +387,19 @@ print("=" * 70)
 # ── §3.4 / Abstract dataset size ─────────────────────────────────────────────
 print(f"\n{BOLD}── DATASET OVERVIEW ──{RESET}")
 checkn("Total scraped (§3.3, Abstract)",         total_scraped,       16215)
-checkn("Analysable total (§3.4, Abstract)",      len(analysable),     8590)
-checkn("n — Migrated",                           len(migrated),       1324)
-checkn("n — Non-migrated",                       len(non_migrated),   5960)
+checkn("Analysable total (§3.4, Abstract)",      len(analysable),     8585)
+checkn("n — Migrated",                           len(migrated),       1323)
+checkn("n — Non-migrated",                       len(non_migrated),   5957)
 checkn("n — Internal transfer",                  len(internal_transfer), 1111)
-checkn("n — Deported",                           len(deported),       195)
+checkn("n — Deported",                           len(deported),       194)
 
 # ── Table 1 — Life expectancy ─────────────────────────────────────────────────
 print(f"\n{BOLD}── TABLE 1: LIFE EXPECTANCY BY GROUP ──{RESET}")
 for ms, label, paper in [
     ('migrated',          'Migrated',          {'mean':75.42, 'median':77, 'std':13.84, 'ci95_lo':74.68, 'ci95_hi':76.17}),
-    ('non_migrated',      'Non-migrated',      {'mean':71.44, 'median':73, 'std':13.61, 'ci95_lo':71.10, 'ci95_hi':71.79}),
+    ('non_migrated',      'Non-migrated',      {'mean':71.45, 'median':73, 'std':13.59, 'ci95_lo':71.10, 'ci95_hi':71.79}),
     ('internal_transfer', 'Internal transfer', {'mean':71.09, 'median':73, 'std':13.61, 'ci95_lo':70.29, 'ci95_hi':71.89}),
-    ('deported',          'Deported',          {'mean':49.39, 'median':46, 'std':15.38, 'ci95_lo':47.22, 'ci95_hi':51.57}),
+    ('deported',          'Deported',          {'mean':49.43, 'median':46, 'std':15.41, 'ci95_lo':47.26, 'ci95_hi':51.60}),
 ]:
     d = descs[ms]
     check(f"  {label} — mean",    d['mean'],    paper['mean'],    0.015)
@@ -411,15 +411,15 @@ for ms, label, paper in [
 # ── §4.2 Gaps and effect sizes ────────────────────────────────────────────────
 print(f"\n{BOLD}── §4.2: GAPS, EFFECT SIZES, P-VALUES ──{RESET}")
 check("Gap mig vs nm (Abstract, §4.1, §4.2, §6)", gap_mn, 3.98, 0.015)
-check("Cohen's d mig vs nm (Abstract, §4.2)",       round(d_mn, 3), 0.292, 0.002)
+check("Cohen's d mig vs nm (Abstract, §4.2)",       round(d_mn, 3), 0.291, 0.002)
 check("Cliff's delta mig vs nm (Abstract, §3.8)",   cd_mn, 0.18, 0.01)
-check("Gap mig vs dep (Abstract, §4.1, §4.2)",     gap_md, 26.03, 0.015)
-check("Cohen's d mig vs dep (§4.2)",                round(d_md, 3), 1.853, 0.002)
-check("Gap nm vs dep (Abstract, §4.1, §4.2, §5.1)",gap_nmd, 22.05, 0.015)
+check("Gap mig vs dep (Abstract, §4.1, §4.2)",     gap_md, 26.00, 0.015)
+check("Cohen's d mig vs dep (§4.2)",                round(d_md, 3), 1.850, 0.002)
+check("Gap nm vs dep (Abstract, §4.1, §4.2, §5.1)",gap_nmd, 22.02, 0.015)
 check("Cohen's d nm vs dep (§4.2)",                 round(d_nmd, 3), 1.613, 0.002)
 check("Gap nm vs IT (§4.1, §4.2, Abstract)",        gap_nmit, 0.35, 0.015)
 check("Cohen's d nm vs IT (§4.2)",                  round(d_nmit, 3), 0.026, 0.002)
-check("p-value nm vs IT (§4.1, §4.2)",              round(p_nmit, 3), 0.271, 0.002)
+check("p-value nm vs IT (§4.1, §4.2)",              round(p_nmit, 3), 0.267, 0.002)
 
 # ── §4.2 Sensitivity ─────────────────────────────────────────────────────────
 print(f"\n{BOLD}── §4.2: SENSITIVITY ANALYSIS ──{RESET}")
@@ -429,9 +429,9 @@ check("Sensitivity gap at 10% (§4.2)",   sens_at_10,  1.84, 0.015)
 # ── Table 2 — Profession ─────────────────────────────────────────────────────
 print(f"\n{BOLD}── TABLE 2: PROFESSION BREAKDOWN ──{RESET}")
 PAPER_PROF = {
-    'Writers/Poets':      {'mig_le':74.5,'mig_n':389, 'nm_le':70.5,'nm_n':1754,'dep_le':46.0,'dep_n':123},
-    'Visual Artists':     {'mig_le':74.8,'mig_n':385, 'nm_le':71.6,'nm_n':1954,'dep_le':56.9,'dep_n':39},
-    'Musicians/Composers':{'mig_le':75.8,'mig_n':308, 'nm_le':71.4,'nm_n':916, 'dep_le':44.9,'dep_n':14},
+    'Writers/Poets':      {'mig_le':74.5,'mig_n':389, 'nm_le':70.5,'nm_n':1753,'dep_le':46.0,'dep_n':123},
+    'Visual Artists':     {'mig_le':74.8,'mig_n':384, 'nm_le':71.6,'nm_n':1954,'dep_le':56.9,'dep_n':39},
+    'Musicians/Composers':{'mig_le':75.8,'mig_n':308, 'nm_le':71.5,'nm_n':914, 'dep_le':45.1,'dep_n':13},
     'Theatre/Film':       {'mig_le':75.5,'mig_n':64,  'nm_le':71.8,'nm_n':731, 'dep_le':55.2,'dep_n':9},
     'Architects':         {'mig_le':79.0,'mig_n':61,  'nm_le':73.2,'nm_n':384, 'dep_le':61.0,'dep_n':4},
     'Other Creative':     {'mig_le':77.7,'mig_n':117, 'nm_le':73.3,'nm_n':221, 'dep_le':63.5,'dep_n':6},
@@ -457,7 +457,7 @@ PAPER_PERIODS = {
     '1946–1953': {'deaths': 124,  'avg_age': 62.6, 'pct': 2.1},
     '1954–1964': {'deaths': 236,  'avg_age': 66.6, 'pct': 4.0},
     '1965–1991': {'deaths': 1432, 'avg_age': 69.2, 'pct': 24.0},
-    'Post-1991': {'deaths': 3716, 'avg_age': 74.7, 'pct': 62.3},
+    'Post-1991': {'deaths': 3713, 'avg_age': 74.7, 'pct': 62.3},
 }
 for p_label, paper in PAPER_PERIODS.items():
     d = periods_nm.get(p_label)
@@ -471,23 +471,22 @@ for p_label, paper in PAPER_PERIODS.items():
 print(f"\n{BOLD}── TABLE 4: 1937 DEATHS ──{RESET}")
 checkn("1937 — Non-migrated deaths",  nm1937_n,  25)
 check( "1937 — Non-migrated avg age", nm1937_avg, 49.4, 0.1)
-checkn("1937 — Deported deaths",      dep1937_n, 67)
-check( "1937 — Deported avg age",     dep1937_avg, 42.7, 0.1)
+checkn("1937 — Deported deaths",      dep1937_n, 66)
+check( "1937 — Deported avg age",     dep1937_avg, 42.7, 0.2)
 checkn("1937 — Internal transfer deaths", it1937_n, 1)
-# it avg age = 25.0 (only 1 person, exact)
 check( "1937 — IT avg age",           it1937_avg, 25.0, 0.5)
 checkn("1937 — Migrated deaths",      mig1937_n, 11)
 check( "1937 — Migrated avg age",     mig1937_avg, 64.3, 0.15)
-checkn("1937 — Total deaths",         total1937, 104)
+checkn("1937 — Total deaths",         total1937, 103)
 
 # ── Table 5 — Birth cohort ───────────────────────────────────────────────────
 print(f"\n{BOLD}── TABLE 5: BIRTH COHORT ANALYSIS ──{RESET}")
 PAPER_COHORTS = {
     1880: {'mig_le':74.3,'mig_n':176,'nm_le':69.3,'nm_n':260,'dep_le':57.3,'dep_n':32,'gap':5.0},
-    1890: {'mig_le':75.4,'mig_n':232,'nm_le':70.8,'nm_n':325,'dep_le':44.7,'dep_n':62,'gap':4.6},
+    1890: {'mig_le':75.4,'mig_n':231,'nm_le':70.8,'nm_n':325,'dep_le':44.7,'dep_n':61,'gap':4.6},
     1900: {'mig_le':75.2,'mig_n':218,'nm_le':72.4,'nm_n':650,'dep_le':44.2,'dep_n':59,'gap':2.8},
-    1910: {'mig_le':77.6,'mig_n':219,'nm_le':74.9,'nm_n':809,'dep_le':46.9,'dep_n':14,'gap':2.7},
-    1920: {'mig_le':78.9,'mig_n':167,'nm_le':75.4,'nm_n':1260,'dep_le':53.2,'dep_n':6,'gap':3.5},
+    1910: {'mig_le':77.6,'mig_n':219,'nm_le':74.9,'nm_n':808,'dep_le':46.9,'dep_n':14,'gap':2.7},
+    1920: {'mig_le':78.9,'mig_n':167,'nm_le':75.4,'nm_n':1259,'dep_le':53.2,'dep_n':6,'gap':3.5},
     1930: {'mig_le':74.9,'mig_n':92, 'nm_le':73.2,'nm_n':1136,'dep_le':78.3,'dep_n':4,'gap':1.7},
 }
 for dec, paper in PAPER_COHORTS.items():
@@ -511,7 +510,7 @@ for dec, paper in PAPER_COHORTS.items():
 print(f"\n{BOLD}── §4.8: DEATH AGE DISTRIBUTION ──{RESET}")
 check("nm % died <50 (§4.8)",          nm_lt50_pct,  6.6, 0.15)
 check("mig % died <50 (§4.8)",         mig_lt50_pct, 5.2, 0.15)
-checkn("nm died <30 (§4.8)",           nm_lt30,  41)
+checkn("nm died <30 (§4.8)",           nm_lt30,  40)
 checkn("mig died <30 (§4.8)",          mig_lt30, 4)
 check("nm % died <30 (§4.8)",          round(nm_lt30_pct, 2),  0.69, 0.02)
 check("mig % died <30 (§4.8)",         round(mig_lt30_pct, 2), 0.30, 0.02)
@@ -543,7 +542,7 @@ for city_key, paper in PAPER_CITIES.items():
 print(f"\n{BOLD}── §5.1 DISCUSSION CROSS-REFS ──{RESET}")
 # "89 non-migrated and deported deaths concentrated in 1937"
 combined_1937 = nm1937_n + dep1937_n
-checkn("1937 nm+dep deaths = 92 (§5.1)", combined_1937, 92)
+checkn("1937 nm+dep deaths = 91 (§5.1)", combined_1937, 91)
 # "average age ~44 for those two groups" — we compute blended avg
 all_1937_staying = [r for r in non_migrated + deported if r['_dy'] == 1937]
 ages_1937_staying = [r['_le'] for r in all_1937_staying if r['_le'] is not None]
@@ -642,7 +641,7 @@ cox_dep_hr = _extract_cox_hr(COX_PATH, '2 — Adjusted', 'mig_deported')
 
 if cox_mig_hr: check("Cox HR migrated (§6.3)", cox_mig_hr, 0.778, 0.002)
 if cox_it_hr:  check("Cox HR internal transfer (§6.3)", cox_it_hr, 1.087, 0.002)
-if cox_dep_hr: check("Cox HR deported (§6.3)", cox_dep_hr, 4.421, 0.002)
+if cox_dep_hr: check("Cox HR deported (§6.3)", cox_dep_hr, 4.403, 0.002)
 
 # Right-censored Cox — paper supplementary
 rc_mig_hr = _extract_censored_hr(COX_CENS_PATH, 2, 'mig_migrated')
@@ -655,7 +654,7 @@ ols_dep = _extract_ols_beta(ANALYSIS_PATH, 'MODEL 2', 'deported')
 
 if ols_mig: check("OLS β migrated Model 2 (§6.1)", ols_mig, 2.71, 0.02)
 if ols_it:  check("OLS β internal transfer Model 2 (§6.1)", ols_it, -1.74, 0.02)
-if ols_dep: check("OLS β deported Model 2 (§6.1)", ols_dep, -23.31, 0.02)
+if ols_dep: check("OLS β deported Model 2 (§6.1)", ols_dep, -23.26, 0.02)
 
 # ---------------------------------------------------------------------------
 # PRINT RESULTS
