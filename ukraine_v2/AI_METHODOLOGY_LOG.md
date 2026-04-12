@@ -1242,22 +1242,24 @@ No AI model calls. All corrections are human-identified.
 
 **Note on Galicia pre-annexation:** Workers from western Ukraine (Galicia) who died before Soviet annexation (1939) did so under Polish/Austrian administration. Soviet demographic conditions did not apply. This is an exposure question, not a nationality question.
 
-### Final Dataset State After Stage 15
+### Final Dataset State (Post-Cleanup, 2026-04-12)
 
 | Metric | Value |
 |---|---|
 | Total scraped | 16,215 |
-| Analysable dead cohort | **8,590** |
-| Migrated | **1,324** |
-| Non-migrated | **5,960** |
+| Analysable dead cohort | **8,585** |
+| Migrated | **1,323** |
+| Non-migrated | **5,957** |
 | Internal transfer | **1,111** |
-| Deported | **195** |
+| Deported | **194** |
 | Primary gap (mig vs nm) | **3.98 years** |
 | Cohen's d | **0.292** |
 | Cliff's δ | **0.18** |
 | Validation: reviewed | **200 / 200** (complete) |
 | Validated error rate | **3.2%** |
-| check_paper_numbers.py | **177 / 177 PASS** |
+| check_paper_numbers.py | **184 / 184 PASS** |
+| Excluded duplicates | **4** (exact same name + birth + death year) |
+| Excluded non-person | **1** ("Два кольори" — film title, not an individual) |
 
 ### Chart Registry (Post-Stage-15 Final)
 

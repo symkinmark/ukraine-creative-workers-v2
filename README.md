@@ -13,19 +13,19 @@
 
 ## What this study finds
 
-Ukrainian creative workers who emigrated from the Soviet sphere lived **3.98 years longer** on average than those who remained (mean age at death: 75.42 vs 71.44 years; Cohen's d=0.292; Cliff's δ=0.18; p<0.001; n=8,590).
+Ukrainian creative workers who emigrated from the Soviet sphere lived **3.98 years longer** on average than those who remained (mean age at death: 75.43 vs 71.45 years; Cohen's d=0.292; Cliff's δ=0.18; p<0.001; n=8,585).
 
-Workers deported by the Soviet state — sent to Gulags, exile, or execution — lived **22.05 years less** than non-migrants (mean 49.39 years; d=1.613; p<0.001). The 1937 peak: 67 deported creative workers died in a single year — 34.4% of the entire deported cohort.
+Workers deported by the Soviet state — sent to Gulags, exile, or execution — lived **22.02 years less** than non-migrants (mean 49.43 years; d=1.613; p<0.001). The 1937 peak: 66 deported creative workers died in a single year — 34.0% of the entire deported cohort.
 
-Internal transfers (workers who voluntarily moved within the USSR) showed **no significant LE difference** from non-migrants (+0.35 years; p=0.271) — confirming the advantage came from leaving the Soviet sphere entirely, not from geographic mobility within it.
+Internal transfers (workers who voluntarily moved within the USSR) showed **no significant difference** from non-migrants (+0.36 years; p=0.267) — confirming the advantage came from leaving the Soviet sphere entirely, not from geographic mobility within it.
 
 ---
 
 ## Dataset
 
 - **Source:** Encyclopedia of Modern Ukraine (esu.com.ua) — 16,215 entries scraped
-- **Analysable:** 8,590 individuals with confirmed Ukrainian nationality, death date, and determinable migration status
-- **Four groups:** Migrated (n=1,324) · Non-migrated (n=5,960) · Internal transfer (n=1,111) · Deported (n=195)
+- **Analysable:** 8,585 individuals with confirmed Ukrainian nationality, death date, and determinable migration status
+- **Four groups:** Migrated (n=1,323) · Non-migrated (n=5,957) · Internal transfer (n=1,111) · Deported (n=194)
 - **Primary dataset:** `ukraine_v2/esu_creative_workers_v2_6.csv`
 - **AI classification error rate:** 3.2% (200-entry stratified validation, complete)
 
