@@ -46,12 +46,7 @@ A prior version of this study (V1, 2025) examined a sample of 415 Ukrainian crea
 
 The present study uses a complete scrape of the ESU — all 16,215 entries in the database as of early 2026 — combined with AI-assisted classification via the Claude API (Anthropic). Classification was performed using a structured two-step protocol that checks for forced displacement signals first (to correctly identify deportees and internal transfers), then assigns migration status. The full ESU scrape covers writers, visual artists, musicians, theatre figures, architects, photographers, and other creative professionals across the full Soviet period. It is not a curated sample.
 
-V3.0 incorporates a systematic five-stage database quality pipeline:
-
-- **Stage 12** (B1–B5): 8 hardcoded validation patches; 97 birth-year-as-death-year scraping corrections; 57 API-credit-error classification retries; non-Ukrainian audit; residual unknown resolution.
-- **Stage 13**: Application of corrections from the first 82-entry manual validation review.
-- **Stage 14**: Re-classification of 135 entries that had failed during Stage 12 due to API authentication errors, using claude-haiku-4-5 with live bio fetches.
-- **Stage 15**: Application of 6 corrections identified during the Stage 14 manual review (3 Galicia pre-annexation reclassifications, 1 bad-dates exclusion, 1 pre-Soviet exclusion, 1 non-Ukrainian exclusion).
+V3.0 incorporates a systematic database quality pipeline documented in full in `SCIENTIFIC_METHODOLOGY.md` and `AI_METHODOLOGY_LOG.md`.
 
 ### 2.3 Key Differences Between V1 and V3.0
 
