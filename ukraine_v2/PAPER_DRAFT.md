@@ -54,7 +54,7 @@ V3.0 incorporates a systematic database quality pipeline documented in full in `
 |---|---|---|
 | Sample size (analysable) | 415 | 8,585 |
 | Sampling | Manual, unsystematic | Complete ESU scrape |
-| Classification | Manual | AI-assisted (Claude API) + validation |
+| Classification | ChatGPT-assisted, manually verified | AI-assisted (Claude API) + validation |
 | Groups | 2 (migrated / non-migrated) | 4 (+internal transfer + deported) |
 | Validated error rate | Not assessed | 3.2% (n=200 reviewed; complete) |
 | Primary gap | +9.0 yrs (with pre-1991 cutoff) | +3.98 yrs (no cutoff) |
