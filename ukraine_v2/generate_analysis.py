@@ -1491,7 +1491,7 @@ for x0, x1, col, lbl in EVENT_BANDS19:
 ax19b.set_xlim(SPIKE_START - 0.5, SPIKE_END + 0.5)
 ax19b.set_ylim(0, ymax19b)
 apply_style(ax19b,
-    'Figure A16 — Annual Death Rate: Simplified 3-Line View\n'
+    'Figure 16 — Annual Death Rate: Simplified 3-Line View\n'
     '(% of each group dying per year — non-migrated + deported combined)',
     xlabel='Year', ylabel='Deaths per year (% of group total)')
 ax19b.legend(fontsize=9, loc='upper right')
@@ -3034,7 +3034,7 @@ if _PLOTLY_AVAIL:
     )
     fig_p19b.update_layout(
         title=dict(
-            text='Figure A16 — Annual Death Rate by Group 1921–1992<br>'
+            text='Figure 16 — Annual Death Rate by Group 1921–1992<br>'
                  '<sup>Deaths per year as % of each group — three-line simplified view</sup>',
             font=dict(size=15),
         ),
