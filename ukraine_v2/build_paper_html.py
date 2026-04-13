@@ -209,20 +209,11 @@ def md_to_html(md_text):
         para = ' '.join(para_lines)
         html_parts.append(f'<p>{md_inline(para)}</p>')
 
-        # Check if this paragraph is a figure caption → inject chart (once per figure)
-        # Interactive Plotly preferred; static PNG fallback for CONSORT flowchart only.
-        fig_m = re.search(r'\*\*Figure\s+(A?\d+[ab]?)', para)
-        if fig_m:
+        # Check if this paragraph references any figures → inject chart(s) (once per figure)
+        for fig_m in re.finditer(r'\*\*Figure\s+(A?\d+[ab]?)', para):
             fig_num = fig_m.group(1)
             if fig_num in _embedded_figs:
-                pass  # Already embedded — skip duplicate
-            elif fig_num in INTERACTIVE:
-                html_parts.append(
-                    f'<figure class="interactive-fig">'
-                    f'{INTERACTIVE[fig_num]}'
-                    f'</figure>'
-                )
-                _embedded_figs.add(fig_num)
+                continue  # Already embedded — skip duplicate
             elif fig_num in IMAGES:
                 html_parts.append(
                     f'<figure>'
